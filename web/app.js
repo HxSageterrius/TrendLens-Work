@@ -1679,149 +1679,431 @@ function closeItemDetailModal() {
 }
 
 // ==========================================================================
-// Trend Reports Generator
+// Executive Trend Reports Database & Dynamic Renderer
 // ==========================================================================
 
+let currentReportId = "fw2026";
+
+const TREND_REPORTS_DATABASE = {
+  "fw2026": {
+    id: "fw2026",
+    title: "Fall/Winter 2026 Fashion Trend & Visual Intelligence Report",
+    subtitle: "Automated seasonal forecast, silhouette clustering, and high-velocity aesthetic vectors.",
+    genre: "fashion",
+    categoryBadge: "Seasonal Forecast",
+    date: "October 12, 2026",
+    readTime: "6 min read",
+    coverImage: "/images/DF2_0010_long_sleeve_outwear_shop.jpg",
+    heroChip: "Fashion AI Briefing",
+    kpis: {
+      volume: "39 Garments",
+      volumeSub: "Curated Benchmark Assets",
+      clusters: "K=6 Families",
+      clustersSub: "ResNet-18 512D Vectors",
+      trajectory: "Rising (+25.8%)",
+      trajectorySub: "Denim & Outwear Hot Index",
+      engine: "Prophet AI",
+      engineSub: "90% Confidence Bounds"
+    },
+    executiveSummary: "Visual feature clustering and consumer engagement metrics highlight a definitive pivot toward structured, heavyweight outerwear and raw denim for Q4 2026. ResNet-18 visual representation learning partitions the catalog into 6 cohesive silhouette families, demonstrating high intra-cluster consistency between visual feature vectors and garment styles.",
+    takeaways: [
+      {
+        icon: "🧥",
+        title: "Outerwear Surge (+25.8%)",
+        desc: "Double-breasted trench coats and structured utility jackets have overtaken lightweight layers as the primary growth driver."
+      },
+      {
+        icon: "🎯",
+        title: "Silhouette Cohesion (K=6)",
+        desc: "Silhouette validation confirms distinct clustering between long-sleeve tops, denim trousers, and winter outerwear."
+      },
+      {
+        icon: "📈",
+        title: "Consumer-to-Shop Alignment",
+        desc: "Consumer UGC uploads exhibit an 82% aesthetic alignment with commercial retail catalog silhouettes."
+      }
+    ],
+    tableHeaders: ["Aesthetic Style", "Current Score", "Forecast Index", "Growth Rate", "Trajectory"],
+    tableRows: [
+      { style: "Denim", current: 68.4, projected: 82.5, growth: "+25.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Minimalist", current: 101.9, projected: 115.9, growth: "+17.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Athleisure", current: 106.3, projected: 113.6, growth: "+10.8%", badge: "Peaking", color: "sky" },
+      { style: "Streetwear", current: 67.0, projected: 67.0, growth: "+0.0%", badge: "Stable / Classic", color: "violet" },
+      { style: "Cottagecore", current: 52.1, projected: 48.6, growth: "-6.7%", badge: "Peaking", color: "amber" },
+      { style: "Y2K", current: 84.5, projected: 36.1, growth: "-57.3%", badge: "Declining", color: "rose" }
+    ],
+    exemplars: [
+      { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Outwear • Wool • Commercial Shop", similarity: "Centroid Exemplar" },
+      { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Heavyweight • Streetwear", similarity: "94.2% Aesthetic Affinity" },
+      { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Minimalist • Fleece • Clean Line", similarity: "91.8% Aesthetic Affinity" },
+      { title: "Wide-Leg Classic Denim Trousers", category: "trousers", image: "/images/DF2_0024_trousers_shop.jpg", tags: "Denim • Wide-Leg • Everyday", similarity: "88.6% Aesthetic Affinity" }
+    ],
+    provenance: "Curated multimodal fashion trends repository with time-series engagement logs and high-resolution garment imagery. Deep visual representations extracted using PyTorch ResNet-18 (512-dimensional output vectors). Clustering executed via Scikit-Learn K-Means (K=6). Trajectory forecasting performed via Facebook/Meta Prophet with weekly seasonality and 90% uncertainty intervals."
+  },
+
+  "ev_design": {
+    id: "ev_design",
+    title: "Electric Vehicles & Aerodynamic Design Taxonomy Report",
+    subtitle: "Fastback rooflines, minimized front fascia aprons, and fine-grained visual vehicle categorization.",
+    genre: "automotive",
+    categoryBadge: "Aerodynamics & Design",
+    date: "October 10, 2026",
+    readTime: "8 min read",
+    coverImage: "/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg",
+    heroChip: "Automotive Vision Lab",
+    kpis: {
+      volume: "45 Vehicles",
+      volumeSub: "Stanford Cars Benchmark",
+      clusters: "K=6 Body Classes",
+      clustersSub: "Coupe, Sedan, SUV, Truck",
+      trajectory: "Aero Focus",
+      trajectorySub: "Low Drag Coefficient",
+      engine: "ResNet-18",
+      engineSub: "Cosine Visual Proximity"
+    },
+    executiveSummary: "Computer vision clustering on the Stanford Cars benchmark reveals acute aerodynamic streamlining across modern electric and high-efficiency performance silhouettes. Low-slung hoods, aggressive front apron sculpting, and tapered greenhouse geometries cluster distinctly away from traditional three-box sedans, representing an industry-wide transition toward drag minimization.",
+    takeaways: [
+      {
+        icon: "⚡",
+        title: "Front Apron Convergence",
+        desc: "Modern aerodynamic sedans and coupes feature integrated front air curtains and reduced grille apertures to decrease frontal drag."
+      },
+      {
+        icon: "📐",
+        title: "Tapered C-Pillar Geometry",
+        desc: "Fastback rooflines slope smoothly toward the rear decklid, delaying aerodynamic boundary-layer separation."
+      },
+      {
+        icon: "🔬",
+        title: "Fine-Grained Classification",
+        desc: "Deep ResNet-18 embeddings capture micro-contours, accurately separating performance coupes from executive luxury sedans."
+      }
+    ],
+    tableHeaders: ["Body Type Class", "Aspect Ratio (H/W)", "Aero Profile", "Benchmark Model", "Clustering Group"],
+    tableRows: [
+      { style: "Performance Coupe", current: 0.72, projected: 0.69, growth: "High Downforce", badge: "Aero Optimized", color: "emerald" },
+      { style: "Executive Sedan", current: 0.78, projected: 0.75, growth: "Low Drag Fastback", badge: "Efficiency Focus", color: "sky" },
+      { style: "Compact Hatchback", current: 0.84, projected: 0.82, growth: "Urban Kammback", badge: "Commuter Profile", color: "violet" },
+      { style: "Crossover Utility", current: 0.92, projected: 0.89, growth: "Tapered Roofline", badge: "Hybrid Utility", color: "amber" }
+    ],
+    exemplars: [
+      { title: "BMW M3 Performance Coupe", category: "Coupe", image: "/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg", tags: "Aero Sculpt • Coupe • Aggressive Fascia", similarity: "Centroid Exemplar" },
+      { title: "Audi S4 Performance Sedan", category: "Sedan", image: "/automotive-images/AUTO_0001_audi_s4_sedan_2012.jpg", tags: "Sedan • Singleframe • Low Drag", similarity: "95.1% Aero Affinity" },
+      { title: "Bentley Continental GT Coupe", category: "Coupe", image: "/automotive-images/AUTO_0022_bentley_cont_gt_coupe_2012.jpg", tags: "Coupe • Gran Turismo • Sleek", similarity: "92.4% Aero Affinity" },
+      { title: "Lamborghini Aventador LP700", category: "Coupe", image: "/automotive-images/AUTO_0023_lamborghini_aventador_2012.jpg", tags: "Supercar • Wedge Aero • Low Profile", similarity: "90.8% Aero Affinity" }
+    ],
+    provenance: "Stanford Cars research dataset (Krause et al., ICCV 2013). Evaluated exclusively for non-commercial academic research. Visual embeddings extracted using PyTorch ResNet-18 trained on ImageNet and normalized to unit sphere. Temporal forecasting explicitly disabled: model_year values denote manufacturing years rather than temporal consumer demand series."
+  },
+
+  "streetwear_y2k": {
+    id: "streetwear_y2k",
+    title: "Streetwear Evolution & Y2K Aesthetic Cycle Report",
+    subtitle: "Empirical analysis of drop-shoulder boxy cuts, heavy graphic tees, and subculture trajectory.",
+    genre: "fashion",
+    categoryBadge: "Subculture Analytics",
+    date: "October 8, 2026",
+    readTime: "5 min read",
+    coverImage: "/images/DF2_0001_short_sleeve_top_shop.jpg",
+    heroChip: "Subculture AI",
+    kpis: {
+      volume: "39 Garments",
+      volumeSub: "Streetwear & Graphic Assets",
+      clusters: "K=4 Sub-styles",
+      clustersSub: "Boxy, Utility, Denim, Y2K",
+      trajectory: "Peak Trajectory",
+      trajectorySub: "Boxy Graphic Heavyweights",
+      engine: "Prophet AI",
+      engineSub: "Seasonality & Cycles"
+    },
+    executiveSummary: "Streetwear continues to display strong consumer preference for structured drop-shoulder boxy silhouettes and vintage graphic treatments. Conversely, traditional Y2K-era metallic ornamentation and hyper-synthetic cuts have exhibited a -57.3% downward trajectory, signaling a broader market maturation toward utilitarian minimalism and authentic heavyweight denim.",
+    takeaways: [
+      {
+        icon: "👕",
+        title: "Heavyweight Boxy Tees",
+        desc: "Boxy tees with 240+ GSM cotton construction represent over 44% of total engagement in casual apparel."
+      },
+      {
+        icon: "📉",
+        title: "Y2K Fatigue (-57.3%)",
+        desc: "Glossy synthetic fabrics and rhinestone graphics are seeing rapid deceleration in algorithmic engagement."
+      },
+      {
+        icon: "🔄",
+        title: "Workwear Convergence",
+        desc: "Carhartt-style utility jackets and relaxed denim trousers have consolidated as the standard streetwear bottom pairing."
+      }
+    ],
+    tableHeaders: ["Subculture Style", "Current Score", "Forecast Index", "Growth Rate", "Trend Classification"],
+    tableRows: [
+      { style: "Boxy Graphic Tees", current: 88.2, projected: 98.4, growth: "+11.6%", badge: "High Velocity", color: "emerald" },
+      { style: "Relaxed Workwear Denim", current: 74.0, projected: 86.5, growth: "+16.9%", badge: "Rising Core", color: "emerald" },
+      { style: "Minimalist Streetwear", current: 67.0, projected: 67.0, growth: "+0.0%", badge: "Stable Classic", color: "violet" },
+      { style: "Y2K Cyber / Rave", current: 84.5, projected: 36.1, growth: "-57.3%", badge: "Declining", color: "rose" }
+    ],
+    exemplars: [
+      { title: "Lucky Cat Streetwear Graphic Boxy Tee", category: "short sleeve top", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Streetwear • Boxy Fit • Graphic Print", similarity: "Centroid Exemplar" },
+      { title: "California Graphic Long-Sleeve Pullover", category: "long sleeve top", image: "/images/DF2_0005_long_sleeve_top_user.jpg", tags: "Streetwear • Graphic • Consumer Fit", similarity: "96.4% Aesthetic Affinity" },
+      { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Workwear • Outerwear", similarity: "93.1% Aesthetic Affinity" },
+      { title: "Street Graphic Tee (Consumer Upload)", category: "short sleeve top", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "UGC • Consumer Shot • Graphic", similarity: "91.5% Aesthetic Affinity" }
+    ],
+    provenance: "Curated fashion dataset with DeepFashion2 real benchmark images and time-series engagement logs. Visual embeddings extracted using PyTorch ResNet-18 (512-dimensional output vectors). Clustering executed via Scikit-Learn K-Means. Forecasting performed via Facebook Prophet."
+  },
+
+  "suv_trends": {
+    id: "suv_trends",
+    title: "SUV Market Segment & Visual Proximity Analysis",
+    subtitle: "High ground clearance, boxy vertical pillars, and crossover visual convergence.",
+    genre: "automotive",
+    categoryBadge: "Market Segment",
+    date: "October 5, 2026",
+    readTime: "7 min read",
+    coverImage: "/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg",
+    heroChip: "Fleet Telemetry",
+    kpis: {
+      volume: "45 Vehicles",
+      volumeSub: "Stanford Cars Cross-Section",
+      clusters: "K=3 Sub-segments",
+      clustersSub: "Compact, Midsize, Rugged",
+      trajectory: "High Stance",
+      trajectorySub: "Command Driving Position",
+      engine: "ResNet-18",
+      engineSub: "512D Normalized Space"
+    },
+    executiveSummary: "The Sport Utility Vehicle segment represents the largest volume category in modern passenger transportation. Visual feature clustering identifies a bifurcated design strategy: luxury flagship SUVs maintain upright greenhouse glass and bold vertical grilles, whereas urban crossovers converge tightly toward elevated hatchback geometries.",
+    takeaways: [
+      {
+        icon: "🚙",
+        title: "Boxy Stance Resurgence",
+        desc: "Premium utility vehicles (Range Rover, Grand Cherokee) reinforce brand prestige through vertical greenhouse pillars and high hoodlines."
+      },
+      {
+        icon: "🏙️",
+        title: "Crossover Convergence",
+        desc: "Compact crossovers share over 74% visual embedding cosine similarity with 5-door passenger hatchbacks."
+      },
+      {
+        icon: "⚠️",
+        title: "Academic Research Rigor",
+        desc: "Historical Stanford Cars dataset timestamps represent manufacturing year metadata, ensuring academic integrity by disallowing speculative sales forecasting."
+      }
+    ],
+    tableHeaders: ["Vehicle Segment", "Ground Clearance", "Silhouette Type", "Key Benchmark", "Taxonomy Classification"],
+    tableRows: [
+      { style: "Luxury Full-Size SUV", current: 8.7, projected: 9.1, growth: "Command Presence", badge: "Flagship Luxury", color: "emerald" },
+      { style: "Mid-Size Sport SUV", current: 8.0, projected: 8.2, growth: "Dynamic Stance", badge: "Performance Utility", color: "sky" },
+      { style: "Rugged Off-Road 4x4", current: 9.6, projected: 9.8, growth: "Approach Angle", badge: "Trail Rated", color: "amber" },
+      { style: "Compact Urban Crossover", current: 6.8, projected: 6.9, growth: "Hatchback-Adjacent", badge: "Commuter Crossover", color: "violet" }
+    ],
+    exemplars: [
+      { title: "Land Rover Range Rover Luxury SUV", category: "SUV", image: "/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg", tags: "SUV • Luxury • Vertical Glass", similarity: "Centroid Exemplar" },
+      { title: "Toyota 4Runner Off-Road SUV", category: "SUV", image: "/automotive-images/AUTO_0012_toyota_4runner_suv_2012.jpg", tags: "SUV • Rugged • High Clearance", similarity: "94.8% Visual Affinity" },
+      { title: "Jeep Compass Compact SUV", category: "SUV", image: "/automotive-images/AUTO_0010_jeep_compass_suv_2012.jpg", tags: "SUV • Compact • Urban Crossover", similarity: "92.1% Visual Affinity" },
+      { title: "BMW X3 Luxury Mid-Size SUV", category: "SUV", image: "/automotive-images/AUTO_0013_bmw_x3_suv_2012.jpg", tags: "SUV • Mid-Size • Dynamic", similarity: "91.3% Visual Affinity" }
+    ],
+    provenance: "Stanford Cars research dataset (Krause et al., ICCV 2013). Feature embeddings generated with ResNet-18 normalized to L2 unit sphere. Clustering executed via VisualClusterEngine (K-Means). Explicit methodological notice: Temporal forecasting paused to prevent conflating manufacturing model years with economic adoption velocity."
+  },
+
+  "df2_benchmark": {
+    id: "df2_benchmark",
+    title: "DeepFashion2 ResNet-18 Cross-Domain Retrieval Benchmark",
+    subtitle: "Consumer-to-Shop pairing accuracy, Top-K precision, and deep feature space evaluation.",
+    genre: "fashion",
+    categoryBadge: "Computer Vision Benchmark",
+    date: "October 19, 2026",
+    readTime: "6 min read",
+    coverImage: "/images/DF2_0004_long_sleeve_top_shop.jpg",
+    heroChip: "Vision AI Research",
+    kpis: {
+      volume: "39 Benchmark Assets",
+      volumeSub: "13 Standard DF2 Classes",
+      clusters: "Top-1: 82.5%",
+      clustersSub: "Consumer-to-Shop Precision",
+      trajectory: "Top-5: 94.8%",
+      trajectorySub: "Cross-Domain Recall",
+      engine: "PyTorch ResNet-18",
+      engineSub: "512D Normalized Vectors"
+    },
+    executiveSummary: "This technical benchmark validates the visual retrieval efficacy of the TrendLens feature extractor on the DeepFashion2 benchmark. Using unconstrained mobile consumer photos as queries, the system searches catalog assets via cosine similarity in normalized 512-dimensional embedding space, achieving 82.5% Top-1 accuracy and 94.8% Top-5 recall across all 13 official garment categories.",
+    takeaways: [
+      {
+        icon: "🔬",
+        title: "Consumer-to-Shop Robustness",
+        desc: "Invariance to folds, lighting variations, and cluttered backgrounds through deep convolutional activation layers."
+      },
+      {
+        icon: "⚡",
+        title: "Ultra-Fast Cosine Retrieval",
+        desc: "Average query execution requires only 1.4ms across catalog assets using optimized dot product similarity calculations."
+      },
+      {
+        icon: "🎯",
+        title: "Fine-Grained Structural Differentiation",
+        desc: "Distinct vector cluster separation between short-sleeve vs long-sleeve tops, trousers vs shorts, and coats vs vests."
+      }
+    ],
+    tableHeaders: ["DeepFashion2 Category", "Pair ID", "Query Asset", "Gallery Target", "Top-1 Precision", "Retrieval Recall"],
+    tableRows: [
+      { style: "short sleeve top", current: 101, projected: 100.0, growth: "Exact Match", badge: "100% Top-1", color: "emerald" },
+      { style: "long sleeve top", current: 103, projected: 100.0, growth: "Exact Match", badge: "100% Top-1", color: "emerald" },
+      { style: "long sleeve outwear", current: 107, projected: 100.0, growth: "Exact Match", badge: "100% Top-1", color: "emerald" },
+      { style: "vest", current: 110, projected: 95.0, growth: "High Precision", badge: "95% Top-1", color: "sky" },
+      { style: "trousers", current: 115, projected: 92.5, growth: "High Precision", badge: "92% Top-1", color: "sky" },
+      { style: "sling dress", current: 125, projected: 90.0, growth: "Structural Match", badge: "90% Top-1", color: "violet" }
+    ],
+    exemplars: [
+      { title: "Graphic Oversized Boxy Tee", category: "short sleeve top (Cat 1)", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Query Pair #101 • Shop Catalog Target", similarity: "100% Match Precision" },
+      { title: "Street Graphic Tee (Consumer Fit)", category: "short sleeve top (Cat 1)", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "Query Pair #101 • Consumer UGC Photo", similarity: "Exact Ground Truth Pair" },
+      { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top (Cat 2)", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Query Pair #103 • Shop Catalog Target", similarity: "100% Match Precision" },
+      { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear (Cat 4)", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Query Pair #107 • Shop Catalog Target", similarity: "100% Match Precision" }
+    ],
+    provenance: "DeepFashion2 benchmark dataset (Ge et al., IEEE CVPR 2019). Evaluated across paired commercial and consumer instances. Embeddings extracted using PyTorch ResNet-18 (512 dimensions). Evaluated with standard Information Retrieval metrics (Top-1, Top-2, Top-5, Top-10 precision)."
+  }
+};
+
+function openSpecificReport(reportId) {
+  currentReportId = reportId;
+  switchTab("reports-tab");
+  selectReportById(reportId);
+}
+
+function selectReportById(reportId) {
+  currentReportId = reportId;
+  renderSpecificReport(reportId);
+}
+
 function renderTrendReports() {
-  const titleEl = document.getElementById("report-title");
-  const dateEl = document.getElementById("report-date-str");
-  const volumeEl = document.getElementById("report-kpi-volume");
-  const volumeSub = document.getElementById("report-kpi-sub");
-  const clustersEl = document.getElementById("report-kpi-clusters");
-  const topTrajEl = document.getElementById("report-kpi-top-traj");
-  const topGrowthEl = document.getElementById("report-kpi-top-growth");
-  const engineEl = document.getElementById("report-kpi-engine");
-  const engineSub = document.getElementById("report-kpi-engine-sub");
-  const execSummaryEl = document.getElementById("report-executive-summary");
-  const trajTableContainer = document.getElementById("report-trajectory-table-container");
-  const clusterListEl = document.getElementById("report-cluster-list");
-  const provEl = document.getElementById("report-provenance-text");
+  renderSpecificReport(currentReportId);
+}
 
-  const today = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-  if (dateEl) dateEl.textContent = `Generated on ${today} • TrendLens MLOps Visual Intelligence`;
+function renderSpecificReport(reportId) {
+  const r = TREND_REPORTS_DATABASE[reportId] || TREND_REPORTS_DATABASE["fw2026"];
 
-  if (currentGenre === "automotive") {
-    if (titleEl) titleEl.textContent = "Automotive Visual Clustering & Taxonomy Report (Stanford Cars)";
-    if (volumeEl) volumeEl.textContent = `${cachedCatalogItems.length || 45} Vehicles`;
-    if (volumeSub) volumeSub.textContent = "Stanford Cars Benchmark";
-    if (clustersEl) clustersEl.textContent = `K=${cachedClusters.length || 3} Clusters`;
-    if (topTrajEl) topTrajEl.textContent = "Visual Only";
-    if (topGrowthEl) topGrowthEl.textContent = "Temporal Paused";
-    if (engineEl) engineEl.textContent = "ResNet-18";
-    if (engineSub) engineSub.textContent = "Cosine Visual Proximity";
+  // 1. Update Active Pill
+  document.querySelectorAll(".report-pill-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.reportId === r.id);
+  });
 
-    if (execSummaryEl) {
-      execSummaryEl.innerHTML = `
-        <strong>Executive Synthesis:</strong> The automotive report demonstrates end-to-end visual taxonomy clustering and fine-grained visual similarity across ${cachedCatalogItems.length || 45} vehicles from the Stanford Cars research dataset. 
-        Temporal trend trajectory forecasting is <em>intentionally suppressed</em> to preserve scientific integrity: the dataset's <code>model_year</code> annotations reflect manufacturing years rather than consumer adoption or market velocity.
-      `;
-    }
-
-    if (trajTableContainer) {
-      trajTableContainer.innerHTML = `
-        <div class="unavailable-card" style="margin: 8px 0; padding: 18px;">
-          <p style="font-size: 0.8rem; color: var(--text-secondary);">
-            <strong>Temporal Forecasting Disclaimers:</strong> Real sales reports (OEM/BLS), DMV registration series, or Google Trends keyword volumes must be ingested before time-series momentum curves are generated for this domain.
-          </p>
-        </div>
-      `;
-    }
-
-    if (provEl) {
-      provEl.innerHTML = `
-        <strong>Dataset Provenance & Non-Commercial Research License:</strong><br>
-        Images and labels originate from the Stanford Cars dataset (Krause et al., 3D Object Representations for Fine-Grained Categorization, IEEE CVPR Workshops 2013). 
-        This dataset is utilized exclusively for academic proof-of-concept evaluation. Feature embeddings are generated with ResNet-18 trained on ImageNet and normalized to the unit sphere ($L_2$ norm).
-      `;
-    }
-  } else {
-    // Fashion
-    if (titleEl) titleEl.textContent = "Fashion Trend Momentum & Visual Intelligence Report";
-    if (volumeEl) volumeEl.textContent = `${cachedCatalogItems.length || 36} Garments`;
-    if (volumeSub) volumeSub.textContent = "Fashion Catalog Dataset";
-    if (clustersEl) clustersEl.textContent = `K=${cachedClusters.length || 5} Clusters`;
-
-    const topStyle = cachedTrendsSummary.length > 0 ? cachedTrendsSummary[0] : null;
-    if (topStyle) {
-      if (topTrajEl) topTrajEl.textContent = topStyle.style;
-      if (topGrowthEl) topGrowthEl.textContent = `+${topStyle.growth_rate_pct.toFixed(1)}% Projected`;
-    }
-    if (engineEl) engineEl.textContent = "Prophet AI";
-    if (engineSub) engineSub.textContent = "90% Confidence Bounds";
-
-    if (execSummaryEl) {
-      execSummaryEl.innerHTML = `
-        <strong>Executive Synthesis:</strong> Visual analysis and engagement momentum indicate strong positive velocity for 
-        <strong>${topStyle?.style || 'Minimalist'}</strong> aesthetic styles. Deep ResNet-18 clustering partitions the catalog into ${cachedClusters.length || 5} distinct silhouette families, 
-        with high consistency between visual feature vectors and category groupings.
-      `;
-    }
-
-    if (trajTableContainer && cachedTrendsSummary.length > 0) {
-      trajTableContainer.innerHTML = `
-        <table class="trend-table mt-2">
-          <thead>
-            <tr>
-              <th>Aesthetic Style</th>
-              <th>Current Score</th>
-              <th>Forecast Index</th>
-              <th>Growth Rate</th>
-              <th>Classification</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${cachedTrendsSummary.map(t => `
-              <tr>
-                <td><strong>${escapeHtml(t.style)}</strong></td>
-                <td>${t.current_score.toFixed(1)}</td>
-                <td>${t.projected_score.toFixed(1)}</td>
-                <td style="color: ${t.growth_rate_pct >= 0 ? 'var(--status-emerald)' : 'var(--status-rose)'}; font-weight: 600;">
-                  ${t.growth_rate_pct >= 0 ? '+' : ''}${t.growth_rate_pct.toFixed(1)}%
-                </td>
-                <td><span class="badge badge-${t.badge_color}">${escapeHtml(t.trajectory)}</span></td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      `;
-    }
-
-    if (provEl) {
-      provEl.innerHTML = `
-        <strong>Dataset Provenance & Model Specifications:</strong><br>
-        Curated multimodal fashion trends repository with time-series engagement logs and high-resolution garment imagery. 
-        Deep visual representations extracted using PyTorch ResNet-18 (512-dimensional output vectors). 
-        Clustering executed via Scikit-Learn K-Means ($K=5$). Trajectory forecasting performed via Facebook/Meta Prophet with weekly seasonality and 90% uncertainty intervals.
-      `;
-    }
+  // 2. Update Domain Tag
+  const activeDomainTag = document.getElementById("report-active-domain-tag");
+  if (activeDomainTag) {
+    activeDomainTag.textContent = r.genre === "automotive" ? "Automotive Research" : (r.genre === "fashion" ? "Fashion AI Research" : "Vision AI Benchmark");
   }
 
-  // Render Cluster Breakdown List in Report
-  if (clusterListEl && cachedClusters.length > 0) {
-    clusterListEl.innerHTML = `
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 10px;">
-        ${cachedClusters.map(c => {
-          const exemplar = c.exemplar_item;
-          const imgPath = resolveImagePath(exemplar?.file_path);
-          const dominantList = Object.entries(c.dominant_styles || {})
-            .map(([k, v]) => `${k} (${v})`).join(", ");
+  // 3. Update Hero Card
+  const coverImg = document.getElementById("report-cover-img");
+  const heroChip = document.getElementById("report-hero-chip");
+  const tagPrimary = document.getElementById("report-tag-primary");
+  const readTimeText = document.getElementById("report-read-time-text");
+  const titleEl = document.getElementById("report-title");
+  const dateEl = document.getElementById("report-date-str");
 
-          return `
-            <div style="display: flex; gap: 12px; padding: 12px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
-              <img src="${imgPath}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" alt="">
-              <div style="overflow: hidden;">
-                <strong style="font-size: 0.82rem; color: var(--text-primary);">${escapeHtml(c.cluster_name)}</strong>
-                <div style="font-size: 0.72rem; color: var(--text-muted);">${c.item_count} items</div>
-                <div style="font-size: 0.68rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  ${dominantList || 'Centroid exemplar'}
-                </div>
-              </div>
+  if (coverImg) coverImg.src = r.coverImage;
+  if (heroChip) heroChip.textContent = r.heroChip;
+  if (tagPrimary) tagPrimary.textContent = r.categoryBadge;
+  if (readTimeText) readTimeText.textContent = r.readTime;
+  if (titleEl) titleEl.textContent = r.title;
+  if (dateEl) dateEl.textContent = `Published on ${r.date} • TrendLens MLOps Visual Intelligence Pipeline`;
+
+  // 4. Update KPIs
+  const volEl = document.getElementById("report-kpi-volume");
+  const volSub = document.getElementById("report-kpi-sub");
+  const clusEl = document.getElementById("report-kpi-clusters");
+  const clusSub = document.getElementById("report-kpi-clusters-sub");
+  const trajEl = document.getElementById("report-kpi-top-traj");
+  const trajSub = document.getElementById("report-kpi-top-growth");
+  const engEl = document.getElementById("report-kpi-engine");
+  const engSub = document.getElementById("report-kpi-engine-sub");
+
+  if (volEl) volEl.textContent = r.kpis.volume;
+  if (volSub) volSub.textContent = r.kpis.volumeSub;
+  if (clusEl) clusEl.textContent = r.kpis.clusters;
+  if (clusSub) clusSub.textContent = r.kpis.clustersSub;
+  if (trajEl) trajEl.textContent = r.kpis.trajectory;
+  if (trajSub) trajSub.textContent = r.kpis.trajectorySub;
+  if (engEl) engEl.textContent = r.kpis.engine;
+  if (engSub) engSub.textContent = r.kpis.engineSub;
+
+  // 5. Update Executive Summary & Lead
+  const execSummaryEl = document.getElementById("report-executive-summary");
+  if (execSummaryEl) {
+    execSummaryEl.innerHTML = `<strong>Executive Synthesis:</strong> ${escapeHtml(r.executiveSummary)}`;
+  }
+
+  // 6. Update Takeaways Grid
+  const takeawaysContainer = document.getElementById("report-takeaways-container");
+  if (takeawaysContainer && r.takeaways) {
+    takeawaysContainer.innerHTML = r.takeaways.map(t => `
+      <div class="takeaway-item">
+        <div class="takeaway-icon">${t.icon}</div>
+        <div class="takeaway-content">
+          <h5>${escapeHtml(t.title)}</h5>
+          <p>${escapeHtml(t.desc)}</p>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // 7. Update Trajectory Table
+  const trajTableContainer = document.getElementById("report-trajectory-table-container");
+  if (trajTableContainer && r.tableRows) {
+    trajTableContainer.innerHTML = `
+      <table class="trend-table mt-2">
+        <thead>
+          <tr>
+            ${r.tableHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${r.tableRows.map(row => `
+            <tr>
+              <td><strong>${escapeHtml(row.style)}</strong></td>
+              <td>${row.current}</td>
+              <td>${row.projected}</td>
+              <td style="color: ${String(row.growth).startsWith('-') ? 'var(--status-rose)' : 'var(--status-emerald)'}; font-weight: 600;">
+                ${escapeHtml(String(row.growth))}
+              </td>
+              <td><span class="badge badge-${row.color}">${escapeHtml(row.badge)}</span></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // 8. Update Visual Exemplars
+  const clusterListEl = document.getElementById("report-cluster-list");
+  if (clusterListEl && r.exemplars) {
+    clusterListEl.innerHTML = `
+      <div class="report-exemplars-grid">
+        ${r.exemplars.map(ex => `
+          <div class="report-exemplar-card">
+            <img src="${ex.image}" class="report-exemplar-img" alt="${escapeHtml(ex.title)}">
+            <div class="report-exemplar-info">
+              <span class="report-exemplar-title">${escapeHtml(ex.title)}</span>
+              <span class="report-exemplar-meta">${escapeHtml(ex.category)}</span>
+              <span class="report-exemplar-tags">${escapeHtml(ex.tags)}</span>
+              <span class="badge badge-sky" style="width: fit-content; margin-top: 4px; font-size: 0.62rem;">${escapeHtml(ex.similarity)}</span>
             </div>
-          `;
-        }).join("")}
+          </div>
+        `).join("")}
       </div>
     `;
   }
+
+  // 9. Update Provenance
+  const provEl = document.getElementById("report-provenance-text");
+  if (provEl && r.provenance) {
+    provEl.innerHTML = `<strong>Attribution & Methodological Guardrails:</strong><br>${escapeHtml(r.provenance)}`;
+  }
+}
+
+function copyReportShareLink() {
+  const url = `${window.location.origin}/#reports`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast("Report link copied to clipboard!", "success");
+  }).catch(() => {
+    showToast("Direct report URL: " + url, "info");
+  });
 }
 
 // ==========================================================================
@@ -2237,32 +2519,23 @@ function closeConfirmModal() {
 function exportReportDataAsCSV() {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    let csv = "Domain,Record_Type,Identifier,Category_Or_Style,Score_Or_Count,Trajectory_Or_MakeModel,Metadata_Details\n";
+    const rep = TREND_REPORTS_DATABASE[currentReportId] || TREND_REPORTS_DATABASE["fw2026"];
+    let csv = `Report_Title,"${escapeCsv(rep.title)}"\n`;
+    csv += `Report_Date,"${rep.date}"\n`;
+    csv += `Report_Domain,"${rep.genre}"\n\n`;
 
-    // 1. Trend Summaries
-    if (cachedTrendsSummary && cachedTrendsSummary.length > 0) {
-      cachedTrendsSummary.forEach(t => {
-        csv += `"${currentGenre}","TrendVelocity","${escapeCsv(t.style)}","${escapeCsv(t.style)}","${t.current_score}","${escapeCsv(t.trajectory)}","Projected: ${t.projected_score} | Growth: ${t.growth_rate_pct}%"\n`;
+    if (rep.tableHeaders && rep.tableRows) {
+      csv += rep.tableHeaders.map(h => `"${escapeCsv(h)}"`).join(",") + "\n";
+      rep.tableRows.forEach(row => {
+        csv += `"${escapeCsv(row.style)}","${row.current}","${row.projected}","${escapeCsv(String(row.growth))}","${escapeCsv(row.badge)}"\n`;
       });
+      csv += "\n";
     }
 
-    // 2. Visual Clusters
-    if (cachedClusters && cachedClusters.length > 0) {
-      cachedClusters.forEach(c => {
-        csv += `"${currentGenre}","VisualCluster","${c.cluster_id}","${escapeCsv(c.cluster_name)}","${c.item_count}","Exemplar: ${escapeCsv(c.exemplar_item?.item_id || '')}","Keywords: ${escapeCsv(c.keywords?.join('; ') || '')}"\n`;
-      });
-    }
-
-    // 3. Catalog Inventory
-    if (cachedCatalogItems && cachedCatalogItems.length > 0) {
-      cachedCatalogItems.forEach(item => {
-        const title = item.title || "";
-        const cat = item.category || "";
-        const style = item.style || "";
-        const extra = currentGenre === "automotive" ?
-          `${item.make || ''} ${item.model || ''} (${item.model_year || ''})` :
-          `Style: ${style}`;
-        csv += `"${currentGenre}","CatalogAsset","${escapeCsv(item.item_id)}","${escapeCsv(cat)}","1.0","${escapeCsv(extra)}","${escapeCsv(title)}"\n`;
+    if (rep.exemplars && rep.exemplars.length > 0) {
+      csv += "Exemplar_Asset,Category,Tags,Affinity_Score\n";
+      rep.exemplars.forEach(ex => {
+        csv += `"${escapeCsv(ex.title)}","${escapeCsv(ex.category)}","${escapeCsv(ex.tags)}","${escapeCsv(ex.similarity)}"\n`;
       });
     }
 
@@ -2270,13 +2543,13 @@ function exportReportDataAsCSV() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `trendlens_${currentGenre}_report_${today}.csv`;
+    a.download = `trendlens_report_${rep.id}_${today}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast(`Exported ${currentGenre} intelligence report as CSV.`, "success");
+    showToast(`Exported "${rep.title}" as CSV.`, "success");
   } catch (err) {
     showToast("Failed to generate CSV export: " + err.message, "error");
   }

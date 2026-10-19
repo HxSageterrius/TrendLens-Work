@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js for time-series curves -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/web/style.css?v=3.0">
+  <link rel="stylesheet" href="/web/style.css?v=3.2">
 </head>
 <body>
   <!-- App Container -->
@@ -320,40 +320,108 @@
             </div>
 
             <div class="featured-reports-grid">
-              <div class="report-featured-card" onclick="switchTab('reports-tab')">
-                <div class="report-card-banner banner-fashion-1">
-                  <span class="badge-domain badge-fashion">Fashion</span>
-                  <span class="report-date-tag">Oct 12, 2026</span>
+              <!-- Report 1: FW 2026 Fashion -->
+              <div class="report-featured-card" onclick="openSpecificReport('fw2026')">
+                <div class="report-card-banner">
+                  <img src="/images/DF2_0010_long_sleeve_outwear_shop.jpg" class="report-banner-img" alt="Fall/Winter 2026 Fashion Trends">
+                  <div class="report-banner-overlay"></div>
+                  <div class="report-banner-top">
+                    <span class="badge-domain badge-fashion">Fashion</span>
+                    <span class="report-date-tag">Oct 12, 2026</span>
+                  </div>
+                  <div class="report-banner-bottom">
+                    <span class="report-velocity-badge">+25.8% Velocity</span>
+                  </div>
                 </div>
-                <h4>Fall/Winter 2026 Fashion Trends</h4>
-                <p>Key styles, deep silhouette clusters, and rising engagement vectors.</p>
+                <div class="report-card-body">
+                  <h4>Fall/Winter 2026 Fashion Trends</h4>
+                  <p>Key styles, deep silhouette clusters, and rising engagement vectors.</p>
+                  <div class="report-card-meta">
+                    <span class="report-meta-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      6 min read
+                    </span>
+                    <span class="report-cta-link">Read Briefing →</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="report-featured-card" onclick="switchTab('reports-tab')">
-                <div class="report-card-banner banner-auto-1">
-                  <span class="badge-domain badge-auto">Automobiles</span>
-                  <span class="report-date-tag">Oct 10, 2026</span>
+              <!-- Report 2: EV Design Automotive -->
+              <div class="report-featured-card" onclick="openSpecificReport('ev_design')">
+                <div class="report-card-banner">
+                  <img src="/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg" class="report-banner-img" alt="Electric Vehicles Design Trends">
+                  <div class="report-banner-overlay"></div>
+                  <div class="report-banner-top">
+                    <span class="badge-domain badge-auto">Automobiles</span>
+                    <span class="report-date-tag">Oct 10, 2026</span>
+                  </div>
+                  <div class="report-banner-bottom">
+                    <span class="report-velocity-badge">Aero Taxonomy</span>
+                  </div>
                 </div>
-                <h4>Electric Vehicles Design Trends</h4>
-                <p>Aerodynamic silhouettes and design evolution across modern sedans and SUVs.</p>
+                <div class="report-card-body">
+                  <h4>Electric Vehicles Design Trends</h4>
+                  <p>Aerodynamic silhouettes and design evolution across modern sedans and coupes.</p>
+                  <div class="report-card-meta">
+                    <span class="report-meta-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      8 min read
+                    </span>
+                    <span class="report-cta-link">Read Briefing →</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="report-featured-card" onclick="switchTab('reports-tab')">
-                <div class="report-card-banner banner-fashion-2">
-                  <span class="badge-domain badge-fashion">Fashion</span>
-                  <span class="report-date-tag">Oct 8, 2026</span>
+              <!-- Report 3: Streetwear & Y2K Fashion -->
+              <div class="report-featured-card" onclick="openSpecificReport('streetwear_y2k')">
+                <div class="report-card-banner">
+                  <img src="/images/DF2_0001_short_sleeve_top_shop.jpg" class="report-banner-img" alt="Streetwear Evolution & Y2K">
+                  <div class="report-banner-overlay"></div>
+                  <div class="report-banner-top">
+                    <span class="badge-domain badge-fashion">Fashion</span>
+                    <span class="report-date-tag">Oct 8, 2026</span>
+                  </div>
+                  <div class="report-banner-bottom">
+                    <span class="report-velocity-badge">Cyclical Peak</span>
+                  </div>
                 </div>
-                <h4>Streetwear Evolution & Y2K</h4>
-                <p>Analysis of oversized garments, utility pockets, and raw denim trends.</p>
+                <div class="report-card-body">
+                  <h4>Streetwear Evolution & Y2K</h4>
+                  <p>Analysis of oversized garments, utility pockets, and raw denim trends.</p>
+                  <div class="report-card-meta">
+                    <span class="report-meta-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      5 min read
+                    </span>
+                    <span class="report-cta-link">Read Briefing →</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="report-featured-card" onclick="switchTab('reports-tab')">
-                <div class="report-card-banner banner-auto-2">
-                  <span class="badge-domain badge-auto">Automobiles</span>
-                  <span class="report-date-tag">Oct 5, 2026</span>
+              <!-- Report 4: SUV Trends Automotive -->
+              <div class="report-featured-card" onclick="openSpecificReport('suv_trends')">
+                <div class="report-card-banner">
+                  <img src="/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg" class="report-banner-img" alt="SUV Design Trends & Market Adoption">
+                  <div class="report-banner-overlay"></div>
+                  <div class="report-banner-top">
+                    <span class="badge-domain badge-auto">Automobiles</span>
+                    <span class="report-date-tag">Oct 5, 2026</span>
+                  </div>
+                  <div class="report-banner-bottom">
+                    <span class="report-velocity-badge">K=6 Clusters</span>
+                  </div>
                 </div>
-                <h4>SUV Design Trends & Market Adoption</h4>
-                <p>Stanford Cars body-type clustering and fine-grained visual comparison.</p>
+                <div class="report-card-body">
+                  <h4>SUV Design Trends & Adoption</h4>
+                  <p>Stanford Cars body-type clustering and fine-grained visual comparison.</p>
+                  <div class="report-card-meta">
+                    <span class="report-meta-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      7 min read
+                    </span>
+                    <span class="report-cta-link">Read Briefing →</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -889,21 +957,79 @@
              ================================================================== -->
         <section id="reports-tab" class="tab-pane">
           <div class="reports-container">
-            <!-- Executive Report Header -->
-            <div class="report-header-card">
-              <div>
-                <span class="badge badge-sky mb-2">Automated Executive Intelligence Briefing</span>
-                <h2 id="report-title">Fashion Trend & Visual Intelligence Report</h2>
-                <p id="report-date-str">Generated on TrendLens Platform • MLOps Visual Pipeline v1.0</p>
+            <!-- Report Directory & Selector Filter Bar -->
+            <div class="reports-catalog-bar">
+              <div class="reports-bar-header">
+                <div>
+                  <span class="badge badge-sky mb-1">Executive Intelligence Archive</span>
+                  <h3 style="margin: 0; font-size: 1.05rem;">Select Intelligence Briefing</h3>
+                </div>
+                <div class="reports-domain-indicator">
+                  <span class="indicator-dot"></span>
+                  <span id="report-active-domain-tag">Multi-Domain Intelligence</span>
+                </div>
               </div>
-              <div style="display: flex; gap: 8px;">
-                <button class="btn-secondary" onclick="exportReportDataAsCSV()">
+              <div class="reports-pills-scroll" id="report-pills-container">
+                <button class="report-pill-btn active" data-report-id="fw2026" onclick="selectReportById('fw2026')">
+                  <span class="report-pill-icon">🧥</span>
+                  <span class="report-pill-title">Fall/Winter 2026 Trends</span>
+                  <span class="report-pill-badge badge-fashion">Fashion</span>
+                </button>
+                <button class="report-pill-btn" data-report-id="ev_design" onclick="selectReportById('ev_design')">
+                  <span class="report-pill-icon">⚡</span>
+                  <span class="report-pill-title">EV Design & Aerodynamics</span>
+                  <span class="report-pill-badge badge-auto">Automotive</span>
+                </button>
+                <button class="report-pill-btn" data-report-id="streetwear_y2k" onclick="selectReportById('streetwear_y2k')">
+                  <span class="report-pill-icon">🛹</span>
+                  <span class="report-pill-title">Streetwear & Y2K Cycle</span>
+                  <span class="report-pill-badge badge-fashion">Fashion</span>
+                </button>
+                <button class="report-pill-btn" data-report-id="suv_trends" onclick="selectReportById('suv_trends')">
+                  <span class="report-pill-icon">🚙</span>
+                  <span class="report-pill-title">SUV Segment Adoption</span>
+                  <span class="report-pill-badge badge-auto">Automotive</span>
+                </button>
+                <button class="report-pill-btn" data-report-id="df2_benchmark" onclick="selectReportById('df2_benchmark')">
+                  <span class="report-pill-icon">🔬</span>
+                  <span class="report-pill-title">DeepFashion2 Benchmark</span>
+                  <span class="report-pill-badge badge-sky">MLOps Benchmark</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Executive Report Hero Header -->
+            <div class="report-header-card" id="report-header-card">
+              <div class="report-hero-content">
+                <div class="report-hero-thumb-wrapper">
+                  <img id="report-cover-img" src="/images/DF2_0010_long_sleeve_outwear_shop.jpg" class="report-hero-thumb" alt="Report Cover">
+                  <span class="report-hero-chip" id="report-hero-chip">Fashion AI</span>
+                </div>
+                <div class="report-hero-details">
+                  <div class="report-tags-row">
+                    <span class="badge badge-sky" id="report-tag-primary">Automated Intelligence Briefing</span>
+                    <span class="report-read-time-pill" id="report-read-time-pill">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span id="report-read-time-text">6 min read</span>
+                    </span>
+                    <span class="report-author-pill">By TrendLens Vision Lab</span>
+                  </div>
+                  <h2 id="report-title">Fall/Winter 2026 Fashion Trend & Visual Intelligence Report</h2>
+                  <p id="report-date-str">Generated on TrendLens Platform • MLOps Visual Pipeline v1.0</p>
+                </div>
+              </div>
+              <div class="report-action-buttons">
+                <button class="btn-secondary" onclick="exportReportDataAsCSV()" title="Export structured tabular metrics as CSV">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   <span>Export CSV</span>
                 </button>
-                <button class="btn-secondary" onclick="window.print()">
+                <button class="btn-secondary" onclick="window.print()" title="Print executive briefing or save as PDF">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                   <span>Print / PDF</span>
+                </button>
+                <button class="btn-secondary" onclick="copyReportShareLink()" title="Copy direct report link">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <span>Share</span>
                 </button>
               </div>
             </div>
@@ -911,23 +1037,23 @@
             <!-- Report KPI Telemetry -->
             <div class="report-meta-grid">
               <div class="metric-card">
-                <span class="metric-label">Ingested Assets</span>
-                <div class="metric-value" id="report-kpi-volume">36 Items</div>
-                <span class="metric-trend neutral" id="report-kpi-sub">Fashion Catalog Dataset</span>
+                <span class="metric-label" id="report-kpi-volume-label">Ingested Assets</span>
+                <div class="metric-value" id="report-kpi-volume">39 Garments</div>
+                <span class="metric-trend neutral" id="report-kpi-sub">Curated Benchmark</span>
               </div>
               <div class="metric-card">
-                <span class="metric-label">Visual Feature Clusters</span>
-                <div class="metric-value" id="report-kpi-clusters">K=5 Groups</div>
-                <span class="metric-trend positive">Normalized 512D Vectors</span>
+                <span class="metric-label" id="report-kpi-clusters-label">Visual Feature Clusters</span>
+                <div class="metric-value" id="report-kpi-clusters">K=6 Groups</div>
+                <span class="metric-trend positive" id="report-kpi-clusters-sub">ResNet-18 512D Vectors</span>
               </div>
               <div class="metric-card">
-                <span class="metric-label">Top Velocity Trajectory</span>
-                <div class="metric-value" id="report-kpi-top-traj">Rising</div>
-                <span class="metric-trend positive" id="report-kpi-top-growth">+21.4% Projected</span>
+                <span class="metric-label" id="report-kpi-top-traj-label">Top Velocity Trajectory</span>
+                <div class="metric-value" id="report-kpi-top-traj">Rising (+25.8%)</div>
+                <span class="metric-trend positive" id="report-kpi-top-growth">Hot Trend Index</span>
               </div>
               <div class="metric-card">
-                <span class="metric-label">Forecast Engine</span>
-                <div class="metric-value" id="report-kpi-engine">Prophet</div>
+                <span class="metric-label" id="report-kpi-engine-label">Forecast Engine</span>
+                <div class="metric-value" id="report-kpi-engine">Prophet AI</div>
                 <span class="metric-trend neutral" id="report-kpi-engine-sub">90% Confidence Bounds</span>
               </div>
             </div>
@@ -941,7 +1067,14 @@
               <p class="report-lead-text" id="report-executive-summary">
                 Loading automated trend synthesis...
               </p>
-              <div id="report-trajectory-table-container">
+
+              <!-- Key Takeaways Highlight Box -->
+              <div class="report-takeaways-container" id="report-takeaways-container">
+                <!-- Dynamically populated key takeaway cards -->
+              </div>
+
+              <!-- Trajectory Performance Table -->
+              <div id="report-trajectory-table-container" class="mt-3">
                 <!-- Trajectory summary table -->
               </div>
             </div>
@@ -950,7 +1083,7 @@
             <div class="report-section">
               <h3>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/></svg>
-                2. Visual Feature Clustering & Centroids
+                2. Visual Feature Clustering & Exemplar Gallery
               </h3>
               <p class="report-lead-text" id="report-cluster-lead">
                 Deep visual feature grouping partitions the catalog into distinct aesthetic clusters via cosine distance.
@@ -968,7 +1101,7 @@
               </h3>
               <div class="provenance-card" id="report-provenance-text">
                 <strong>Attribution & Methodological Guardrails:</strong><br>
-                TrendLens adheres to strict data integrity standards. Temporal forecasting models operate strictly on observed engagement signals and are explicitly disabled for datasets where temporal markers (such as Stanford Cars <code>model_year</code>) represent manufacturing dates rather than market demand. All visual embeddings are extracted using a pre-trained ResNet-18 vision backbone with L2 normalization.
+                TrendLens adheres to strict data integrity standards. Temporal forecasting models operate strictly on observed engagement signals and are explicitly disabled for datasets where temporal markers represent manufacturing dates rather than market demand. All visual embeddings are extracted using a pre-trained ResNet-18 vision backbone with L2 normalization.
               </div>
             </div>
           </div>
@@ -1397,6 +1530,6 @@
        ==================================================================== -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="/web/app.js?v=3.0"></script>
+  <script src="/web/app.js?v=3.2"></script>
 </body>
 </html>
