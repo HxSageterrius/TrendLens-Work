@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js for time-series curves -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/web/style.css?v=3.3">
+  <link rel="stylesheet" href="/web/style.css?v=3.4">
 </head>
 <body>
   <!-- App Container -->
@@ -113,6 +113,13 @@
         </div>
 
         <div class="header-right">
+          <!-- Explore Collections Slide-Down Trigger -->
+          <button class="mega-drawer-trigger-btn" id="mega-drawer-trigger-btn" onclick="toggleMegaDrawer()" title="Explore Fashion & Automotive Collections (Slide-Down)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Explore Collections</span>
+            <svg class="drawer-chevron-icon" id="drawer-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
           <!-- Main Domain Switcher (Single Canonical Option) -->
           <div class="genre-switcher" id="genre-switcher" role="group" aria-label="Dataset Domain Switcher">
             <button class="genre-btn active" id="genre-fashion-btn" data-genre="fashion" onclick="switchGenre('fashion')">Fashion</button>
@@ -128,6 +135,116 @@
           <div class="user-avatar-badge" title="TrendLens Researcher">HK</div>
         </div>
       </header>
+
+      <!-- ====================================================================
+           SLIDE-DOWN TOP DRAWER / MEGA-MENU (Fashion & Automobile Dedicated Sections)
+           ==================================================================== -->
+      <div id="mega-drawer-backdrop" class="mega-drawer-backdrop" onclick="closeMegaDrawer()"></div>
+      <div id="mega-top-drawer" class="mega-top-drawer" aria-hidden="true">
+        <div class="mega-drawer-inner">
+          
+          <!-- Drawer Header -->
+          <div class="mega-drawer-header">
+            <div class="mega-drawer-title-group">
+              <div class="mega-drawer-icon-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="mega-drawer-title">Dedicated Visual Collections</h3>
+                <p class="mega-drawer-subtitle">Comprehensive drag-down catalog for Fashion aesthetics & Stanford Automotive vehicles</p>
+              </div>
+            </div>
+            
+            <div class="mega-drawer-actions">
+              <div class="mega-drawer-search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="mega-drawer-search" placeholder="Filter collections..." oninput="filterMegaDrawerItems(this.value)">
+              </div>
+              <button class="mega-drawer-close-btn" onclick="closeMegaDrawer()" aria-label="Close Drawer" title="Close (Esc)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Drawer Dual Section Grid -->
+          <div class="mega-drawer-grid">
+            
+            <!-- SECTION 1: DEDICATED FASHION SECTION -->
+            <section class="mega-drawer-section mega-section-fashion">
+              <div class="mega-section-banner">
+                <div class="mega-section-header-left">
+                  <span class="mega-domain-badge badge-fashion">Fashion Domain</span>
+                  <h4 class="mega-section-heading">DeepFashion2 & Editorial Aesthetics</h4>
+                  <p class="mega-section-meta" id="drawer-fashion-count-meta">39 Garments • 6 Macro Aesthetics • K=5 Silhouette Clusters</p>
+                </div>
+                <button class="btn-sm mega-section-jump-btn" onclick="switchGenre('fashion'); switchTab('explorer-tab'); closeMegaDrawer();">
+                  Open Fashion Explorer →
+                </button>
+              </div>
+
+              <!-- Macro Style Filter Chips -->
+              <div class="mega-filter-chips" id="drawer-fashion-chips">
+                <button class="mega-chip active" onclick="filterDrawerFashionStyle('all', this)">All Styles</button>
+                <button class="mega-chip" onclick="filterDrawerFashionStyle('Streetwear', this)">Streetwear</button>
+                <button class="mega-chip" onclick="filterDrawerFashionStyle('Y2K', this)">Y2K</button>
+                <button class="mega-chip" onclick="filterDrawerFashionStyle('Minimalist', this)">Minimalist</button>
+                <button class="mega-chip" onclick="filterDrawerFashionStyle('Denim', this)">Denim</button>
+                <button class="mega-chip" onclick="filterDrawerFashionStyle('Cottagecore', this)">Cottagecore</button>
+                <button class="mega-chip" onclick="filterDrawerFashionStyle('Athleisure', this)">Athleisure</button>
+              </div>
+
+              <!-- Fashion Visual Items Scroll Track -->
+              <div class="mega-items-scroll-track" id="drawer-fashion-items-track">
+                <!-- Loaded dynamically -->
+              </div>
+            </section>
+
+            <!-- SECTION 2: DEDICATED AUTOMOTIVE SECTION -->
+            <section class="mega-drawer-section mega-section-auto">
+              <div class="mega-section-banner">
+                <div class="mega-section-header-left">
+                  <span class="mega-domain-badge badge-auto">Automotive Domain</span>
+                  <h4 class="mega-section-heading">Stanford Cars Fine-Grained Telemetry</h4>
+                  <p class="mega-section-meta" id="drawer-auto-count-meta">45 Verified Models • 11 Makes • K=3 Structural Clusters</p>
+                </div>
+                <button class="btn-sm mega-section-jump-btn" onclick="switchGenre('automotive'); switchTab('explorer-tab'); closeMegaDrawer();">
+                  Open Auto Explorer →
+                </button>
+              </div>
+
+              <!-- Vehicle Category Filter Chips -->
+              <div class="mega-filter-chips" id="drawer-auto-chips">
+                <button class="mega-chip active" onclick="filterDrawerAutoCategory('all', this)">All Body Types</button>
+                <button class="mega-chip" onclick="filterDrawerAutoCategory('Sedan', this)">Sedans</button>
+                <button class="mega-chip" onclick="filterDrawerAutoCategory('SUV', this)">SUVs</button>
+                <button class="mega-chip" onclick="filterDrawerAutoCategory('Coupe', this)">Coupes</button>
+                <button class="mega-chip" onclick="filterDrawerAutoCategory('Convertible', this)">Convertibles</button>
+                <button class="mega-chip" onclick="filterDrawerAutoCategory('Pickup', this)">Pickups</button>
+              </div>
+
+              <!-- Automotive Visual Items Scroll Track -->
+              <div class="mega-items-scroll-track" id="drawer-auto-items-track">
+                <!-- Loaded dynamically -->
+              </div>
+            </section>
+
+          </div>
+
+          <!-- Drawer Footer Telemetry -->
+          <div class="mega-drawer-footer">
+            <div class="mega-footer-info">
+              <span class="mega-dot"></span>
+              <span><strong>Live Data Pipelines:</strong> ResNet-18 (512D) Feature Extraction • K-Means Silhouette Evaluated • Prophet Forecaster</span>
+            </div>
+            <div class="mega-footer-shortcut">
+              <span>Press <kbd>Esc</kbd> or click outside to dismiss</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
       <!-- Content Views Body -->
       <div class="content-body">
@@ -1500,6 +1617,6 @@
        ==================================================================== -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="/web/app.js?v=3.3"></script>
+  <script src="/web/app.js?v=3.4"></script>
 </body>
 </html>

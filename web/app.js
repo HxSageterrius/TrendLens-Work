@@ -102,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial load
   loadAllGenreData();
   loadDashboardTelemetry();
+  loadMegaDrawerData();
 });
 
 function initMobileNav() {
@@ -133,6 +134,7 @@ function initGlobalSearch() {
       searchInput.blur();
       closeItemDetailModal();
       closeCameraModal();
+      closeMegaDrawer();
     }
   });
 
@@ -2570,3 +2572,200 @@ function exportReportDataAsCSV() {
     showToast("Failed to generate CSV export: " + err.message, "error");
   }
 }
+
+// ==========================================================================
+// Slide-Down Top Drawer (Dedicated Fashion & Automotive Visual Collections)
+// ==========================================================================
+
+let cachedMegaDrawerData = { fashion: [], automotive: [] };
+let activeDrawerFashionStyle = "all";
+let activeDrawerAutoCategory = "all";
+let drawerSearchFilterQuery = "";
+
+function toggleMegaDrawer() {
+  const drawer = document.getElementById("mega-top-drawer");
+  if (!drawer) return;
+  if (drawer.classList.contains("open")) {
+    closeMegaDrawer();
+  } else {
+    openMegaDrawer();
+  }
+}
+
+function openMegaDrawer() {
+  const drawer = document.getElementById("mega-top-drawer");
+  const backdrop = document.getElementById("mega-drawer-backdrop");
+  const triggerBtn = document.getElementById("mega-drawer-trigger-btn");
+  if (!drawer) return;
+
+  drawer.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
+  if (backdrop) backdrop.classList.add("open");
+  if (triggerBtn) {
+    triggerBtn.classList.add("active");
+    triggerBtn.setAttribute("aria-expanded", "true");
+  }
+
+  // Populate items if empty
+  if (!cachedMegaDrawerData.fashion.length || !cachedMegaDrawerData.automotive.length) {
+    loadMegaDrawerData();
+  }
+}
+
+function closeMegaDrawer() {
+  const drawer = document.getElementById("mega-top-drawer");
+  const backdrop = document.getElementById("mega-drawer-backdrop");
+  const triggerBtn = document.getElementById("mega-drawer-trigger-btn");
+  if (!drawer) return;
+
+  drawer.classList.remove("open");
+  drawer.setAttribute("aria-hidden", "true");
+  if (backdrop) backdrop.classList.remove("open");
+  if (triggerBtn) {
+    triggerBtn.classList.remove("active");
+    triggerBtn.setAttribute("aria-expanded", "false");
+  }
+}
+
+async function loadMegaDrawerData() {
+  try {
+    const [fashionRes, autoRes] = await Promise.all([
+      fetch("/api/items?genre=fashion").then(r => r.json()).catch(() => []),
+      fetch("/api/items?genre=automotive").then(r => r.json()).catch(() => [])
+    ]);
+
+    cachedMegaDrawerData.fashion = (Array.isArray(fashionRes) ? fashionRes : []).map(item => ({ ...item, genre: "fashion" }));
+    cachedMegaDrawerData.automotive = (Array.isArray(autoRes) ? autoRes : []).map(item => ({ ...item, genre: "automotive" }));
+
+    // Update count meta
+    const fCountEl = document.getElementById("drawer-fashion-count-meta");
+    if (fCountEl && cachedMegaDrawerData.fashion.length > 0) {
+      fCountEl.textContent = `${cachedMegaDrawerData.fashion.length} Ingested Garments • 6 Macro Aesthetics • K=5 Silhouette Clusters`;
+    }
+    const aCountEl = document.getElementById("drawer-auto-count-meta");
+    if (aCountEl && cachedMegaDrawerData.automotive.length > 0) {
+      aCountEl.textContent = `${cachedMegaDrawerData.automotive.length} Verified Models • 11 Makes • K=3 Structural Clusters`;
+    }
+
+    renderDrawerFashionItems();
+    renderDrawerAutoItems();
+  } catch (err) {
+    console.warn("Failed to load mega drawer data:", err);
+  }
+}
+
+function renderDrawerFashionItems() {
+  const container = document.getElementById("drawer-fashion-items-track");
+  if (!container) return;
+
+  let items = cachedMegaDrawerData.fashion;
+
+  // Filter by style
+  if (activeDrawerFashionStyle !== "all") {
+    items = items.filter(it => (it.style || "").toLowerCase() === activeDrawerFashionStyle.toLowerCase());
+  }
+
+  // Filter by search query
+  if (drawerSearchFilterQuery) {
+    const q = drawerSearchFilterQuery.toLowerCase();
+    items = items.filter(it => 
+      (it.title || "").toLowerCase().includes(q) ||
+      (it.style || "").toLowerCase().includes(q) ||
+      (it.category || "").toLowerCase().includes(q)
+    );
+  }
+
+  if (items.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.8rem;">No fashion items match the filter.</div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(item => {
+    const itemId = item.item_id || item.id;
+    return `
+      <div class="mega-item-card" onclick="openItemDetailModal('${escapeHtml(itemId)}', 'fashion'); closeMegaDrawer();" title="${escapeHtml(item.title)}">
+        <div class="mega-item-thumb-wrapper">
+          <img class="mega-item-thumb" src="${resolveImagePath(item.file_path || item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
+          <span class="mega-item-pill">${escapeHtml(item.style || item.category || 'Fashion')}</span>
+        </div>
+        <div class="mega-item-info">
+          <div class="mega-item-name">${escapeHtml(item.title || itemId)}</div>
+          <div class="mega-item-sub">
+            <span>${escapeHtml(item.category || '')}</span>
+            <span style="font-weight: 600; color: var(--accent-violet);">DF2</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderDrawerAutoItems() {
+  const container = document.getElementById("drawer-auto-items-track");
+  if (!container) return;
+
+  let items = cachedMegaDrawerData.automotive;
+
+  // Filter by category
+  if (activeDrawerAutoCategory !== "all") {
+    items = items.filter(it => (it.category || it.style || "").toLowerCase().includes(activeDrawerAutoCategory.toLowerCase()));
+  }
+
+  // Filter by search query
+  if (drawerSearchFilterQuery) {
+    const q = drawerSearchFilterQuery.toLowerCase();
+    items = items.filter(it => 
+      (it.title || "").toLowerCase().includes(q) ||
+      (it.make || "").toLowerCase().includes(q) ||
+      (it.model || "").toLowerCase().includes(q) ||
+      (it.category || "").toLowerCase().includes(q)
+    );
+  }
+
+  if (items.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.8rem;">No vehicle models match the filter.</div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(item => {
+    const itemId = item.item_id || item.id;
+    return `
+      <div class="mega-item-card" onclick="openItemDetailModal('${escapeHtml(itemId)}', 'automotive'); closeMegaDrawer();" title="${escapeHtml(item.title)}">
+        <div class="mega-item-thumb-wrapper">
+          <img class="mega-item-thumb" src="${resolveImagePath(item.file_path || item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
+          <span class="mega-item-pill">${escapeHtml(String(item.model_year || item.category || 'Auto'))}</span>
+        </div>
+        <div class="mega-item-info">
+          <div class="mega-item-name">${escapeHtml(item.title || itemId)}</div>
+          <div class="mega-item-sub">
+            <span>${escapeHtml(item.make || item.category || '')}</span>
+            <span style="font-weight: 600; color: var(--status-sky);">CVPR</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function filterDrawerFashionStyle(style, btn) {
+  activeDrawerFashionStyle = style;
+  const chips = document.querySelectorAll("#drawer-fashion-chips .mega-chip");
+  chips.forEach(c => c.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderDrawerFashionItems();
+}
+
+function filterDrawerAutoCategory(cat, btn) {
+  activeDrawerAutoCategory = cat;
+  const chips = document.querySelectorAll("#drawer-auto-chips .mega-chip");
+  chips.forEach(c => c.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderDrawerAutoItems();
+}
+
+function filterMegaDrawerItems(query) {
+  drawerSearchFilterQuery = (query || "").trim();
+  renderDrawerFashionItems();
+  renderDrawerAutoItems();
+}
+
