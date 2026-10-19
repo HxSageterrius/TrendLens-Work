@@ -1,0 +1,19 @@
+{
+  "source": "user",
+  "pair_id": 107,
+  "item1": {
+    "category_name": "long sleeve outwear",
+    "category_id": 4,
+    "style": 107,
+    "bounding_box": [
+      30,
+      40,
+      370,
+      470
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

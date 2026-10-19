@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 124,
+  "item1": {
+    "category_name": "vest dress",
+    "category_id": 12,
+    "style": 124,
+    "bounding_box": [
+      35,
+      35,
+      365,
+      470
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "source": "user",
+  "pair_id": 105,
+  "item1": {
+    "category_name": "short sleeve outwear",
+    "category_id": 3,
+    "style": 105,
+    "bounding_box": [
+      50,
+      45,
+      350,
+      455
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

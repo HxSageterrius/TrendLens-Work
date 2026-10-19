@@ -60,14 +60,19 @@ data/forecasts/*
 !data/fashion_trends/
 *.mat
 
-# External cloned repositories
+# Scratch & temporary review directories
+scratch/
+
+# External cloned repositories & reference archives
 reference_repos/
+fashion_trend_analyzer-main/
 
 # Model Checkpoints and Weights
-models/*.pt
-models/*.pth
-models/*.bin
-models/*.onnx
+*.pt
+*.pth
+*.bin
+*.onnx
+*.h5
 !models/.gitkeep
 
 # IDE and Operating System Files

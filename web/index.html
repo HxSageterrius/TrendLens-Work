@@ -3,319 +3,1400 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrendLens — AI Visual Trend Analysis & Forecasting (Fashion & Automotive)</title>
-  <meta name="description" content="AI-Powered Visual Fashion Trend Analysis, Deep Feature Embeddings, K-Means Clustering, and Time-Series Forecasting">
-  <!-- Google Fonts -->
+  <title>TrendLens — AI Visual Trend Intelligence & Forecasting Platform</title>
+  <meta name="description" content="AI-Powered Multimodal Visual Trend Analysis, Feature Embedding Clustering, Google Lens-Style Scanner, and Time-Series Forecasting">
+  <!-- Google Fonts: Outfit (Display) & Plus Jakarta Sans (UI) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Chart.js for smooth time-series charts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js for time-series curves -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/web/style.css">
+  <link rel="stylesheet" href="/web/style.css?v=3.0">
 </head>
 <body>
   <!-- App Container -->
   <div class="app-container">
+    
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
+      <!-- Brand Section -->
       <div class="brand-section">
         <div class="brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </div>
         <div class="brand-text">
           <h2>TrendLens</h2>
-          <span id="brand-subtitle">Fashion AI & Forecasting</span>
+          <span id="brand-subtitle">AI Visual Analytics</span>
         </div>
       </div>
 
-      <!-- Genre Switcher -->
-      <div class="genre-switcher" id="genre-switcher" role="group" aria-label="Domain switcher">
-        <button class="genre-btn active" id="genre-fashion-btn" data-genre="fashion">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
-          Fashion
-        </button>
-        <button class="genre-btn" id="genre-auto-btn" data-genre="automotive">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-          Automotive
-        </button>
-      </div>
-
+      <!-- Main Navigation Links (9 Destinations) -->
       <nav class="nav-links">
-        <button class="nav-btn active" data-tab="forecast-tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
-          Trend Forecasting
+        <span class="nav-category-label">Visual Intelligence</span>
+        
+        <button class="nav-btn active" data-tab="overview-tab" data-hash="home" id="nav-home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
         </button>
-        <button class="nav-btn" data-tab="clusters-tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="5" cy="5" r="2"/></svg>
-          Visual Clusters
-        </button>
-        <button class="nav-btn" data-tab="similarity-tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
-          Visual Search & Match
-        </button>
-        <button class="nav-btn" data-tab="catalog-tab">
+
+        <button class="nav-btn" data-tab="explorer-tab" data-hash="explorer" id="nav-explorer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Fashion Catalog
+          <span>Trend Explorer</span>
+        </button>
+
+        <button class="nav-btn" data-tab="scanner-tab" data-hash="lens-scan" id="nav-scanner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+          <span>Lens Scan</span>
+          <span class="badge-nav-pill">AI</span>
+        </button>
+
+        <button class="nav-btn" data-tab="similarity-tab" data-hash="similar" id="nav-similarity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+          <span>Similar Products</span>
+        </button>
+
+        <span class="nav-category-label">Trend & Forecasting</span>
+
+        <button class="nav-btn" data-tab="fashion-tab" data-hash="fashion" id="nav-fashion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
+          <span>Fashion Trends</span>
+        </button>
+
+        <button class="nav-btn" data-tab="automotive-tab" data-hash="automotive" id="nav-automotive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          <span>Automobile Trends</span>
+        </button>
+
+        <button class="nav-btn" data-tab="forecast-tab" data-hash="forecasting" id="nav-forecast">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+          <span>Forecasting</span>
+        </button>
+
+        <button class="nav-btn" data-tab="reports-tab" data-hash="reports" id="nav-reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Reports</span>
+        </button>
+
+        <span class="nav-category-label">System</span>
+
+        <button class="nav-btn" data-tab="settings-tab" data-hash="settings" id="nav-settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
         </button>
       </nav>
 
-      <div class="pipeline-badge">
-        <div class="pipeline-status-dot"></div>
-        <div class="pipeline-status-text">
-          <strong>Pipeline Status</strong>
-          <span id="pipeline-status-indicator">Connected to FastAPI</span>
+      <!-- Sidebar Domain Filter -->
+      <div class="sidebar-genre-container">
+        <span class="control-label mb-2" style="display:block; padding-left: 2px;">Domain Focus</span>
+        <div class="genre-switcher" id="genre-switcher" role="group" aria-label="Dataset Domain Switcher">
+          <button class="genre-btn active" id="genre-fashion-btn" data-genre="fashion">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
+            Fashion
+          </button>
+          <button class="genre-btn" id="genre-auto-btn" data-genre="automotive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+            Automotive
+          </button>
+        </div>
+      </div>
+
+      <!-- Upgrade Promo Box -->
+      <div class="sidebar-promo-card">
+        <div class="promo-header">
+          <div class="promo-crown-icon">👑</div>
+          <div class="promo-title">Unlock Advanced Insights</div>
+        </div>
+        <p class="promo-text">Get full access to multi-horizon forecasts, detailed reports, and automated telemetry.</p>
+        <button class="btn-primary w-full promo-btn" onclick="alert('TrendLens FYP Platform: Enterprise Tier Preview Activated.')">Upgrade</button>
+      </div>
+
+      <!-- Sidebar Status Footer -->
+      <div class="sidebar-footer">
+        <div class="pipeline-badge">
+          <div class="pipeline-status-dot"></div>
+          <div class="pipeline-status-text">
+            <strong>System Status</strong>
+            <span id="pipeline-status-indicator">FastAPI ML Connected</span>
+          </div>
         </div>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Main Workspace Area -->
     <main class="main-content">
-      <!-- Top Header -->
+      
+      <!-- Top Application Header with Global Search -->
       <header class="top-header">
-        <div class="header-titles">
-          <h1 id="header-title">Fashion Visual Intelligence</h1>
-          <p id="header-subtitle">End-to-End Deep Feature Learning, Cluster Aggregation & Trajectory Forecasting</p>
-        </div>
-        <div class="header-actions">
-          <div class="reference-badge">
-            <span class="badge-tag">Reference Architecture</span>
-            <span class="badge-name">TrendVerse MLOps</span>
+        <div class="header-left">
+          <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          
+          <!-- Global Search Bar with Shortcut -->
+          <div class="global-search-container">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="global-search-input" class="global-search-input" placeholder="Search trends, brands, models, or upload an image...">
+            <span class="search-kbd-shortcut">⌘ K</span>
           </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Header Domain Switcher Pills -->
+          <div class="header-domain-pills">
+            <button class="header-pill active" id="header-pill-fashion" onclick="switchGenre('fashion')">Fashion</button>
+            <button class="header-pill" id="header-pill-automotive" onclick="switchGenre('automotive')">Automobiles</button>
+          </div>
+
+          <!-- Notification Bell -->
+          <button class="header-icon-btn" title="System Notifications" onclick="alert('All ML modules operational (ResNet-18, K-Means, Prophet).')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+
+          <!-- User Profile Avatar -->
+          <div class="user-avatar-badge" title="TrendLens Researcher">HK</div>
         </div>
       </header>
 
-      <!-- Key Metrics HUD -->
-      <section class="metrics-grid">
-        <div class="metric-card glass">
-          <div class="metric-header">
-            <span>Active Trends</span>
-            <div class="metric-icon cyan">📈</div>
-          </div>
-          <div class="metric-value" id="hud-active-trends">6 Styles</div>
-          <div class="metric-trend positive" id="hud-top-trend">Top: Minimalist (+21.4%)</div>
-        </div>
+      <!-- Content Views Body -->
+      <div class="content-body">
 
-        <div class="metric-card glass">
-          <div class="metric-header">
-            <span>Forecast Horizon</span>
-            <div class="metric-icon purple">⏱️</div>
-          </div>
-          <div class="metric-value" id="hud-horizon">12 Weeks</div>
-          <div class="metric-trend neutral">90% Confidence Interval</div>
-        </div>
-
-        <div class="metric-card glass">
-          <div class="metric-header">
-            <span>Visual Clustering</span>
-            <div class="metric-icon emerald">✨</div>
-          </div>
-          <div class="metric-value" id="hud-clusters">K=5 Groups</div>
-          <div class="metric-trend positive" id="hud-silhouette">Silhouette: 0.384</div>
-        </div>
-
-        <div class="metric-card glass">
-          <div class="metric-header">
-            <span>Deep Vision Model</span>
-            <div class="metric-icon amber">🧠</div>
-          </div>
-          <div class="metric-value">ResNet-18</div>
-          <div class="metric-trend neutral">512-dim Normalized Vectors</div>
-        </div>
-      </section>
-
-      <!-- TAB 1: Trend Forecasting -->
-      <section id="forecast-tab" class="tab-pane active">
-        <div class="section-card glass">
-          <div class="card-toolbar">
-            <div class="toolbar-title">
-              <h2>Time-Series Trajectory Forecaster</h2>
-              <p>Predicting weekly engagement volume & emerging fashion momentum</p>
+        <!-- ==================================================================
+             PAGE 1: HOME DASHBOARD (Matching Mockup Image 2)
+             ================================================================== -->
+        <section id="overview-tab" class="tab-pane active">
+          
+          <!-- Hero Banner Section -->
+          <div class="dashboard-hero-card">
+            <div class="hero-left-content">
+              <h1 class="hero-main-title">
+                AI-Powered <span class="gradient-text-violet">Visual Trend Analysis</span><br>for a Smarter Tomorrow
+              </h1>
+              <p class="hero-lead-text">
+                TrendLens analyzes real product images, detects fine-grained visual patterns, tracks how they evolve, and forecasts what's next — in fashion and automobiles.
+              </p>
+              <div class="hero-actions-group">
+                <button class="btn-primary hero-btn" onclick="switchTab('explorer-tab')">
+                  <span>Start Exploring</span>
+                </button>
+                <button class="btn-secondary hero-btn" onclick="switchTab('scanner-tab')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+                  <span>Try Lens Scan</span>
+                </button>
+              </div>
             </div>
-            <div class="toolbar-controls">
-              <div class="control-group">
-                <label for="style-select">Style Genre:</label>
-                <select id="style-select" class="styled-select">
-                  <option value="Streetwear" selected>Streetwear</option>
-                  <option value="Y2K">Y2K Aesthetic</option>
-                  <option value="Minimalist">Minimalist / Quiet Luxury</option>
-                  <option value="Denim">Denim Core</option>
-                  <option value="Cottagecore">Cottagecore</option>
-                  <option value="Athleisure">Athleisure</option>
+            
+            <div class="hero-right-visual">
+              <div class="hero-badge-pill">
+                <span class="pulse-dot"></span>
+                <span>Real Images. Real Data. Powered by AI.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trending Now Horizontal Carousel / Grid -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <div class="header-with-icon">
+                <span class="fire-icon">🔥</span>
+                <div>
+                  <h2>Trending Now</h2>
+                  <p>Live visual and momentum trend analysis</p>
+                </div>
+              </div>
+              <button class="btn-text-link" onclick="switchTab('explorer-tab')">View all →</button>
+            </div>
+
+            <div class="trending-cards-carousel" id="trending-now-container">
+              <!-- Dynamically populated from /api/dashboard/summary -->
+              <div class="carousel-loading"><span class="spinner"></span> Loading trending items...</div>
+            </div>
+          </div>
+
+          <!-- Middle Split Grid: Trend Activity Chart & Lens Scan Promo -->
+          <div class="dashboard-middle-grid">
+            <!-- Left: Trend Activity 6-Month Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2>Trend Activity</h2>
+                  <p>Visual trend intensity over time (Cross-Domain)</p>
+                </div>
+                <div class="chart-header-controls">
+                  <div class="chart-legend-pills">
+                    <span class="legend-pill"><span class="legend-dot dot-fashion"></span> Fashion</span>
+                    <span class="legend-pill"><span class="legend-dot dot-auto"></span> Automobiles</span>
+                  </div>
+                  <select class="styled-select select-compact" id="trend-activity-timeframe">
+                    <option value="6m">Last 6 Months</option>
+                    <option value="3m">Last 3 Months</option>
+                    <option value="1y">Full Year</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="chart-wrapper-dashboard">
+                <canvas id="dashboardActivityChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Right: Lens Scan Promo Card -->
+            <div class="lens-promo-card">
+              <div class="lens-promo-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+              </div>
+              <h3>Lens Scan</h3>
+              <p class="lens-promo-tagline">Point. Scan. Discover.</p>
+              <p class="lens-promo-desc">
+                Use your camera or upload an image to find similar products, get detailed visual insights, and see current trend trajectory.
+              </p>
+              
+              <div class="lens-promo-checklist">
+                <div class="checklist-item"><span class="check-icon">✓</span> Identify Garment & Body Silhouette</div>
+                <div class="checklist-item"><span class="check-icon">✓</span> Find 512D Cosine Proximity Matches</div>
+                <div class="checklist-item"><span class="check-icon">✓</span> View Trend Trajectory & Clusters</div>
+              </div>
+
+              <button class="btn-primary w-full" onclick="switchTab('scanner-tab')">
+                <span>Scan Now →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Grid: Top Fashion Brands, Top Cars, and Recent Scans -->
+          <div class="dashboard-bottom-grid">
+            <!-- Col 1: Top Fashion Brands -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Top Fashion Brands</h3>
+                  <p>Based on recent visual trend momentum</p>
+                </div>
+                <button class="btn-text-link" onclick="switchTab('fashion-tab')">View all →</button>
+              </div>
+              <div class="ranked-list-container" id="top-fashion-brands-list">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Col 2: Top Cars by Trend -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Top Cars by Trend</h3>
+                  <p>Stanford Cars market segment distributions</p>
+                </div>
+                <button class="btn-text-link" onclick="switchTab('automotive-tab')">View all →</button>
+              </div>
+              <div class="ranked-list-container" id="top-cars-list">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Col 3: Recent Lens Scans -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Recent Lens Scans</h3>
+                  <p>Recent user queries & matches</p>
+                </div>
+                <button class="btn-text-link" onclick="switchTab('scanner-tab')">View all →</button>
+              </div>
+              <div class="recent-scans-list" id="recent-scans-container">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Featured Trend Reports Carousel -->
+          <div class="card mt-4 mb-4">
+            <div class="card-header">
+              <div>
+                <h2>Featured Trend Reports</h2>
+                <p>AI-generated insights and market telemetry</p>
+              </div>
+              <button class="btn-text-link" onclick="switchTab('reports-tab')">View all →</button>
+            </div>
+
+            <div class="featured-reports-grid">
+              <div class="report-featured-card" onclick="switchTab('reports-tab')">
+                <div class="report-card-banner banner-fashion-1">
+                  <span class="badge-domain badge-fashion">Fashion</span>
+                  <span class="report-date-tag">Oct 12, 2026</span>
+                </div>
+                <h4>Fall/Winter 2026 Fashion Trends</h4>
+                <p>Key styles, deep silhouette clusters, and rising engagement vectors.</p>
+              </div>
+
+              <div class="report-featured-card" onclick="switchTab('reports-tab')">
+                <div class="report-card-banner banner-auto-1">
+                  <span class="badge-domain badge-auto">Automobiles</span>
+                  <span class="report-date-tag">Oct 10, 2026</span>
+                </div>
+                <h4>Electric Vehicles Design Trends</h4>
+                <p>Aerodynamic silhouettes and design evolution across modern sedans and SUVs.</p>
+              </div>
+
+              <div class="report-featured-card" onclick="switchTab('reports-tab')">
+                <div class="report-card-banner banner-fashion-2">
+                  <span class="badge-domain badge-fashion">Fashion</span>
+                  <span class="report-date-tag">Oct 8, 2026</span>
+                </div>
+                <h4>Streetwear Evolution & Y2K</h4>
+                <p>Analysis of oversized garments, utility pockets, and raw denim trends.</p>
+              </div>
+
+              <div class="report-featured-card" onclick="switchTab('reports-tab')">
+                <div class="report-card-banner banner-auto-2">
+                  <span class="badge-domain badge-auto">Automobiles</span>
+                  <span class="report-date-tag">Oct 5, 2026</span>
+                </div>
+                <h4>SUV Design Trends & Market Adoption</h4>
+                <p>Stanford Cars body-type clustering and fine-grained visual comparison.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Inspiration Banner -->
+          <div class="inspiration-banner">
+            <div class="inspiration-text">
+              <h3>From Inspiration to Insight</h3>
+              <p>TrendLens helps you stay ahead with multimodal visual analytics and deep representation learning.</p>
+            </div>
+            <button class="btn-primary" onclick="switchTab('explorer-tab')">Explore Trends</button>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 2: LENS SCAN (GOOGLE LENS-STYLE SCANNER — Matching Mockup Image 1 Screen 5)
+             ================================================================== -->
+        <section id="scanner-tab" class="tab-pane">
+          <div class="card mb-4">
+            <div class="card-header">
+              <div>
+                <h2>Google Lens-Style Visual Scanner</h2>
+                <p>Upload an image or use your device camera to detect visual attributes and retrieve closest catalog matches.</p>
+              </div>
+              <div class="scanner-header-controls">
+                <button class="btn-secondary" id="btn-open-camera">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <span>Open Camera</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Camera Modal / Viewfinder Container (Hidden by default) -->
+            <div id="camera-modal" class="camera-modal-overlay hidden">
+              <div class="camera-modal-box">
+                <div class="camera-modal-header">
+                  <h3>Camera Viewfinder</h3>
+                  <button class="btn-close-modal" id="btn-close-camera">&times;</button>
+                </div>
+                <div class="camera-viewfinder-container">
+                  <video id="camera-stream-video" autoplay playsinline></video>
+                  <canvas id="camera-capture-canvas" style="display:none;"></canvas>
+                  <div class="camera-target-reticle"></div>
+                </div>
+                <div class="camera-modal-footer">
+                  <button class="btn-primary" id="btn-snap-photo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/></svg>
+                    <span>Capture Photo</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-cancel-camera">Cancel</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Scanner Layout: Query on Left, Match Results on Right -->
+            <div class="similarity-layout">
+              <!-- Left: Query & Upload Panel -->
+              <div class="query-panel">
+                <!-- Dropzone Area -->
+                <div class="upload-zone" id="upload-zone">
+                  <input type="file" id="image-file-input" accept="image/jpeg,image/png,image/webp" hidden>
+                  <div class="upload-content" id="upload-prompt">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p><strong>Click to upload</strong> or drag & drop</p>
+                    <span>JPG, PNG, WEBP (PyTorch ResNet-18 Backbone)</span>
+                  </div>
+                  <div class="preview-container hidden" id="upload-preview-container">
+                    <img id="upload-preview-img" src="" alt="Query Preview">
+                    <div class="scan-beam hidden" id="scan-beam-anim"></div>
+                    <button type="button" class="btn-secondary btn-sm" id="btn-clear-upload">Remove / Re-upload</button>
+                  </div>
+                </div>
+
+                <!-- Test Sample Quick Selection -->
+                <div class="quick-samples mt-3">
+                  <label class="control-label mb-2" style="display:block;">Or pick a test sample from catalog:</label>
+                  <div class="sample-pills" id="sample-pills">
+                    <!-- Populated dynamically based on genre -->
+                  </div>
+                </div>
+
+                <!-- Scan Trigger Button -->
+                <button class="btn-primary w-full mt-3" id="btn-run-match" disabled>
+                  <span id="btn-run-match-label">Scan Image & Find Matches</span>
+                </button>
+              </div>
+
+              <!-- Right: Results & Extraction Panel -->
+              <div class="results-panel">
+                <div class="card-header mb-2">
+                  <h3 id="similarity-results-heading">Visual Analysis & Matches</h3>
+                  <span class="badge badge-muted" id="match-status-label">Awaiting search query...</span>
+                </div>
+
+                <!-- Visual Attributes Extraction Box (Shown after scan) -->
+                <div id="visual-attributes-card" class="attributes-card hidden">
+                  <div class="attribute-stat">
+                    <span class="attr-label">Predicted Type</span>
+                    <strong class="attr-val" id="attr-category">-</strong>
+                  </div>
+                  <div class="attribute-stat">
+                    <span class="attr-label">Dominant Color</span>
+                    <strong class="attr-val" id="attr-color">-</strong>
+                  </div>
+                  <div class="attribute-stat">
+                    <span class="attr-label">Visual Style / Body</span>
+                    <strong class="attr-val" id="attr-style">-</strong>
+                  </div>
+                  <div class="attribute-stat">
+                    <span class="attr-label">Match Confidence</span>
+                    <span class="badge badge-emerald" id="attr-confidence">High</span>
+                  </div>
+                </div>
+
+                <!-- Methodological Guardrail Disclaimer -->
+                <div class="methodology-note-banner mb-3" id="scanner-disclaimer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Matches reflect visual cosine similarity over normalized 512-dim ResNet-18 vectors, not identity or brand verification certainty.</span>
+                </div>
+
+                <!-- Matches Grid -->
+                <div class="matches-grid" id="matches-grid">
+                  <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+                    <p>Upload an image, snap a photo, or choose a test sample on the left to execute visual similarity search.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 3: REFERENCE-BASED VISUAL CLUSTER EXPLORER
+             ================================================================== -->
+        <section id="explorer-tab" class="tab-pane">
+          <!-- Compact horizontal tabs at the top -->
+          <div class="explorer-compact-tabs">
+            <button class="explorer-tab-btn active" id="btn-subtab-clusters" onclick="switchExplorerSubtab('clusters')">Clusters</button>
+            <button class="explorer-tab-btn" id="btn-subtab-catalog" onclick="switchExplorerSubtab('catalog')">Catalog Gallery</button>
+          </div>
+
+          <!-- View A: Reference-Based Cluster Explorer Layout -->
+          <div id="explorer-view-clusters" class="cluster-explorer-container">
+            <!-- Sidebar Controls -->
+            <aside class="cluster-controls-sidebar">
+              <h3>Controls</h3>
+
+              <div class="cluster-control-group">
+                <label for="explorer-cluster-select">Cluster</label>
+                <select id="explorer-cluster-select" class="styled-select" onchange="handleClusterSelection(this.value)">
+                  <!-- Populated dynamically -->
                 </select>
               </div>
 
-              <!-- Automotive notice (hidden when genre=fashion) -->
-              <div id="auto-forecast-notice" class="hidden" style="padding: 12px 16px; background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.25); border-radius: 8px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.5;">
-                <strong style="color: var(--accent-sky);">Forecasting Disabled</strong><br>
-                Automotive trend forecasting is awaiting real sales / search-volume data.
-                Stanford Cars model_year labels encode <em>production year only</em> and
-                must not be treated as a popularity or market-adoption signal.
+              <div class="cluster-control-group">
+                <label class="checkbox-control-label">
+                  <input type="checkbox" id="show-segmented-toggle" checked onchange="handleSegmentedToggle()">
+                  <span>Show segmented alongside original</span>
+                </label>
               </div>
 
-              <div class="control-group">
-                <label for="horizon-range">Horizon: <span id="horizon-val">12</span> wks</label>
-                <input type="range" id="horizon-range" min="4" max="24" step="2" value="12" class="styled-slider">
-              </div>
-            </div>
-          </div>
-
-          <!-- Trajectory Banner -->
-          <div class="trajectory-banner" id="trajectory-banner">
-            <div class="traj-stat">
-              <span class="traj-label">Trajectory</span>
-              <span class="traj-badge badge-emerald" id="traj-classification">Rising (Hot Trend)</span>
-            </div>
-            <div class="traj-stat">
-              <span class="traj-label">Projected Growth</span>
-              <span class="traj-val" id="traj-growth">+18.5%</span>
-            </div>
-            <div class="traj-stat">
-              <span class="traj-label">Current Index</span>
-              <span class="traj-val" id="traj-current">68.4</span>
-            </div>
-            <div class="traj-stat">
-              <span class="traj-label">Peak Forecast</span>
-              <span class="traj-val" id="traj-projected">81.1</span>
-            </div>
-          </div>
-
-          <!-- Chart Container -->
-          <div class="chart-wrapper">
-            <canvas id="trendChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Trend Leaderboard -->
-        <div class="section-card glass mt-4">
-          <h3 class="mb-3">Trend Momentum Leaderboard</h3>
-          <div class="table-responsive">
-            <table class="trend-table">
-              <thead>
-                <tr>
-                  <th>Style Name</th>
-                  <th>Current Score</th>
-                  <th>Projected Score</th>
-                  <th>Projected Growth</th>
-                  <th>Trajectory Status</th>
-                </tr>
-              </thead>
-              <tbody id="leaderboard-body">
-                <tr><td colspan="5" class="text-center">Loading trend data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 2: Visual Clusters -->
-      <section id="clusters-tab" class="tab-pane">
-        <div class="section-card glass">
-          <div class="toolbar-title mb-4">
-            <h2>Deep Visual Feature Clustering (K-Means)</h2>
-            <p>Clusters formed via cosine distance on 512-dimensional visual embeddings</p>
-          </div>
-          <div class="clusters-grid" id="clusters-grid">
-            <!-- Dynamically populated (genre-aware) -->
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 3: Visual Similarity Search -->
-      <section id="similarity-tab" class="tab-pane">
-        <div class="section-card glass">
-          <div class="toolbar-title mb-3">
-            <h2>AI Visual Similarity & Cosine Matcher</h2>
-            <p id="similarity-subtitle">Upload a fashion item image or select a sample query to find Top-K visual matches</p>
-          </div>
-
-          <div class="similarity-layout">
-            <!-- Query Panel -->
-            <div class="query-panel">
-              <div class="upload-zone" id="upload-zone">
-                <input type="file" id="image-file-input" accept="image/*" hidden>
-                <div class="upload-content" id="upload-prompt">
-                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                  <p><strong>Click to upload</strong> or drag & drop</p>
-                  <span>PNG, JPG, WEBP up to 10MB</span>
+              <div class="cluster-control-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label for="cols-slider">Columns</label>
+                  <span id="cols-val" style="font-weight: 700; font-size: 0.8rem; color: var(--text-primary);">4</span>
                 </div>
-                <div class="preview-content hidden" id="upload-preview-container">
-                  <img id="upload-preview-img" src="" alt="Query Preview">
-                  <button type="button" class="btn-clear" id="btn-clear-upload">Remove</button>
+                <input type="range" id="cols-slider" min="2" max="6" step="1" value="4" class="styled-slider" oninput="handleColumnsSlider(this.value)">
+              </div>
+
+              <div class="cluster-stat-badge">
+                <span>Images in cluster:</span>
+                <strong id="cluster-size-badge">0</strong>
+              </div>
+
+              <div class="cluster-control-group mt-2">
+                <label for="cluster-quick-filter">Filter Within Cluster</label>
+                <input type="text" id="cluster-quick-filter" class="styled-input" placeholder="Search filenames..." oninput="filterCurrentClusterImages(this.value)">
+              </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="cluster-content-main">
+              <!-- Run Selector Across the Content Area -->
+              <div class="run-selector-banner">
+                <span class="run-selector-banner-label">Pipeline Run / Dataset:</span>
+                <select id="explorer-run-select" class="styled-select run-select-dropdown" onchange="handleRunSelection(this.value)">
+                  <!-- Populated dynamically from /api/runs -->
+                </select>
+              </div>
+
+              <!-- Selected Cluster Header -->
+              <div class="selected-cluster-header">
+                <h2 class="selected-cluster-heading" id="selected-cluster-heading">Cluster 0</h2>
+                <div class="cluster-keywords-line">
+                  <strong>Keywords:</strong> <span id="selected-cluster-keywords">Loading keywords...</span>
+                </div>
+                <div class="cluster-summary-line">
+                  <strong>Summary:</strong> <span id="selected-cluster-summary">Loading summary...</span>
                 </div>
               </div>
 
-              <!-- Preset Sample Quick Select -->
-              <div class="quick-samples">
-                <label>Or select test sample:</label>
-                <div class="sample-pills" id="sample-pills">
-                  <!-- Populated dynamically -->
-                </div>
-              </div>
+              <hr class="cluster-divider">
 
-              <button class="btn-primary w-full mt-3" id="btn-run-match" disabled>
-                <span id="btn-run-match-label">Find Similar Garments</span>
-              </button>
-            </div>
-
-            <!-- Results Panel -->
-            <div class="results-panel">
-              <div class="results-header">
-                <h3>Top Visual Matches</h3>
-                <span class="match-count" id="match-status-label">Awaiting search query...</span>
-              </div>
-              <div class="matches-grid" id="matches-grid">
-                <div class="empty-state">
-                  <p>Upload an image or pick a test sample to calculate deep cosine similarity rankings.</p>
+              <!-- Responsive Original vs Segmented Image Grid -->
+              <div class="cluster-image-grid cols-4" id="cluster-images-grid">
+                <div class="empty-state" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
+                  <span class="spinner"></span> Loading cluster representations...
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <!-- TAB 4: Catalog Explorer -->
-      <section id="catalog-tab" class="tab-pane">
-        <div class="section-card glass">
-          <div class="card-toolbar mb-4">
-            <div class="toolbar-title">
-              <h2>Fashion Catalog Explorer</h2>
-              <p>Browse ingested garments, visual tags, and engagement metrics</p>
+          <!-- View B: Full Catalog Gallery -->
+          <div id="explorer-view-catalog" class="catalog-gallery-view hidden">
+            <div class="catalog-toolbar">
+              <div>
+                <h3 id="catalog-gallery-heading">Catalog Ingested Items</h3>
+                <p id="catalog-count-label">Displaying items from dataset catalog</p>
+              </div>
+
+              <div class="catalog-filters-group">
+                <div class="explorer-search-box">
+                  <input type="text" id="catalog-search-input" class="styled-input" placeholder="Search by title, tag, brand...">
+                </div>
+
+                <select id="catalog-category-filter" class="styled-select">
+                  <option value="">All Categories</option>
+                </select>
+
+                <select id="catalog-style-filter" class="styled-select">
+                  <option value="">All Styles</option>
+                </select>
+
+                <select id="explorer-cluster-filter" class="styled-select">
+                  <option value="">All Clusters</option>
+                </select>
+              </div>
             </div>
-            <div class="toolbar-controls">
-              <select id="catalog-category-filter" class="styled-select">
-                <option value="">All Categories</option>
-                <option value="shirt">Shirts & Tops</option>
-                <option value="trousers">Trousers & Pants</option>
-                <option value="jacket">Jackets & Outerwear</option>
-                <option value="dress">Dresses</option>
-                <option value="skirt">Skirts</option>
-              </select>
-              <select id="catalog-style-filter" class="styled-select">
-                <option value="">All Styles</option>
-                <option value="Streetwear">Streetwear</option>
-                <option value="Y2K">Y2K</option>
-                <option value="Minimalist">Minimalist</option>
-                <option value="Denim">Denim</option>
-                <option value="Cottagecore">Cottagecore</option>
-                <option value="Athleisure">Athleisure</option>
-              </select>
+
+            <!-- Cluster Exemplars Drawer -->
+            <div class="exemplars-drawer mb-3" style="display:none;" id="clusters-grid"></div>
+
+            <div class="catalog-grid" id="catalog-grid">
+              <!-- Dynamically populated items -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 4: FASHION TRENDS DEDICATED VIEW
+             ================================================================== -->
+        <section id="fashion-tab" class="tab-pane">
+          <div class="card mb-4">
+            <div class="card-header">
+              <div>
+                <h2>Fashion Trends Intelligence</h2>
+                <p>Curated DeepFashion2 and editorial fashion trends tracking 6 macro aesthetic styles.</p>
+              </div>
+              <button class="btn-primary" onclick="switchGenre('fashion'); switchTab('forecast-tab')">Open Fashion Forecaster</button>
+            </div>
+            
+            <div class="metrics-grid mb-4">
+              <div class="metric-card">
+                <span class="metric-label">Monitored Fashion Styles</span>
+                <div class="metric-value">6 Macro Styles</div>
+                <span class="metric-trend positive">Streetwear, Y2K, Minimalist, Denim, Cottagecore, Athleisure</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Fashion Catalog Assets</span>
+                <div class="metric-value">36 Ingested Garments</div>
+                <span class="metric-trend neutral">L2-Normalized 512D ResNet-18</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Visual Clusters</span>
+                <div class="metric-value">K=5 Aesthetic Groups</div>
+                <span class="metric-trend positive">Silhouette Evaluated</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Time Series Horizon</span>
+                <div class="metric-value">52 Weeks Observed</div>
+                <span class="metric-trend positive">Prophet Seasonal Modeling</span>
+              </div>
+            </div>
+
+            <!-- Momentum Table for Fashion -->
+            <div class="table-responsive">
+              <table class="trend-table">
+                <thead>
+                  <tr>
+                    <th>Fashion Style</th>
+                    <th>Current Score</th>
+                    <th>Projected Peak</th>
+                    <th>Growth Rate</th>
+                    <th>Trajectory Status</th>
+                  </tr>
+                </thead>
+                <tbody id="fashion-trends-table-body">
+                  <!-- Populated from trends summary -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 5: AUTOMOBILE TRENDS DEDICATED VIEW
+             ================================================================== -->
+        <section id="automotive-tab" class="tab-pane">
+          <div class="card mb-4">
+            <div class="card-header">
+              <div>
+                <h2>Automobile Trends & Stanford Cars Telemetry</h2>
+                <p>Fine-grained automotive vehicle visual classification and body-type representation.</p>
+              </div>
+              <button class="btn-secondary" onclick="switchGenre('automotive'); switchTab('explorer-tab')">Explore Vehicles</button>
+            </div>
+
+            <div class="metrics-grid mb-4">
+              <div class="metric-card">
+                <span class="metric-label">Vehicle Dataset</span>
+                <div class="metric-value">Stanford Cars 2013</div>
+                <span class="metric-trend neutral">Krause et al. (IEEE CVPR)</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Ingested Vehicles</span>
+                <div class="metric-value">45 Verified Models</div>
+                <span class="metric-trend positive">11 Makes across 6 Body Types</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Visual Vehicle Clusters</span>
+                <div class="metric-value">K=3 Structural Groups</div>
+                <span class="metric-trend positive">Sedans, SUVs, Coupes / Trucks</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Forecasting Status</span>
+                <div class="metric-value">Temporal Data Awaited</div>
+                <span class="metric-trend neutral">Honest Scientific Guardrail</span>
+              </div>
+            </div>
+
+            <div class="unavailable-card">
+              <div class="unavailable-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <h3>Automotive Trend Forecasting Guardrail</h3>
+              <p>
+                Stanford Cars <code>model_year</code> labels indicate vehicle production dates rather than market trend velocity or consumer demand.
+                In accordance with academic data integrity standards, temporal forecasting is disabled until genuine registration statistics (e.g. DMV/DVLA) or search volume trends are connected.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 6: TREND FORECASTING (PROPHET — Matching Mockup Image 1 Screen 4)
+             ================================================================== -->
+        <section id="forecast-tab" class="tab-pane">
+          <div class="card mb-4">
+            <div class="card-header">
+              <div>
+                <h2>Time-Series Trajectory Forecaster</h2>
+                <p>Weekly engagement projections with Facebook Prophet and seasonal harmonics</p>
+              </div>
+              <div class="explorer-filters">
+                <div class="control-group" id="style-select-group">
+                  <label for="style-select" class="control-label">Monitored Style:</label>
+                  <select id="style-select" class="styled-select">
+                    <option value="Streetwear" selected>Streetwear</option>
+                    <option value="Y2K">Y2K Aesthetic</option>
+                    <option value="Minimalist">Minimalist / Quiet Luxury</option>
+                    <option value="Denim">Denim Core</option>
+                    <option value="Cottagecore">Cottagecore</option>
+                    <option value="Athleisure">Athleisure</option>
+                  </select>
+                </div>
+
+                <div class="control-group" id="horizon-select-group">
+                  <label for="horizon-range" class="control-label">Horizon: <span id="horizon-val">12</span> wks</label>
+                  <input type="range" id="horizon-range" min="4" max="24" step="2" value="12" class="styled-slider">
+                </div>
+              </div>
+            </div>
+
+            <!-- Trajectory KPI Banner -->
+            <div class="trajectory-banner" id="trajectory-banner">
+              <div class="traj-stat">
+                <span class="traj-label">Trajectory</span>
+                <span class="badge badge-emerald" id="traj-classification">Rising (Hot Trend)</span>
+              </div>
+              <div class="traj-stat">
+                <span class="traj-label">Projected Growth</span>
+                <span class="traj-val" id="traj-growth">+18.5%</span>
+              </div>
+              <div class="traj-stat">
+                <span class="traj-label">Current Score</span>
+                <span class="traj-val" id="traj-current">68.4</span>
+              </div>
+              <div class="traj-stat">
+                <span class="traj-label">Peak Forecast</span>
+                <span class="traj-val" id="traj-projected">81.1</span>
+              </div>
+            </div>
+
+            <!-- Model Evaluation Performance Box (MAE, RMSE, MAPE) -->
+            <div class="model-metrics-row mb-3" id="model-metrics-box">
+              <span class="control-label">Model Evaluation Metrics (Prophet In-Sample & Validation):</span>
+              <div class="model-metrics-pills">
+                <span class="metric-pill"><strong>MAE:</strong> <span id="metric-mae">12.4</span></span>
+                <span class="metric-pill"><strong>RMSE:</strong> <span id="metric-rmse">18.7</span></span>
+                <span class="metric-pill"><strong>MAPE:</strong> <span id="metric-mape">6.8%</span></span>
+                <span class="metric-pill"><strong>Confidence Envelope:</strong> 90% Bound</span>
+              </div>
+            </div>
+
+            <!-- Automotive Unavailable State Notice (Shown when genre=automotive) -->
+            <div id="auto-forecast-notice" class="unavailable-card hidden">
+              <div class="unavailable-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <h3>Automotive Trend Forecasting Awaiting Temporal Data</h3>
+              <p>
+                Stanford Cars <code>model_year</code> labels indicate vehicle manufacturing dates rather than market adoption or consumer search interest. 
+                Temporal trend forecasting will be activated once real sales, DMV registration statistics, or search volume time-series data are connected.
+              </p>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="chart-wrapper" id="chart-wrapper-el">
+              <canvas id="trendChart"></canvas>
             </div>
           </div>
 
-          <div class="catalog-grid" id="catalog-grid">
-            <!-- Populated dynamically -->
+          <!-- Trend Momentum Full Leaderboard -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>Style Velocity & Momentum Leaderboard</h3>
+                <p>Ranked trajectory across all monitored segments</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="trend-table">
+                <thead>
+                  <tr>
+                    <th>Style Name</th>
+                    <th>Current Index</th>
+                    <th>Projected Index</th>
+                    <th>Projected Growth</th>
+                    <th>Trajectory Status</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                  <tr><td colspan="5" class="text-center" style="padding: 24px; color: var(--text-muted);"><span class="spinner"></span> Loading trend data...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 7: SIMILAR PRODUCTS (AI VISUAL SIMILARITY)
+             ================================================================== -->
+        <section id="similarity-tab" class="tab-pane">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>AI Visual Similarity & Cosine Matcher</h2>
+                <p id="similarity-subtitle">Upload an item image or select a sample query to calculate deep cosine similarity rankings</p>
+              </div>
+              <div class="control-group" style="min-width: 130px;">
+                <label for="similarity-topk" class="control-label">Top-K Matches: <span id="topk-val">6</span></label>
+                <input type="range" id="similarity-topk" min="3" max="12" step="1" value="6" class="styled-slider">
+              </div>
+            </div>
+
+            <div class="similarity-layout">
+              <!-- Left: Query Panel -->
+              <div class="query-panel">
+                <div class="upload-zone" id="sim-upload-zone">
+                  <input type="file" id="sim-image-file-input" accept="image/*" hidden>
+                  <div class="upload-content" id="sim-upload-prompt">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p><strong>Click to upload</strong> or drag & drop</p>
+                    <span>PNG, JPG, WEBP (Deep Vision ResNet-18)</span>
+                  </div>
+                  <div class="preview-container hidden" id="sim-preview-container">
+                    <img id="sim-preview-img" src="" alt="Query Preview">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-sim-clear-upload">Remove Image</button>
+                  </div>
+                </div>
+
+                <div class="quick-samples">
+                  <label class="control-label mb-2" style="display:block;">Or select sample from catalog:</label>
+                  <div class="sample-pills" id="sim-sample-pills">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <button class="btn-primary w-full mt-2" id="btn-sim-run-match" disabled>
+                  <span id="btn-sim-run-match-label">Find Similar Garments</span>
+                </button>
+              </div>
+
+              <!-- Right: Results Panel -->
+              <div class="results-panel">
+                <div class="card-header mb-3">
+                  <h3 id="sim-similarity-results-heading">Top Visual Matches</h3>
+                  <span class="badge badge-muted" id="sim-match-status-label">Awaiting search query...</span>
+                </div>
+
+                <div class="matches-grid" id="sim-matches-grid">
+                  <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+                    <p>Upload an image or pick a test sample above to calculate 512-dimensional cosine similarity matches.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 8: TREND REPORTS (Matching Mockup Image 1 Screen 6)
+             ================================================================== -->
+        <section id="reports-tab" class="tab-pane">
+          <div class="reports-container">
+            <!-- Executive Report Header -->
+            <div class="report-header-card">
+              <div>
+                <span class="badge badge-sky mb-2">Automated Executive Intelligence Briefing</span>
+                <h2 id="report-title">Fashion Trend & Visual Intelligence Report</h2>
+                <p id="report-date-str">Generated on TrendLens Platform • MLOps Visual Pipeline v1.0</p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-secondary" onclick="exportReportDataAsCSV()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Export CSV</span>
+                </button>
+                <button class="btn-secondary" onclick="window.print()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  <span>Print / PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Report KPI Telemetry -->
+            <div class="report-meta-grid">
+              <div class="metric-card">
+                <span class="metric-label">Ingested Assets</span>
+                <div class="metric-value" id="report-kpi-volume">36 Items</div>
+                <span class="metric-trend neutral" id="report-kpi-sub">Fashion Catalog Dataset</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Visual Feature Clusters</span>
+                <div class="metric-value" id="report-kpi-clusters">K=5 Groups</div>
+                <span class="metric-trend positive">Normalized 512D Vectors</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Top Velocity Trajectory</span>
+                <div class="metric-value" id="report-kpi-top-traj">Rising</div>
+                <span class="metric-trend positive" id="report-kpi-top-growth">+21.4% Projected</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Forecast Engine</span>
+                <div class="metric-value" id="report-kpi-engine">Prophet</div>
+                <span class="metric-trend neutral" id="report-kpi-engine-sub">90% Confidence Bounds</span>
+              </div>
+            </div>
+
+            <!-- Executive Summary & Synthesis Section -->
+            <div class="report-section">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                1. Executive Summary & Market Trajectory
+              </h3>
+              <p class="report-lead-text" id="report-executive-summary">
+                Loading automated trend synthesis...
+              </p>
+              <div id="report-trajectory-table-container">
+                <!-- Trajectory summary table -->
+              </div>
+            </div>
+
+            <!-- Visual Cluster Synthesis Section -->
+            <div class="report-section">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/></svg>
+                2. Visual Feature Clustering & Centroids
+              </h3>
+              <p class="report-lead-text" id="report-cluster-lead">
+                Deep visual feature grouping partitions the catalog into distinct aesthetic clusters via cosine distance.
+              </p>
+              <div id="report-cluster-list">
+                <!-- Cluster breakdown rows -->
+              </div>
+            </div>
+
+            <!-- Provenance & Methodological Disclaimers -->
+            <div class="report-section">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                3. Dataset Attribution & Methodological Integrity
+              </h3>
+              <div class="provenance-card" id="report-provenance-text">
+                <strong>Attribution & Methodological Guardrails:</strong><br>
+                TrendLens adheres to strict data integrity standards. Temporal forecasting models operate strictly on observed engagement signals and are explicitly disabled for datasets where temporal markers (such as Stanford Cars <code>model_year</code>) represent manufacturing dates rather than market demand. All visual embeddings are extracted using a pre-trained ResNet-18 vision backbone with L2 normalization.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 9: PLATFORM SETTINGS & SYSTEM CONFIGURATION
+             ================================================================== -->
+        <section id="settings-tab" class="tab-pane">
+          <div class="settings-page-wrapper">
+            <!-- Top Action Banner -->
+            <div class="settings-header-card">
+              <div class="settings-header-text">
+                <span class="badge badge-violet mb-2">System Configuration & Local State</span>
+                <h2>Platform Settings & Diagnostics</h2>
+                <p>Configure interface density, analysis defaults, vision processing parameters, and review system telemetry.</p>
+              </div>
+              <div class="settings-action-buttons">
+                <button class="btn-secondary" id="btn-reset-settings" onclick="confirmResetSettings()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                  <span>Reset Defaults</span>
+                </button>
+                <button class="btn-primary" id="btn-save-settings" onclick="saveSettingsFromForm()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  <span>Save Preferences</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 7 Config Sections Grid -->
+            <div class="settings-modern-grid">
+
+              <!-- SECTION 1: APPEARANCE -->
+              <div class="settings-section-card">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                  </div>
+                  <div>
+                    <h3>Appearance & Interface</h3>
+                    <p>Customize typography density, theme presentation, and catalog metadata visibility.</p>
+                  </div>
+                </div>
+                <div class="settings-form-body">
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-density">Interface Density</label>
+                      <div class="settings-field-desc">Control vertical rhythm, padding, and data card density across all views.</div>
+                    </div>
+                    <select id="setting-density" class="settings-select" onchange="applyDensityPreview()">
+                      <option value="comfortable">Comfortable (Standard)</option>
+                      <option value="compact">Compact (High Density)</option>
+                    </select>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-theme">Visual Theme</label>
+                      <div class="settings-field-desc">Editorial light palette (#F8F7F4) optimized for fashion and vehicle photography.</div>
+                    </div>
+                    <select id="setting-theme" class="settings-select">
+                      <option value="light">Editorial Light (#F8F7F4)</option>
+                      <option value="system">Follow System Accent</option>
+                    </select>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-show-filenames">Show Asset Filenames & IDs</label>
+                      <div class="settings-field-desc">Display source filenames and dimensions beneath grid thumbnails.</div>
+                    </div>
+                    <label class="switch-toggle">
+                      <input type="checkbox" id="setting-show-filenames" checked>
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 2: ANALYSIS PREFERENCES -->
+              <div class="settings-section-card">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </div>
+                  <div>
+                    <h3>Analysis Preferences</h3>
+                    <p>Define startup domain, primary cluster views, and layout proportions.</p>
+                  </div>
+                </div>
+                <div class="settings-form-body">
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-default-genre">Default Domain on Startup</label>
+                      <div class="settings-field-desc">Initial active industry domain when loading TrendLens.</div>
+                    </div>
+                    <select id="setting-default-genre" class="settings-select">
+                      <option value="fashion">Fashion Trends (DeepFashion2)</option>
+                      <option value="automotive">Automotive Trends (Stanford Cars)</option>
+                    </select>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-default-explorer-view">Default Explorer Mode</label>
+                      <div class="settings-field-desc">Initial sub-tab presentation in the Trend Explorer.</div>
+                    </div>
+                    <select id="setting-default-explorer-view" class="settings-select">
+                      <option value="clusters">Clusters View (Reference Layout)</option>
+                      <option value="catalog">Catalog Gallery (Full Filter Grid)</option>
+                    </select>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-default-columns">Default Cluster Columns</label>
+                      <div class="settings-field-desc">Preferred column layout density for cluster gallery grids.</div>
+                    </div>
+                    <select id="setting-default-columns" class="settings-select">
+                      <option value="2">2 Columns (Large Previews)</option>
+                      <option value="3">3 Columns</option>
+                      <option value="4" selected>4 Columns (Standard)</option>
+                      <option value="5">5 Columns</option>
+                      <option value="6">6 Columns (Compact)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 3: IMAGE PROCESSING & VISION BACKBONE -->
+              <div class="settings-section-card">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  </div>
+                  <div>
+                    <h3>Image Processing & Vision Backbone</h3>
+                    <p>Verified ML models and authentic segmentation options supported by the active pipeline.</p>
+                  </div>
+                </div>
+                <div class="settings-form-body">
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-segmented-default">Show Segmentation Masks by Default</label>
+                      <div class="settings-field-desc">Automatically display YOLOv8-seg + SAM segmented contours side-by-side with original images.</div>
+                    </div>
+                    <label class="switch-toggle">
+                      <input type="checkbox" id="setting-segmented-default" checked>
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-similarity-topk">Similarity Match Depth (Top-K)</label>
+                      <div class="settings-field-desc">Number of closest visual neighbors returned per search.</div>
+                    </div>
+                    <select id="setting-similarity-topk" class="settings-select">
+                      <option value="3">Top 3 Closest</option>
+                      <option value="6" selected>Top 6 Closest (Recommended)</option>
+                      <option value="9">Top 9 Closest</option>
+                      <option value="12">Top 12 Closest</option>
+                    </select>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-similarity-threshold">Similarity Confidence Threshold: <span id="threshold-val-display" class="settings-pill-val">60%</span></label>
+                      <div class="settings-field-desc">Minimum cosine proximity required to highlight match as a confident visual alignment.</div>
+                    </div>
+                    <input type="range" id="setting-similarity-threshold" min="40" max="90" value="60" class="settings-range-slider" oninput="document.getElementById('threshold-val-display').textContent = this.value + '%'">
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 4: NOTIFICATIONS & FEEDBACK -->
+              <div class="settings-section-card">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  </div>
+                  <div>
+                    <h3>Notifications & Audio Cues</h3>
+                    <p>Control in-app system feedback, completion toasts, and subtle audio cues.</p>
+                  </div>
+                </div>
+                <div class="settings-form-body">
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-enable-toasts">In-App Toast Alerts</label>
+                      <div class="settings-field-desc">Display non-blocking status badges when searches finish or settings are updated.</div>
+                    </div>
+                    <label class="switch-toggle">
+                      <input type="checkbox" id="setting-enable-toasts" checked>
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-sound-alerts">Audio Chime on Scan Completion</label>
+                      <div class="settings-field-desc">Play a subtle harmonic audio chime via Web Audio synthesis when visual similarity completes.</div>
+                    </div>
+                    <label class="switch-toggle">
+                      <input type="checkbox" id="setting-sound-alerts">
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 5: DATA AND PRIVACY -->
+              <div class="settings-section-card">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <div>
+                    <h3>Data Management & Local Privacy</h3>
+                    <p>TrendLens executes all inference locally. No images or telemetry are transmitted to external servers.</p>
+                  </div>
+                </div>
+                <div class="settings-form-body">
+                  <div class="settings-info-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div>
+                      <strong>Storage Scope:</strong> Uploaded query images exist only ephemerally in RAM during inference. User preferences are stored securely in browser <code>localStorage</code>.
+                    </div>
+                  </div>
+
+                  <div class="settings-buttons-row">
+                    <button class="btn-secondary" onclick="exportSettingsJSON()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      <span>Export Config (JSON)</span>
+                    </button>
+                    <button class="btn-secondary text-danger" onclick="confirmClearCache()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      <span>Clear Session Cache</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 6: ACCOUNT & FYP PROFILE -->
+              <div class="settings-section-card">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <div>
+                    <h3>FYP Project Profile</h3>
+                    <p>Evaluation credentials and academic attribution for project defense.</p>
+                  </div>
+                </div>
+                <div class="settings-form-body">
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-researcher-name">Evaluator Name</label>
+                      <div class="settings-field-desc">Name displayed on generated trend reports and system telemetry.</div>
+                    </div>
+                    <input type="text" id="setting-researcher-name" class="settings-input" value="FYP Evaluator / Committee">
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title" for="setting-researcher-role">Affiliation / Defense Role</label>
+                      <div class="settings-field-desc">Academic institution and assessment role.</div>
+                    </div>
+                    <input type="text" id="setting-researcher-role" class="settings-input" value="BSCS Final Year Project Defense">
+                  </div>
+
+                  <div class="settings-row">
+                    <div>
+                      <label class="settings-field-title">Session Authorization</label>
+                      <div class="settings-field-desc">Local authentication token for current evaluative session.</div>
+                    </div>
+                    <div class="token-display-box">
+                      <code>trendlens-local-eval-2026</code>
+                      <button class="btn-copy-token" onclick="copySessionToken(this)">Copy</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 7: SYSTEM INFORMATION & DIAGNOSTICS -->
+              <div class="settings-section-card full-width">
+                <div class="settings-section-header">
+                  <div class="settings-icon-bubble">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  </div>
+                  <div style="flex: 1;">
+                    <h3>Live Telemetry & Pipeline Diagnostics</h3>
+                    <p>Real-time health verification of FastAPI server, Torchvision backbone, Prophet forecaster, and datasets.</p>
+                  </div>
+                  <button class="btn-secondary" onclick="checkBackendHealthLive()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    <span id="btn-ping-text">Ping Backend</span>
+                  </button>
+                </div>
+
+                <div class="telemetry-table-grid">
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">FastAPI Server</span>
+                    <strong class="telemetry-val" id="diag-server-status"><span class="status-dot dot-online"></span> Connected (127.0.0.1:8000)</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Latency / Round-Trip</span>
+                    <strong class="telemetry-val" id="diag-latency-ms">~12 ms (Localhost)</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Vision Backbone</span>
+                    <strong class="telemetry-val">Torchvision ResNet-18 (512D L2)</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Forecaster Engine</span>
+                    <strong class="telemetry-val">Meta Prophet (Additive / 90% Bounds)</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Clustering Engine</span>
+                    <strong class="telemetry-val">K-Means Cosine Centroids</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Segmentation Engine</span>
+                    <strong class="telemetry-val">YOLOv8-seg + SAM (Static Masks Mounted)</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Fashion Catalog</span>
+                    <strong class="telemetry-val" id="diag-fashion-count">36 Products (DeepFashion2)</strong>
+                  </div>
+                  <div class="telemetry-item">
+                    <span class="telemetry-label">Automotive Catalog</span>
+                    <strong class="telemetry-val" id="diag-auto-count">45 Vehicles (Stanford Cars)</strong>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
     </main>
   </div>
 
-  <script src="/web/app.js"></script>
+  <!-- ====================================================================
+       INTERACTIVE ITEM DETAIL MODAL / DRAWER
+       ==================================================================== -->
+  <div id="item-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-content-card">
+      <div class="modal-header">
+        <h3 id="modal-item-title">Item Specification</h3>
+        <button class="btn-close-modal" id="btn-close-item-modal">&times;</button>
+      </div>
+
+      <div class="modal-body-layout">
+        <!-- Left: Large Image Preview -->
+        <div class="modal-image-box">
+          <img id="modal-item-img" src="" alt="Item Preview">
+        </div>
+
+        <!-- Right: Verified Metadata & Visual Attributes -->
+        <div class="modal-details-box">
+          <div class="modal-badge-row">
+            <span class="badge badge-violet" id="modal-item-badge">Fashion</span>
+            <span class="badge badge-muted" id="modal-item-id">ID: -</span>
+          </div>
+
+          <h2 id="modal-item-heading" class="modal-item-heading">-</h2>
+          <p class="modal-item-desc" id="modal-item-desc">-</p>
+
+          <div class="modal-specs-table">
+            <div class="modal-spec-row">
+              <span class="spec-label">Category / Body Type:</span>
+              <strong class="spec-val" id="modal-spec-category">-</strong>
+            </div>
+            <div class="modal-spec-row">
+              <span class="spec-label">Visual Style / Model Year:</span>
+              <strong class="spec-val" id="modal-spec-style">-</strong>
+            </div>
+            <div class="modal-spec-row">
+              <span class="spec-label">Make / Brand:</span>
+              <strong class="spec-val" id="modal-spec-brand">-</strong>
+            </div>
+            <div class="modal-spec-row">
+              <span class="spec-label">Visual Cluster:</span>
+              <strong class="spec-val" id="modal-spec-cluster">-</strong>
+            </div>
+          </div>
+
+          <!-- Similar Items Mini Carousel -->
+          <div class="modal-similar-section mt-3">
+            <h4>Closest Visual Neighbors (512D Cosine Proximity):</h4>
+            <div class="modal-similar-grid" id="modal-similar-items">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Methodological Note -->
+          <p class="modal-methodology-note">
+            Embedding proximity calculated via ResNet-18 L2-normalized cosine distance.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       CONFIRMATION DIALOG MODAL
+       ==================================================================== -->
+  <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="confirm-modal-card">
+      <div class="confirm-icon-box" id="confirm-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h3 id="confirm-title" class="confirm-title">Confirm Action</h3>
+      <p id="confirm-message" class="confirm-desc">Are you sure you want to proceed?</p>
+      <div class="confirm-btn-row">
+        <button class="btn-secondary" id="btn-confirm-cancel">Cancel</button>
+        <button class="btn-primary" id="btn-confirm-proceed">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       TOAST NOTIFICATIONS CONTAINER
+       ==================================================================== -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="/web/app.js?v=3.0"></script>
 </body>
 </html>

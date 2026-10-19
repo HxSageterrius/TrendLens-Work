@@ -1,0 +1,19 @@
+{
+  "source": "user",
+  "pair_id": 121,
+  "item1": {
+    "category_name": "long sleeve dress",
+    "category_id": 11,
+    "style": 121,
+    "bounding_box": [
+      35,
+      30,
+      365,
+      480
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 114,
+  "item1": {
+    "category_name": "shorts",
+    "category_id": 7,
+    "style": 114,
+    "bounding_box": [
+      45,
+      80,
+      355,
+      460
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

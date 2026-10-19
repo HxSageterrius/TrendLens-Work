@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 111,
+  "item1": {
+    "category_name": "sling",
+    "category_id": 6,
+    "style": 111,
+    "bounding_box": [
+      40,
+      50,
+      360,
+      450
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

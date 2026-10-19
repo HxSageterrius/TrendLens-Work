@@ -1,0 +1,19 @@
+{
+  "source": "user",
+  "pair_id": 125,
+  "item1": {
+    "category_name": "sling dress",
+    "category_id": 13,
+    "style": 125,
+    "bounding_box": [
+      40,
+      40,
+      360,
+      475
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

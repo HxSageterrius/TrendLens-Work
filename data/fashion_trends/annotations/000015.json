@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 110,
+  "item1": {
+    "category_name": "vest",
+    "category_id": 5,
+    "style": 110,
+    "bounding_box": [
+      35,
+      40,
+      365,
+      460
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

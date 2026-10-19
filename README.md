@@ -5,11 +5,13 @@
 ---
 
 ## 📌 Project Overview
+
 **TrendLens** is an AI-powered visual trend analysis and forecasting platform. The platform analyzes product images across different domains (starting with **Fashion** and later demonstrating a proof-of-concept in **Automobiles**), extracts deep visual features, groups visually similar products into clusters, tracks how clusters evolve over time, forecasts trend trajectory, and allows users to match new images against active trends.
 
 ---
 
 ## 🚀 Core Pipeline
+
 ```text
 Product Images
       │
@@ -38,17 +40,19 @@ Product Images
 ---
 
 ## 🛠️ Technology Stack
+
 - **Languages:** Python (Core Engine & Backend), PHP / JavaScript (Web Presentation)
 - **Deep Learning / Vision:** PyTorch, torchvision (ResNet / CLIP)
 - **Machine Learning & Analytics:** scikit-learn (K-Means, DBSCAN, Cosine Similarity), Prophet (Time-series)
 - **Backend API:** FastAPI, Uvicorn, Pydantic
 - **Database:** PostgreSQL (with SQLAlchemy)
-- **CMS / Reporting:** WordPress, PHP
+- **CMS / Reporting:** WordPress, PHP, VS Code
 - **Testing & Code Quality:** pytest
 
 ---
 
 ## 📂 Project Structure
+
 ```text
 trendlens/
 ├── data/                    # Datasets (git-ignored, strictly structured)
@@ -93,19 +97,22 @@ trendlens/
 ## 🚀 Running the Project
 
 ### 1. Build Fashion Dataset & Run Core AI Pipeline
+
 ```powershell
 .\.venv\Scripts\python.exe src/preprocessing/trendverse_data_builder.py
 .\.venv\Scripts\python.exe src/pipeline_runner.py
 ```
 
 ### 2. Run Test Suite (100% Pass)
+
 ```powershell
 .\.venv\Scripts\pytest.exe tests/ -v
 ```
 
 ### 3. Start the Web Dashboard & API Server
+
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
 ```
-Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser to access the live dashboard!
 
+Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser to access the live dashboard!

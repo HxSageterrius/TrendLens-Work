@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 104,
+  "item1": {
+    "category_name": "long sleeve top",
+    "category_id": 2,
+    "style": 104,
+    "bounding_box": [
+      35,
+      50,
+      365,
+      460
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

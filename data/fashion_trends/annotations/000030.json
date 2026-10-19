@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 120,
+  "item1": {
+    "category_name": "short sleeve dress",
+    "category_id": 10,
+    "style": 120,
+    "bounding_box": [
+      30,
+      30,
+      370,
+      475
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}
