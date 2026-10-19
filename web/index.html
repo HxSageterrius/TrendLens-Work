@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js for time-series curves -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/web/style.css?v=3.2">
+  <link rel="stylesheet" href="/web/style.css?v=3.3">
 </head>
 <body>
   <!-- App Container -->
@@ -59,14 +59,9 @@
 
         <span class="nav-category-label">Trend & Forecasting</span>
 
-        <button class="nav-btn" data-tab="fashion-tab" data-hash="fashion" id="nav-fashion">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
-          <span>Fashion Trends</span>
-        </button>
-
-        <button class="nav-btn" data-tab="automotive-tab" data-hash="automotive" id="nav-automotive">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-          <span>Automobile Trends</span>
+        <button class="nav-btn" data-tab="trends-tab" data-hash="trends" id="nav-trends">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          <span id="nav-trends-label">Trends</span>
         </button>
 
         <button class="nav-btn" data-tab="forecast-tab" data-hash="forecasting" id="nav-forecast">
@@ -86,31 +81,6 @@
           <span>Settings</span>
         </button>
       </nav>
-
-      <!-- Sidebar Domain Filter -->
-      <div class="sidebar-genre-container">
-        <span class="control-label mb-2" style="display:block; padding-left: 2px;">Domain Focus</span>
-        <div class="genre-switcher" id="genre-switcher" role="group" aria-label="Dataset Domain Switcher">
-          <button class="genre-btn active" id="genre-fashion-btn" data-genre="fashion">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
-            Fashion
-          </button>
-          <button class="genre-btn" id="genre-auto-btn" data-genre="automotive">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-            Automotive
-          </button>
-        </div>
-      </div>
-
-      <!-- Upgrade Promo Box -->
-      <div class="sidebar-promo-card">
-        <div class="promo-header">
-          <div class="promo-crown-icon">👑</div>
-          <div class="promo-title">Unlock Advanced Insights</div>
-        </div>
-        <p class="promo-text">Get full access to multi-horizon forecasts, detailed reports, and automated telemetry.</p>
-        <button class="btn-primary w-full promo-btn" onclick="alert('TrendLens FYP Platform: Enterprise Tier Preview Activated.')">Upgrade</button>
-      </div>
 
       <!-- Sidebar Status Footer -->
       <div class="sidebar-footer">
@@ -143,10 +113,10 @@
         </div>
 
         <div class="header-right">
-          <!-- Header Domain Switcher Pills -->
-          <div class="header-domain-pills">
-            <button class="header-pill active" id="header-pill-fashion" onclick="switchGenre('fashion')">Fashion</button>
-            <button class="header-pill" id="header-pill-automotive" onclick="switchGenre('automotive')">Automobiles</button>
+          <!-- Main Domain Switcher (Single Canonical Option) -->
+          <div class="genre-switcher" id="genre-switcher" role="group" aria-label="Dataset Domain Switcher">
+            <button class="genre-btn active" id="genre-fashion-btn" data-genre="fashion" onclick="switchGenre('fashion')">Fashion</button>
+            <button class="genre-btn" id="genre-auto-btn" data-genre="automotive" onclick="switchGenre('automotive')">Automotive</button>
           </div>
 
           <!-- Notification Bell -->
@@ -1530,6 +1500,6 @@
        ==================================================================== -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="/web/app.js?v=3.2"></script>
+  <script src="/web/app.js?v=3.3"></script>
 </body>
 </html>

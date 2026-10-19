@@ -62,6 +62,7 @@ const TAB_HASH_MAP = {
   "explorer": "explorer-tab",
   "lens-scan": "scanner-tab",
   "similar": "similarity-tab",
+  "trends": "trends-tab",
   "fashion": "fashion-tab",
   "automotive": "automotive-tab",
   "forecasting": "forecast-tab",
@@ -69,9 +70,17 @@ const TAB_HASH_MAP = {
   "settings": "settings-tab"
 };
 
-const TAB_ID_TO_HASH = Object.fromEntries(
-  Object.entries(TAB_HASH_MAP).map(([hash, id]) => [id, hash])
-);
+const TAB_ID_TO_HASH = {
+  "overview-tab": "home",
+  "explorer-tab": "explorer",
+  "scanner-tab": "lens-scan",
+  "similarity-tab": "similar",
+  "fashion-tab": "trends",
+  "automotive-tab": "trends",
+  "forecast-tab": "forecasting",
+  "reports-tab": "reports",
+  "settings-tab": "settings"
+};
 
 // ==========================================================================
 // Initialization
@@ -157,16 +166,16 @@ function switchGenre(genre) {
   if (currentGenre === genre) return;
   currentGenre = genre;
 
-  // Toggle active button styling on sidebar and header pills
+  // Toggle active button styling on the main genre switcher
   const fashionBtn = document.getElementById("genre-fashion-btn");
   const autoBtn = document.getElementById("genre-auto-btn");
-  const headerPillFashion = document.getElementById("header-pill-fashion");
-  const headerPillAuto = document.getElementById("header-pill-automotive");
-
   if (fashionBtn) fashionBtn.classList.toggle("active", genre === "fashion");
   if (autoBtn) autoBtn.classList.toggle("active", genre === "automotive");
-  if (headerPillFashion) headerPillFashion.classList.toggle("active", genre === "fashion");
-  if (headerPillAuto) headerPillAuto.classList.toggle("active", genre === "automotive");
+
+  // If user is currently looking at Trends, smoothly transition between fashion and automotive view
+  if (currentTab === "fashion-tab" || currentTab === "automotive-tab") {
+    switchTab(genre === "automotive" ? "automotive-tab" : "fashion-tab", true);
+  }
 
   // Update brand subtitle & genre badge
   const subtitle = document.getElementById("brand-subtitle");
@@ -274,11 +283,18 @@ function initNavigation() {
 }
 
 function switchTab(tabId, updateHash = true) {
+  // If generic trends-tab is requested, route dynamically based on active domain
+  if (tabId === "trends-tab") {
+    tabId = currentGenre === "automotive" ? "automotive-tab" : "fashion-tab";
+  }
+
   currentTab = tabId;
 
-  // Update Nav Buttons
+  // Update Nav Buttons (supports unified trends button)
   document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.tab === tabId);
+    const isTarget = btn.dataset.tab === tabId ||
+      (btn.dataset.tab === "trends-tab" && (tabId === "fashion-tab" || tabId === "automotive-tab"));
+    btn.classList.toggle("active", isTarget);
   });
 
   // Update Tab Panes
