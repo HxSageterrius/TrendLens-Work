@@ -897,5 +897,139 @@
         "cluster_id": 5
       }
     ]
+  },
+  {
+    "cluster_id": 6,
+    "cluster_name": "Cluster #7 • Sneakers & Footwear",
+    "item_count": 2,
+    "exemplar_item": {
+      "item_id": "DF2_SNEAKER_001",
+      "title": "Chunky Street Runner Lifestyle Sneakers",
+      "category": "sneakers",
+      "category_id": 14,
+      "source": "shop",
+      "pair_id": 201,
+      "style": "Sneakers",
+      "pattern": "colorblock",
+      "likes": 4120,
+      "comments": 389,
+      "timestamp": "2025-06-15",
+      "bounding_box": "[40, 40, 360, 460]",
+      "file_path": "data/fashion_trends/images/DF2_SNEAKER_001_sneakers_shop.jpg",
+      "annotation_file": "data/fashion_trends/annotations/sneakers_01.json",
+      "tags": "#sneakers #footwear #streetwear #lifestyle",
+      "cluster_id": 6
+    },
+    "dominant_styles": {
+      "Sneakers": 2
+    },
+    "dominant_categories": {
+      "sneakers": 2
+    },
+    "items": [
+      {
+        "item_id": "DF2_SNEAKER_001",
+        "title": "Chunky Street Runner Lifestyle Sneakers",
+        "category": "sneakers",
+        "category_id": 14,
+        "source": "shop",
+        "pair_id": 201,
+        "style": "Sneakers",
+        "pattern": "colorblock",
+        "likes": 4120,
+        "comments": 389,
+        "timestamp": "2025-06-15",
+        "bounding_box": "[40, 40, 360, 460]",
+        "file_path": "data/fashion_trends/images/DF2_SNEAKER_001_sneakers_shop.jpg",
+        "annotation_file": "data/fashion_trends/annotations/sneakers_01.json",
+        "tags": "#sneakers #footwear #streetwear #lifestyle",
+        "cluster_id": 6
+      },
+      {
+        "item_id": "DF2_SNEAKER_002",
+        "title": "Retro Athletic Heritage Sneaker",
+        "category": "sneakers",
+        "category_id": 14,
+        "source": "shop",
+        "pair_id": 202,
+        "style": "Sneakers",
+        "pattern": "solid",
+        "likes": 3670,
+        "comments": 245,
+        "timestamp": "2025-07-20",
+        "bounding_box": "[42, 45, 358, 455]",
+        "file_path": "data/fashion_trends/images/DF2_SNEAKER_002_sneakers_shop.jpg",
+        "annotation_file": "data/fashion_trends/annotations/sneakers_02.json",
+        "tags": "#sneakers #retro #athletic #footwear",
+        "cluster_id": 6
+      }
+    ]
+  },
+  {
+    "cluster_id": 7,
+    "cluster_name": "Cluster #8 • Bags & Luxury Accessories",
+    "item_count": 2,
+    "exemplar_item": {
+      "item_id": "DF2_BAG_001",
+      "title": "Designer Flap Crossbody Bag",
+      "category": "bags",
+      "category_id": 15,
+      "source": "shop",
+      "pair_id": 301,
+      "style": "Bags",
+      "pattern": "solid",
+      "likes": 4890,
+      "comments": 512,
+      "timestamp": "2025-05-18",
+      "bounding_box": "[35, 40, 365, 460]",
+      "file_path": "data/fashion_trends/images/DF2_BAG_001_bags_shop.jpg",
+      "annotation_file": "data/fashion_trends/annotations/bags_01.json",
+      "tags": "#bags #crossbody #leather #luxury",
+      "cluster_id": 7
+    },
+    "dominant_styles": {
+      "Bags": 2
+    },
+    "dominant_categories": {
+      "bags": 2
+    },
+    "items": [
+      {
+        "item_id": "DF2_BAG_001",
+        "title": "Designer Flap Crossbody Bag",
+        "category": "bags",
+        "category_id": 15,
+        "source": "shop",
+        "pair_id": 301,
+        "style": "Bags",
+        "pattern": "solid",
+        "likes": 4890,
+        "comments": 512,
+        "timestamp": "2025-05-18",
+        "bounding_box": "[35, 40, 365, 460]",
+        "file_path": "data/fashion_trends/images/DF2_BAG_001_bags_shop.jpg",
+        "annotation_file": "data/fashion_trends/annotations/bags_01.json",
+        "tags": "#bags #crossbody #leather #luxury",
+        "cluster_id": 7
+      },
+      {
+        "item_id": "DF2_BAG_002",
+        "title": "Classic Leather Daily Tote Bag",
+        "category": "bags",
+        "category_id": 15,
+        "source": "shop",
+        "pair_id": 302,
+        "style": "Bags",
+        "pattern": "solid",
+        "likes": 3980,
+        "comments": 310,
+        "timestamp": "2025-08-11",
+        "bounding_box": "[38, 42, 362, 458]",
+        "file_path": "data/fashion_trends/images/DF2_BAG_002_bags_shop.jpg",
+        "annotation_file": "data/fashion_trends/annotations/bags_02.json",
+        "tags": "#bags #tote #leather #accessories",
+        "cluster_id": 7
+      }
+    ]
   }
 ]

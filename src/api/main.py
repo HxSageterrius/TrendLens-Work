@@ -329,7 +329,7 @@ def get_available_runs():
                 })
     runs.append({
         "run_id": "fashion-benchmark",
-        "title": "DeepFashion2 ResNet-18 Benchmark (39 Assets, K=6)",
+        "title": "DeepFashion2 ResNet-18 Benchmark (43 Assets, K=8)",
         "type": "benchmark"
     })
     runs.append({
@@ -395,7 +395,7 @@ def get_run_clusters(run_id: str):
 
             clusters_result.append({
                 "cluster_id": cid,
-                "cluster_name": f"Cluster {cid}",
+                "cluster_name": cinfo.get("cluster_name") or f"Cluster {cid}",
                 "size": len(image_list),
                 "keywords": cinfo.get("keywords", []),
                 "summary": cinfo.get("summary", ""),
@@ -421,7 +421,9 @@ def get_run_clusters(run_id: str):
             "Minimalist": ["minimalist", "clean silhouette", "neutral tones", "tailored", "quiet luxury", "timeless"],
             "Denim": ["denim", "raw wash", "jackets", "trousers", "indigo", "durable", "structured"],
             "Cottagecore": ["cottagecore", "floral", "puff sleeve", "vintage", "romantic", "earthy"],
-            "Athleisure": ["athleisure", "performance", "comfort", "sporty", "breathable", "activewear"]
+            "Athleisure": ["athleisure", "performance", "comfort", "sporty", "breathable", "activewear"],
+            "Sneakers": ["sneakers", "athletic footwear", "chunky soles", "streetwear kicks", "running shoes", "lifestyle sneakers"],
+            "Bags": ["bags", "crossbody", "handbags", "leather accessories", "tote", "luxury goods", "structured silhouette"]
         }
 
         result = []

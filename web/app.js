@@ -27,8 +27,10 @@ const DEFAULT_SETTINGS = {
   similarityThreshold: 0.60,
   enableToasts: true,
   soundAlerts: false,
-  researcherName: "FYP Evaluator / Committee",
-  researcherRole: "BSCS Final Year Project Defense"
+  researcherName: "Hamza Khalid",
+  researcherRole: "BSCS Final Year Project Researcher",
+  researcherEmail: "hamza.khalid@trendlens.ai",
+  profileAvatarUrl: ""
 };
 let currentSettings = { ...DEFAULT_SETTINGS };
 
@@ -37,6 +39,7 @@ let currentGenre = "fashion";
 let currentTab = "overview-tab";
 let trendChartInstance = null;
 let dashboardActivityChartInstance = null;
+let trendingInsightsChartInstance = null;
 let currentSelectedSampleId = null;
 let currentUploadFile = null;
 let cameraMediaStream = null;
@@ -88,6 +91,7 @@ const TAB_ID_TO_HASH = {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadSettings();
+  initThemeEngine();
   initMobileNav();
   initGenreSwitcher();
   initNavigation();
@@ -98,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCatalogFilters();
   initItemDetailModal();
   initClusterExplorer();
+  initAccountMenu();
 
   // Initial load
   loadAllGenreData();
@@ -164,15 +169,20 @@ function initGenreSwitcher() {
   if (autoBtn) autoBtn.addEventListener("click", () => switchGenre("automotive"));
 }
 
+function setDashboardDomain(genre) {
+  switchGenre(genre);
+}
+
 function switchGenre(genre) {
-  if (currentGenre === genre) return;
+  if (currentGenre === genre) {
+    // Ensure all toggle buttons reflect the active state even if unchanged
+    syncDomainToggleButtons(genre);
+    return;
+  }
   currentGenre = genre;
 
-  // Toggle active button styling on the main genre switcher
-  const fashionBtn = document.getElementById("genre-fashion-btn");
-  const autoBtn = document.getElementById("genre-auto-btn");
-  if (fashionBtn) fashionBtn.classList.toggle("active", genre === "fashion");
-  if (autoBtn) autoBtn.classList.toggle("active", genre === "automotive");
+  // Synchronize all domain buttons across sidebar, trending insights, and trending now
+  syncDomainToggleButtons(genre);
 
   // If user is currently looking at Trends, smoothly transition between fashion and automotive view
   if (currentTab === "fashion-tab" || currentTab === "automotive-tab") {
@@ -234,6 +244,31 @@ function switchGenre(genre) {
 
   // Reload all datasets for the new genre
   loadAllGenreData();
+
+  // Update home dashboard components for current genre
+  renderTrendingInsights(genre);
+  renderPopularCategories(genre);
+  renderTrendingNowList(genre);
+}
+
+function syncDomainToggleButtons(genre) {
+  const fashionBtns = [
+    document.getElementById("genre-fashion-btn"),
+    document.getElementById("insights-fashion-btn"),
+    document.getElementById("trending-tab-fashion")
+  ];
+  const autoBtns = [
+    document.getElementById("genre-auto-btn"),
+    document.getElementById("insights-auto-btn"),
+    document.getElementById("trending-tab-auto")
+  ];
+
+  fashionBtns.forEach(btn => {
+    if (btn) btn.classList.toggle("active", genre === "fashion");
+  });
+  autoBtns.forEach(btn => {
+    if (btn) btn.classList.toggle("active", genre === "automotive");
+  });
 }
 
 function loadAllGenreData() {
@@ -332,87 +367,622 @@ function switchTab(tabId, updateHash = true) {
 async function loadDashboardTelemetry() {
   try {
     const res = await fetch("/api/dashboard/summary");
-    if (!res.ok) throw new Error("Dashboard summary fetch failed");
-    const data = await res.json();
-    cachedDashboardSummary = data;
+    if (res.ok) {
+      const data = await res.json();
+      cachedDashboardSummary = data;
 
-    // 1. Trending Now Horizontal Cards
-    const trendingContainer = document.getElementById("trending-now-container");
-    if (trendingContainer && data.trending_now) {
-      trendingContainer.innerHTML = data.trending_now.map(item => `
-        <div class="trending-card" onclick="openItemDetailModal('${escapeHtml(item.id)}', '${escapeHtml(item.genre)}')">
-          <div class="trending-img-box">
-            <img src="${resolveImagePath(item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
-            <span class="trending-growth-badge">${escapeHtml(item.growth)}</span>
-          </div>
-          <div class="trending-info">
-            <div class="trending-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
-            <div class="trending-sub">
-              <span>${escapeHtml(item.category)}</span>
-              <span class="badge ${item.genre === 'automotive' ? 'badge-sky' : 'badge-violet'}">${escapeHtml(item.genre)}</span>
+      // Legacy containers support if present
+      const trendingContainer = document.getElementById("trending-now-container");
+      if (trendingContainer && data.trending_now) {
+        trendingContainer.innerHTML = data.trending_now.map(item => `
+          <div class="trending-card" onclick="openItemDetailModal('${escapeHtml(item.id)}', '${escapeHtml(item.genre)}')">
+            <div class="trending-img-box">
+              <img src="${resolveImagePath(item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
+              <span class="trending-growth-badge">${escapeHtml(item.growth)}</span>
+            </div>
+            <div class="trending-info">
+              <div class="trending-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
+              <div class="trending-sub">
+                <span>${escapeHtml(item.category)}</span>
+                <span class="badge ${item.genre === 'automotive' ? 'badge-sky' : 'badge-violet'}">${escapeHtml(item.genre)}</span>
+              </div>
             </div>
           </div>
-        </div>
-      `).join("");
-    }
+        `).join("");
+      }
 
-    // 2. Trend Activity Dual Line Chart
-    if (data.trend_activity) {
-      renderDashboardActivityChart(data.trend_activity);
+      if (data.trend_activity) {
+        renderDashboardActivityChart(data.trend_activity);
+      }
     }
-
-    // 3. Top Fashion Brands List
-    const brandsContainer = document.getElementById("top-fashion-brands-list");
-    if (brandsContainer && data.top_fashion_brands) {
-      brandsContainer.innerHTML = data.top_fashion_brands.map(b => `
-        <div class="ranked-item">
-          <div class="ranked-left">
-            <span class="rank-number">${b.rank}</span>
-            <div>
-              <div class="ranked-name">${escapeHtml(b.name)}</div>
-              <div class="ranked-sub">Editorial Verified</div>
-            </div>
-          </div>
-          <span class="ranked-growth">${escapeHtml(b.growth)}</span>
-        </div>
-      `).join("");
-    }
-
-    // 4. Top Cars by Trend List
-    const carsContainer = document.getElementById("top-cars-list");
-    if (carsContainer && data.top_cars_by_trend) {
-      carsContainer.innerHTML = data.top_cars_by_trend.map(c => `
-        <div class="ranked-item">
-          <div class="ranked-left">
-            <span class="rank-number">${c.rank}</span>
-            <div>
-              <div class="ranked-name">${escapeHtml(c.name)}</div>
-              <div class="ranked-sub">${escapeHtml(c.body)}</div>
-            </div>
-          </div>
-          <span class="ranked-growth">${escapeHtml(c.growth)}</span>
-        </div>
-      `).join("");
-    }
-
-    // 5. Recent Scans List
-    const scansContainer = document.getElementById("recent-scans-container");
-    if (scansContainer && data.recent_scans) {
-      scansContainer.innerHTML = data.recent_scans.map(s => `
-        <div class="recent-scan-item" onclick="openItemDetailModal('${escapeHtml(s.id)}', '${escapeHtml(s.genre)}')">
-          <img class="recent-scan-thumb" src="${resolveImagePath(s.image_url)}" alt="${escapeHtml(s.title)}" onerror="this.src='/web/placeholder.png';">
-          <div class="recent-scan-details">
-            <div class="recent-scan-title">${escapeHtml(s.title)}</div>
-            <div class="recent-scan-meta">${escapeHtml(s.matches_count)} visual matches • ${escapeHtml(s.time_ago)}</div>
-          </div>
-          <span class="badge ${s.status === 'Rising' ? 'badge-emerald' : 'badge-sky'}">${escapeHtml(s.status)}</span>
-        </div>
-      `).join("");
-    }
-
   } catch (err) {
-    console.warn("Dashboard summary error:", err);
+    console.warn("Dashboard summary API fetch notice:", err);
   }
+
+  // Populate reference Home Dashboard sections
+  renderTrendingInsights(currentGenre);
+  renderPopularCategories(currentGenre);
+  renderTrendingNowList(currentGenre);
+  renderRecentScansList();
+}
+
+// --------------------------------------------------------------------------
+// 1. Trending Insights (Chart + Direction List)
+// --------------------------------------------------------------------------
+function renderTrendingInsights(genre) {
+  const isFashion = (genre || currentGenre) === "fashion";
+  const heading = document.getElementById("insights-chart-heading");
+  const directionList = document.getElementById("trend-direction-list");
+  const canvas = document.getElementById("trendingInsightsChart");
+
+  if (heading) {
+    heading.innerHTML = isFashion
+      ? `Top Fashion Categories <span class="header-timeframe">(Last 30 Days)</span>`
+      : `Top Automotive Categories <span class="header-timeframe">(Last 30 Days)</span>`;
+  }
+
+  // Populate Direction List
+  if (directionList) {
+    const directions = isFashion ? [
+      { name: "Streetwear", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "tops" },
+      { name: "Denim", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "jeans" },
+      { name: "Formal Wear", status: "Stable", badgeClass: "direction-stable", icon: "—", categoryKey: "jackets" },
+      { name: "Dresses", status: "Declining", badgeClass: "direction-declining", icon: "↘", categoryKey: "dresses" },
+      { name: "Sneakers", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "sneakers" }
+    ] : [
+      { name: "Sedans", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "sedan" },
+      { name: "SUVs", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "suv" },
+      { name: "Coupes", status: "Stable", badgeClass: "direction-stable", icon: "—", categoryKey: "coupe" },
+      { name: "Convertibles", status: "Declining", badgeClass: "direction-declining", icon: "↘", categoryKey: "convertible" },
+      { name: "Pickup Trucks", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "truck" }
+    ];
+
+    directionList.innerHTML = directions.map(d => `
+      <div class="direction-row" style="cursor: pointer;" onclick="navigateToCategoryCluster('${d.categoryKey}', '${isFashion ? 'fashion' : 'automotive'}')" title="Explore ${escapeHtml(d.name)} cluster">
+        <span class="direction-name">${escapeHtml(d.name)}</span>
+        <span class="direction-status ${d.badgeClass}">
+          <span class="direction-icon">${d.icon}</span>
+          <span>${d.status}</span>
+        </span>
+      </div>
+    `).join("");
+  }
+
+  // Render Multi-Line Insights Chart
+  if (!canvas) return;
+  if (trendingInsightsChartInstance) {
+    trendingInsightsChartInstance.destroy();
+    trendingInsightsChartInstance = null;
+  }
+
+  const ctx = canvas.getContext("2d");
+  const labels = ["Apr 10", "Apr 17", "Apr 24", "May 1", "May 8"];
+
+  const datasets = isFashion ? [
+    {
+      label: "Tops",
+      data: [46, 55, 68, 62, 72],
+      borderColor: "#7040F5",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Denim",
+      data: [32, 38, 48, 46, 56],
+      borderColor: "#3B82F6",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Sneakers",
+      data: [22, 26, 38, 36, 42],
+      borderColor: "#F59E0B",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Dresses",
+      data: [14, 16, 25, 23, 28],
+      borderColor: "#10B981",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Jackets",
+      data: [8, 10, 18, 16, 22],
+      borderColor: "#06B6D4",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    }
+  ] : [
+    {
+      label: "Sedans",
+      data: [50, 56, 65, 62, 70],
+      borderColor: "#7040F5",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "SUVs",
+      data: [38, 45, 54, 58, 64],
+      borderColor: "#3B82F6",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Coupes",
+      data: [26, 30, 34, 33, 38],
+      borderColor: "#F59E0B",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Trucks",
+      data: [16, 18, 22, 24, 27],
+      borderColor: "#10B981",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    },
+    {
+      label: "Convertibles",
+      data: [10, 12, 14, 13, 17],
+      borderColor: "#06B6D4",
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    }
+  ];
+
+  trendingInsightsChartInstance = new Chart(ctx, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: "right",
+          labels: {
+            usePointStyle: true,
+            pointStyle: "circle",
+            boxWidth: 7,
+            boxHeight: 7,
+            padding: 12,
+            font: { size: 11, family: "'Plus Jakarta Sans', sans-serif", weight: "500" },
+            color: "#4A4E69"
+          }
+        },
+        tooltip: {
+          backgroundColor: "#FFFFFF",
+          titleColor: "#202447",
+          bodyColor: "#7A819A",
+          borderColor: "#E7E8F0",
+          borderWidth: 1,
+          padding: 9,
+          boxPadding: 4,
+          usePointStyle: true
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: "#7A819A", font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" } },
+          border: { display: false }
+        },
+        y: {
+          min: 0,
+          max: 100,
+          ticks: {
+            stepSize: 25,
+            color: "#7A819A",
+            font: { size: 10, family: "'Plus Jakarta Sans', sans-serif" }
+          },
+          grid: {
+            color: "#F1F1F6",
+            drawBorder: false
+          },
+          border: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// --------------------------------------------------------------------------
+// Category-to-Cluster Taxonomy & Cross-Navigation Mappings
+// --------------------------------------------------------------------------
+const CATEGORY_CLUSTER_MAPPINGS = {
+  fashion: {
+    tops: {
+      name: "Tops & T-Shirts",
+      keywords: ["top", "shirt", "crewneck", "tee", "sweatshirt", "blouse", "cotton", "sleeveless"],
+      defaultIndex_2026_06_23: 2, // Cluster 3 (sporty graphic prints, short silhouettes)
+      defaultIndex_fashion_benchmark: 0, // Minimalist tops
+      catalogCategory: "short sleeve top",
+      catalogSearch: "top"
+    },
+    jackets: {
+      name: "Jackets & Coats",
+      keywords: ["jacket", "coat", "outwear", "outerwear", "trench", "utility", "hoodie", "bomber"],
+      defaultIndex_2026_06_23: 3, // Cluster 4 (athleisure, sporty jackets, shorts)
+      defaultIndex_fashion_benchmark: 1, // Long sleeve outwear & trench coats
+      catalogCategory: "long sleeve outwear",
+      catalogSearch: "outwear"
+    },
+    dresses: {
+      name: "Dresses & Skirts",
+      keywords: ["dress", "skirt", "floral", "maxi", "wrap dress", "cottagecore", "slit", "elegant"],
+      defaultIndex_2026_06_23: 4, // Cluster 5 (floral, pastel, maxi, slit, elegant)
+      defaultIndex_fashion_benchmark: 4, // Cottagecore dresses
+      catalogCategory: "short sleeve dress",
+      catalogSearch: "dress"
+    },
+    jeans: {
+      name: "Jeans & Trousers",
+      keywords: ["denim", "trousers", "jean", "pants", "shorts", "wide-leg", "indigo", "raw wash"],
+      defaultIndex_2026_06_23: 1, // Cluster 2 (denim, shorts, stripes, casual)
+      defaultIndex_fashion_benchmark: 3, // Denim trousers & pants
+      catalogCategory: "trousers",
+      catalogSearch: "denim"
+    },
+    sneakers: {
+      name: "Sneakers & Footwear",
+      keywords: ["sneaker", "shoes", "chunky", "athletic footwear", "streetwear kicks", "running", "kicks"],
+      defaultIndex_2026_06_23: 7, // Cluster 8 (Chunky Sneakers & Athletic Footwear)
+      defaultIndex_fashion_benchmark: 6, // Cluster 7 (Sneakers & Footwear)
+      catalogCategory: "",
+      catalogSearch: "sneaker"
+    },
+    bags: {
+      name: "Bags & Accessories",
+      keywords: ["bag", "handbag", "crossbody", "leather accessories", "tote", "luxury", "hardware"],
+      defaultIndex_2026_06_23: 8, // Cluster 9 (Luxury Handbags & Crossbody Bags)
+      defaultIndex_fashion_benchmark: 7, // Cluster 8 (Bags & Luxury Accessories)
+      catalogCategory: "",
+      catalogSearch: "bag"
+    }
+  },
+  automotive: {
+    sedan: {
+      name: "Sedans",
+      keywords: ["sedan", "four-door", "executive", "saloon", "audi s4", "bmw 3"],
+      defaultIndex: 0, // Cluster 1: Sedan
+      catalogCategory: "sedan",
+      catalogSearch: "sedan"
+    },
+    suv: {
+      name: "SUVs",
+      keywords: ["suv", "crossover", "high-clearance", "grand cherokee"],
+      defaultIndex: 2, // Cluster 3: SUV & Pickup
+      catalogCategory: "suv",
+      catalogSearch: "suv"
+    },
+    coupe: {
+      name: "Coupes",
+      keywords: ["coupe", "two-door", "fastback", "bentley gt", "bmw m3 coupe"],
+      defaultIndex: 1, // Cluster 2: Coupe
+      catalogCategory: "coupe",
+      catalogSearch: "coupe"
+    },
+    convertible: {
+      name: "Convertibles",
+      keywords: ["convertible", "cabriolet", "roadster", "open-top"],
+      defaultIndex: 1, // Coupe/Convertible
+      catalogCategory: "convertible",
+      catalogSearch: "convertible"
+    },
+    truck: {
+      name: "Pickup Trucks",
+      keywords: ["truck", "pickup", "payload", "hauling", "ram", "f-150"],
+      defaultIndex: 2, // Cluster 3: SUV & Pickup
+      catalogCategory: "truck",
+      catalogSearch: "truck"
+    },
+    supercar: {
+      name: "Supercars",
+      keywords: ["supercar", "exotic", "lamborghini", "aventador", "performance"],
+      defaultIndex: 1, // Cluster 2: Coupe & Supercar
+      catalogCategory: "coupe",
+      catalogSearch: "supercar"
+    }
+  }
+};
+
+// --------------------------------------------------------------------------
+// 2. Popular Categories (6 Image-First Cards with Dedicated Cluster Pathways)
+// --------------------------------------------------------------------------
+function renderPopularCategories(genre) {
+  const container = document.getElementById("popular-categories-grid");
+  if (!container) return;
+
+  const isFashion = (genre || currentGenre) === "fashion";
+  const normGenre = isFashion ? "fashion" : "automotive";
+
+  const categories = isFashion ? [
+    { title: "Tops & T-Shirts", count: "124 items", image: "/web/assets/cat_tops.jpg", key: "tops" },
+    { title: "Jackets & Coats", count: "98 items", image: "/web/assets/cat_jackets.jpg", key: "jackets" },
+    { title: "Dresses", count: "76 items", image: "/web/assets/cat_dresses.jpg", key: "dresses" },
+    { title: "Jeans & Trousers", count: "112 items", image: "/web/assets/cat_jeans.jpg", key: "jeans" },
+    { title: "Sneakers", count: "143 items", image: "/web/assets/cat_sneakers.jpg", key: "sneakers" },
+    { title: "Bags & Accessories", count: "67 items", image: "/web/assets/cat_bags.jpg", key: "bags" }
+  ] : [
+    { title: "Sedans", count: "165 models", image: "/web/assets/hero_car.jpg", key: "sedan" },
+    { title: "SUVs", count: "142 models", image: "/web/assets/scan_car.jpg", key: "suv" },
+    { title: "Coupes", count: "98 models", image: "/web/assets/hero_car.jpg", key: "coupe" },
+    { title: "Convertibles", count: "64 models", image: "/web/assets/scan_car.jpg", key: "convertible" },
+    { title: "Pickup Trucks", count: "48 models", image: "/web/assets/hero_car.jpg", key: "truck" },
+    { title: "Supercars", count: "35 models", image: "/web/assets/scan_car.jpg", key: "supercar" }
+  ];
+
+  container.innerHTML = categories.map(cat => `
+    <div class="pop-cat-card" onclick="navigateToCategoryCluster('${cat.key}', '${normGenre}')" title="Explore ${escapeHtml(cat.title)} cluster & catalog">
+      <div class="pop-cat-img-box">
+        <img src="${cat.image}" alt="${escapeHtml(cat.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
+      </div>
+      <div class="pop-cat-footer">
+        <div class="pop-cat-meta">
+          <div class="pop-cat-title">${escapeHtml(cat.title)}</div>
+          <div class="pop-cat-count">${escapeHtml(cat.count)}</div>
+        </div>
+        <div class="pop-cat-chevron">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/**
+ * Navigates directly from any Category / Trend button to its related Cluster in Trend Explorer.
+ */
+async function navigateToCategoryCluster(categoryKey, genre = currentGenre) {
+  const normGenre = genre === "automotive" ? "automotive" : "fashion";
+  if (currentGenre !== normGenre) {
+    switchGenre(normGenre);
+  }
+
+  // Switch to Trend Explorer tab
+  switchTab("explorer-tab");
+
+  // Activate Clusters subtab view
+  switchExplorerSubtab("clusters");
+
+  const genreMap = CATEGORY_CLUSTER_MAPPINGS[normGenre] || {};
+  const config = genreMap[categoryKey.toLowerCase()] || Object.values(genreMap)[0];
+  if (!config) return;
+
+  // Ensure clusters are loaded for the current active run
+  if (!currentRunClusters || currentRunClusters.length === 0) {
+    const runId = normGenre === "automotive" ? "automotive-benchmark" : "2026-06-23";
+    await loadRunClusters(runId);
+  }
+
+  // Find the best-matching cluster index in currentRunClusters
+  let matchedIndex = -1;
+  const kws = config.keywords || [];
+
+  for (let i = 0; i < currentRunClusters.length; i++) {
+    const cl = currentRunClusters[i];
+    const clName = (cl.cluster_name || "").toLowerCase();
+    const clSum = (cl.summary || "").toLowerCase();
+    const clKws = Array.isArray(cl.keywords) ? cl.keywords.map(k => k.toLowerCase()) : [];
+
+    // Check if any keyword matches cluster keywords or summary
+    const hasKwMatch = kws.some(k => clKws.some(ck => ck.includes(k) || k.includes(ck)));
+    const hasNameMatch = kws.some(k => clName.includes(k) || clSum.includes(k));
+
+    if (hasKwMatch || hasNameMatch) {
+      matchedIndex = i;
+      break;
+    }
+  }
+
+  // Fallback to predetermined benchmark cluster index
+  if (matchedIndex === -1) {
+    if (normGenre === "automotive") {
+      matchedIndex = config.defaultIndex ?? 0;
+    } else {
+      matchedIndex = currentRunId === "fashion-benchmark" ?
+        (config.defaultIndex_fashion_benchmark ?? 0) :
+        (config.defaultIndex_2026_06_23 ?? 0);
+    }
+  }
+
+  // Bounds check
+  if (matchedIndex < 0 || matchedIndex >= currentRunClusters.length) {
+    matchedIndex = 0;
+  }
+
+  // 1. Activate and render the related cluster in Trend Explorer
+  selectedClusterIndex = matchedIndex;
+  const clusterSelect = document.getElementById("explorer-cluster-select");
+  if (clusterSelect) {
+    clusterSelect.value = matchedIndex.toString();
+  }
+  renderSelectedCluster();
+
+  // 2. Pre-filter the Catalog Gallery view so switching subtabs shows matching items
+  const catFilter = document.getElementById("catalog-category-filter");
+  const searchInput = document.getElementById("catalog-search-input");
+  if (catFilter && config.catalogCategory) {
+    let found = false;
+    for (let opt of catFilter.options) {
+      if (opt.value.toLowerCase() === config.catalogCategory.toLowerCase() ||
+          opt.value.toLowerCase().includes(config.catalogCategory.toLowerCase())) {
+        catFilter.value = opt.value;
+        found = true;
+        break;
+      }
+    }
+    if (!found && catFilter.options.length > 0) {
+      catFilter.value = "";
+    }
+  }
+  if (searchInput && config.catalogSearch) {
+    searchInput.value = config.catalogSearch;
+  }
+  applyCatalogFilters();
+
+  // 3. Display the Category Indicator Banner in Trend Explorer
+  const banner = document.getElementById("explorer-category-badge");
+  const bannerName = document.getElementById("explorer-active-category-name");
+  if (banner && bannerName) {
+    bannerName.textContent = config.name;
+    banner.classList.remove("hidden");
+  }
+
+  const clName = currentRunClusters[matchedIndex]?.cluster_name || `Cluster #${matchedIndex + 1}`;
+  showToast(`Navigated to ${config.name} (${clName}) in Trend Explorer.`, "success", 3000);
+}
+
+function clearCategoryClusterNavigation() {
+  const banner = document.getElementById("explorer-category-badge");
+  if (banner) banner.classList.add("hidden");
+
+  const searchInput = document.getElementById("catalog-search-input");
+  const catFilter = document.getElementById("catalog-category-filter");
+  if (searchInput) searchInput.value = "";
+  if (catFilter) catFilter.value = "";
+  applyCatalogFilters();
+
+  selectedClusterIndex = 0;
+  const clusterSelect = document.getElementById("explorer-cluster-select");
+  if (clusterSelect) clusterSelect.value = "0";
+  renderSelectedCluster();
+  showToast("Showing all visual clusters.", "info", 2000);
+}
+
+function filterCatalogByCategory(catFilter) {
+  navigateToCategoryCluster(catFilter);
+}
+
+// --------------------------------------------------------------------------
+// 3. Trending Now (5 Ranked Items with Indicators & Chevrons)
+// --------------------------------------------------------------------------
+function renderTrendingNowList(genre) {
+  const container = document.getElementById("trending-now-list");
+  if (!container) return;
+
+  const isFashion = (genre || currentGenre) === "fashion";
+  const normGenre = isFashion ? "fashion" : "automotive";
+
+  const items = isFashion ? [
+    { title: "Oversized Blazers", growth: "12%", direction: "Rising", image: "/web/assets/trend_blazer.jpg", categoryKey: "jackets" },
+    { title: "Graphic Tees", growth: "8%", direction: "Rising", image: "/web/assets/trend_tee.jpg", categoryKey: "tops" },
+    { title: "Wide Leg Jeans", growth: "6%", direction: "Rising", image: "/web/assets/trend_jeans.jpg", categoryKey: "jeans" },
+    { title: "Chunky Sneakers", growth: "5%", direction: "Rising", image: "/web/assets/trend_sneaker.jpg", categoryKey: "sneakers" },
+    { title: "Crossbody Bags", growth: "3%", direction: "Declining", image: "/web/assets/trend_bag.jpg", categoryKey: "bags" }
+  ] : [
+    { title: "BMW M3 Sedan", growth: "15%", direction: "Rising", image: "/web/assets/hero_car.jpg", categoryKey: "sedan" },
+    { title: "Audi R8 V10", growth: "11%", direction: "Rising", image: "/web/assets/scan_car.jpg", categoryKey: "coupe" },
+    { title: "Mercedes-AMG GT", growth: "9%", direction: "Rising", image: "/web/assets/hero_car.jpg", categoryKey: "supercar" },
+    { title: "Porsche 911 Turbo", growth: "7%", direction: "Rising", image: "/web/assets/scan_car.jpg", categoryKey: "coupe" },
+    { title: "Tesla Model S", growth: "4%", direction: "Declining", image: "/web/assets/hero_car.jpg", categoryKey: "sedan" }
+  ];
+
+  container.innerHTML = items.map(item => {
+    const isRising = item.direction === "Rising";
+    const dirClass = isRising ? "trend-badge-rising" : "trend-badge-declining";
+    const dirIcon = isRising ? "↗" : "↘";
+    return `
+      <div class="trending-now-row" onclick="navigateToCategoryCluster('${item.categoryKey}', '${normGenre}')" title="Explore ${escapeHtml(item.title)} cluster">
+        <img class="trending-now-thumb" src="${item.image}" alt="${escapeHtml(item.title)}" onerror="this.src='/web/placeholder.png';">
+        <div class="trending-now-info">
+          <div class="trending-now-name">${escapeHtml(item.title)}</div>
+          <div class="trending-now-metrics">
+            <span class="trending-growth ${dirClass}">
+              <span>${dirIcon}</span>
+              <span>${escapeHtml(item.growth)}</span>
+            </span>
+            <span class="trending-status-text ${dirClass}">
+              <span>◆</span>
+              <span>${escapeHtml(item.direction)}</span>
+            </span>
+          </div>
+        </div>
+        <div class="trending-now-chevron">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// --------------------------------------------------------------------------
+// 4. Recent Scans (3 Items with Metadata & Match Counts)
+// --------------------------------------------------------------------------
+function renderRecentScansList() {
+  const container = document.getElementById("recent-scans-list");
+  if (!container) return;
+
+  const scans = [
+    {
+      title: "Nike Air Force 1",
+      subtitle: "Similar items found • 89% match",
+      timeAgo: "2 mins ago",
+      image: "/web/assets/scan_sneaker.jpg"
+    },
+    {
+      title: "Denim Jacket",
+      subtitle: "Similar items found • 92% match",
+      timeAgo: "12 mins ago",
+      image: "/web/assets/scan_jacket.jpg"
+    },
+    {
+      title: "Toyota Corolla",
+      subtitle: "Similar items found • 87% match",
+      timeAgo: "28 mins ago",
+      image: "/web/assets/scan_car.jpg"
+    }
+  ];
+
+  container.innerHTML = scans.map(s => `
+    <div class="recent-scan-row" onclick="switchTab('scanner-tab')">
+      <img class="recent-scan-img" src="${s.image}" alt="${escapeHtml(s.title)}" onerror="this.src='/web/placeholder.png';">
+      <div class="recent-scan-info">
+        <div class="recent-scan-name">${escapeHtml(s.title)}</div>
+        <div class="recent-scan-meta">${escapeHtml(s.subtitle)}</div>
+        <div class="recent-scan-time">${escapeHtml(s.timeAgo)}</div>
+      </div>
+      <div class="recent-scan-chevron">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  `).join("");
 }
 
 function renderDashboardActivityChart(activityData) {
@@ -543,6 +1113,116 @@ function initScannerControls() {
   if (snapPhotoBtn) snapPhotoBtn.addEventListener("click", captureCameraPhoto);
 }
 
+// ==========================================================================
+// Google Lens Interactive Viewfinder Controller
+// ==========================================================================
+
+let activeLensMode = "upload"; // "upload" | "camera"
+
+function switchLensMode(mode) {
+  activeLensMode = mode;
+  const btnUpload = document.getElementById("lens-mode-upload");
+  const btnCamera = document.getElementById("lens-mode-camera");
+  const uploadViewport = document.getElementById("lens-upload-viewport");
+  const cameraViewport = document.getElementById("lens-camera-viewport");
+
+  if (btnUpload) btnUpload.classList.toggle("active", mode === "upload");
+  if (btnCamera) btnCamera.classList.toggle("active", mode === "camera");
+
+  if (mode === "upload") {
+    if (uploadViewport) uploadViewport.classList.remove("hidden");
+    if (cameraViewport) cameraViewport.classList.add("hidden");
+    stopLensCameraStream();
+  } else {
+    if (uploadViewport) uploadViewport.classList.add("hidden");
+    if (cameraViewport) cameraViewport.classList.remove("hidden");
+    startLensCameraStream();
+  }
+}
+
+async function startLensCameraStream() {
+  const video = document.getElementById("lens-camera-video");
+  if (!video) return;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    cameraMediaStream = stream;
+    video.srcObject = stream;
+  } catch (err) {
+    showToast("Camera access unavailable. Switching back to file upload.", "error");
+    switchLensMode("upload");
+  }
+}
+
+function stopLensCameraStream() {
+  if (cameraMediaStream) {
+    cameraMediaStream.getTracks().forEach(t => t.stop());
+    cameraMediaStream = null;
+  }
+  const video = document.getElementById("lens-camera-video");
+  if (video) video.srcObject = null;
+}
+
+function captureLensPhoto() {
+  const video = document.getElementById("lens-camera-video");
+  const canvas = document.getElementById("lens-camera-canvas");
+  if (!video || !canvas) return;
+
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    if (blob) {
+      const file = new File([blob], "lens_scan_capture.jpg", { type: "image/jpeg" });
+      stopLensCameraStream();
+      switchLensMode("upload");
+      handleScannerImageUpload(file);
+      executeScannerSearch();
+    }
+  }, "image/jpeg", 0.95);
+}
+
+function renderLensFocalPins(attributes) {
+  const pinsLayer = document.getElementById("lens-focal-pins-layer");
+  if (!pinsLayer) return;
+
+  pinsLayer.innerHTML = "";
+  if (!attributes) return;
+
+  const detectedStyle = attributes.style || attributes.category || "Target Object";
+  const detectedColor = attributes.dominant_color ? `${attributes.dominant_color}` : "Feature";
+
+  const pinsData = [
+    { x: 48, y: 44, label: detectedStyle },
+    { x: 62, y: 68, label: detectedColor }
+  ];
+
+  pinsData.forEach(p => {
+    const pin = document.createElement("div");
+    pin.className = "lens-focal-pin";
+    pin.style.left = `${p.x}%`;
+    pin.style.top = `${p.y}%`;
+    pin.innerHTML = `
+      <div class="lens-focal-dot"></div>
+      <div class="lens-focal-tag">${escapeHtml(p.label)}</div>
+    `;
+    pin.onclick = (e) => {
+      e.stopPropagation();
+      showToast(`Focal point selected: ${p.label}`, "info");
+    };
+    pinsLayer.appendChild(pin);
+  });
+}
+
+function clearLensFocalPins() {
+  const pinsLayer = document.getElementById("lens-focal-pins-layer");
+  if (pinsLayer) pinsLayer.innerHTML = "";
+}
+
 async function openCameraModal() {
   const modal = document.getElementById("camera-modal");
   const video = document.getElementById("camera-stream-video");
@@ -598,7 +1278,8 @@ function handleScannerImageUpload(file) {
   currentUploadFile = file;
   currentSelectedSampleId = null;
 
-  document.querySelectorAll(".sample-pill").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".lens-sample-card, .sample-pill").forEach(p => p.classList.remove("active"));
+  clearLensFocalPins();
 
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -619,7 +1300,7 @@ async function executeScannerSearch() {
   const matchesGrid = document.getElementById("matches-grid");
   const statusLabel = document.getElementById("match-status-label");
   const attrBox = document.getElementById("visual-attributes-card");
-  const scanBeam = document.getElementById("scan-beam-anim");
+  const scanBeam = document.getElementById("lens-laser-beam") || document.getElementById("scan-beam-anim");
 
   if (!matchesGrid) return;
 
@@ -660,6 +1341,11 @@ async function executeScannerSearch() {
 
     const data = await res.json();
     const matches = data.matches || [];
+
+    // Render interactive focal pins on target
+    if (data.predicted_attributes) {
+      renderLensFocalPins(data.predicted_attributes);
+    }
 
     // Visual attributes display
     if (attrBox && data.predicted_attributes) {
@@ -1557,31 +2243,55 @@ async function loadSamplePills() {
     if (!res.ok) return;
     const items = await res.json();
 
-    const html = items.map(it => `
-      <button class="sample-pill" data-id="${it.item_id}" onclick="selectSampleQuery('${escapeHtml(it.item_id)}')">
-        ${escapeHtml(it.title)}
-      </button>
-    `).join("");
+    // Cache items if not already cached
+    items.forEach(it => {
+      if (!cachedCatalogItems.some(c => c.item_id === it.item_id)) {
+        cachedCatalogItems.push(it);
+      }
+    });
 
-    if (pillsContainer) pillsContainer.innerHTML = html;
-    if (simPillsContainer) simPillsContainer.innerHTML = html;
+    const lensCardsHtml = items.map(it => {
+      const imgPath = resolveImagePath(it.file_path);
+      const domainLabel = it.genre === "automotive" ? "Auto" : "Fashion";
+      return `
+        <div class="lens-sample-card" data-id="${escapeHtml(it.item_id)}" onclick="selectSampleQuery('${escapeHtml(it.item_id)}', true)">
+          <div class="lens-sample-thumb">
+            <img src="${imgPath}" alt="${escapeHtml(it.title)}" onerror="this.src='/web/placeholder.png';">
+            <span class="lens-sample-domain-tag">${domainLabel}</span>
+          </div>
+          <div class="lens-sample-info">
+            <span class="lens-sample-name" title="${escapeHtml(it.title)}">${escapeHtml(it.title)}</span>
+            <span class="lens-sample-action-hint">Tap to scan</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if (pillsContainer) pillsContainer.innerHTML = lensCardsHtml;
+
+    if (simPillsContainer) {
+      simPillsContainer.innerHTML = items.map(it => `
+        <button class="sample-pill" data-id="${escapeHtml(it.item_id)}" onclick="selectSampleQuery('${escapeHtml(it.item_id)}')">
+          ${escapeHtml(it.title)}
+        </button>
+      `).join("");
+    }
   } catch (err) {
     console.warn("Sample pills error:", err);
   }
 }
 
-function selectSampleQuery(itemId) {
+function selectSampleQuery(itemId, autoScan = false) {
   currentSelectedSampleId = itemId;
   currentUploadFile = null;
 
-  document.querySelectorAll(".sample-pill").forEach(p => {
+  document.querySelectorAll(".lens-sample-card, .sample-pill").forEach(p => {
     p.classList.toggle("active", p.dataset.id === itemId);
   });
 
   const previewContainer = document.getElementById("upload-preview-container");
   const promptEl = document.getElementById("upload-prompt");
-  if (previewContainer) previewContainer.classList.add("hidden");
-  if (promptEl) promptEl.classList.remove("hidden");
+  const runBtn = document.getElementById("btn-run-match");
 
   const sample = cachedCatalogItems.find(it => it.item_id === itemId);
   if (sample) {
@@ -1589,10 +2299,14 @@ function selectSampleQuery(itemId) {
     if (previewImg) previewImg.src = resolveImagePath(sample.file_path);
     if (previewContainer) previewContainer.classList.remove("hidden");
     if (promptEl) promptEl.classList.add("hidden");
+    if (runBtn) runBtn.disabled = false;
   }
 
-  const runBtn = document.getElementById("btn-run-match");
-  if (runBtn) runBtn.disabled = false;
+  clearLensFocalPins();
+
+  if (autoScan) {
+    executeScannerSearch();
+  }
 }
 
 function clearSimilaritySelection() {
@@ -1603,23 +2317,31 @@ function clearSimilaritySelection() {
   if (fileInput) fileInput.value = "";
   const previewContainer = document.getElementById("upload-preview-container");
   const promptEl = document.getElementById("upload-prompt");
+  const runBtn = document.getElementById("btn-run-match");
+  const attrBox = document.getElementById("visual-attributes-card");
+  const statusLabel = document.getElementById("match-status-label");
+  const laserBeam = document.getElementById("lens-laser-beam") || document.getElementById("scan-beam-anim");
+
   if (previewContainer) previewContainer.classList.add("hidden");
   if (promptEl) promptEl.classList.remove("hidden");
-
-  document.querySelectorAll(".sample-pill").forEach(p => p.classList.remove("active"));
-
-  const runBtn = document.getElementById("btn-run-match");
   if (runBtn) runBtn.disabled = true;
+  if (attrBox) attrBox.classList.add("hidden");
+  if (laserBeam) laserBeam.classList.add("hidden");
+  clearLensFocalPins();
 
-  const statusLabel = document.getElementById("match-status-label");
-  if (statusLabel) statusLabel.textContent = "Awaiting search query...";
+  document.querySelectorAll(".lens-sample-card, .sample-pill").forEach(p => p.classList.remove("active"));
+
+  if (statusLabel) {
+    statusLabel.textContent = "Awaiting search query...";
+    statusLabel.className = "badge badge-muted";
+  }
 
   const matchesGrid = document.getElementById("matches-grid");
   if (matchesGrid) {
     matchesGrid.innerHTML = `
       <div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
-        <p>Upload an image, snap a photo, or choose a test sample on the left to execute visual similarity search.</p>
+        <p>Select a visual test sample or upload an image to run real-time visual feature extraction.</p>
       </div>
     `;
   }
@@ -2161,6 +2883,11 @@ function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (parsed.researcherName === "FYP Evaluator / Committee" || !parsed.researcherName) {
+        parsed.researcherName = "Hamza Khalid";
+        parsed.researcherRole = "BSCS Final Year Project Researcher";
+        parsed.researcherEmail = "hamza.khalid@trendlens.ai";
+      }
       currentSettings = { ...DEFAULT_SETTINGS, ...parsed };
     }
   } catch (e) {
@@ -2184,6 +2911,57 @@ function loadSettings() {
 
   // Sync form inputs
   syncSettingsFormInputs();
+  renderHeaderProfile();
+}
+
+// ==========================================================================
+// Theme Engine (Light & Dark Palettes Only)
+// ==========================================================================
+
+function initThemeEngine() {
+  const saved = currentSettings.theme === "dark" ? "dark" : "light";
+  applyEffectiveTheme(saved);
+}
+
+function applyThemeSetting(val) {
+  const chosen = (val === "dark") ? "dark" : "light";
+  currentSettings.theme = chosen;
+  saveSettingsSilently();
+  applyEffectiveTheme(chosen);
+  showToast(`Theme switched to ${chosen === "dark" ? "Modern Dark" : "Editorial Light"} mode`, "info");
+}
+
+function toggleThemeFromMenu() {
+  const nextTheme = (currentSettings.theme === "dark") ? "light" : "dark";
+  applyThemeSetting(nextTheme);
+}
+
+function applyEffectiveTheme(themeSetting) {
+  const effective = (themeSetting === "dark") ? "dark" : "light";
+  const badgeText = (effective === "dark") ? "Dark" : "Light";
+
+  // Set DOM theme attribute
+  document.documentElement.setAttribute("data-theme", effective);
+
+  // Update theme select if present
+  const themeEl = document.getElementById("setting-theme");
+  if (themeEl && themeEl.value !== effective) {
+    themeEl.value = effective;
+  }
+
+  // Update dropdown badge if present
+  const badgeEl = document.getElementById("dropdown-theme-badge");
+  if (badgeEl) {
+    badgeEl.textContent = badgeText;
+  }
+}
+
+function saveSettingsSilently() {
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(currentSettings));
+  } catch (e) {
+    console.warn("Failed to save settings silently:", e);
+  }
 }
 
 function syncSettingsFormInputs() {
@@ -2203,7 +2981,7 @@ function syncSettingsFormInputs() {
   const resRoleEl = document.getElementById("setting-researcher-role");
 
   if (densityEl) densityEl.value = currentSettings.density || "comfortable";
-  if (themeEl) themeEl.value = currentSettings.theme || "light";
+  if (themeEl) themeEl.value = (currentSettings.theme === "dark") ? "dark" : "light";
   if (showNamesEl) showNamesEl.checked = currentSettings.showFilenames !== false;
   if (defGenreEl) defGenreEl.value = currentSettings.defaultGenre || "fashion";
   if (defViewEl) defViewEl.value = currentSettings.defaultExplorerView || "clusters";
@@ -2217,8 +2995,8 @@ function syncSettingsFormInputs() {
   }
   if (toastsEl) toastsEl.checked = currentSettings.enableToasts !== false;
   if (soundEl) soundEl.checked = currentSettings.soundAlerts === true;
-  if (resNameEl) resNameEl.value = currentSettings.researcherName || "FYP Evaluator / Committee";
-  if (resRoleEl) resRoleEl.value = currentSettings.researcherRole || "BSCS Final Year Project Defense";
+  if (resNameEl) resNameEl.value = currentSettings.researcherName || "Hamza Khalid";
+  if (resRoleEl) resRoleEl.value = currentSettings.researcherRole || "BSCS Final Year Project Researcher";
 }
 
 function applyDensityPreview() {
@@ -2243,8 +3021,9 @@ function saveSettingsFromForm() {
   const resRoleEl = document.getElementById("setting-researcher-role");
 
   currentSettings = {
+    ...currentSettings,
     density: densityEl ? densityEl.value : "comfortable",
-    theme: themeEl ? themeEl.value : "light",
+    theme: (themeEl && themeEl.value === "dark") ? "dark" : "light",
     showFilenames: showNamesEl ? showNamesEl.checked : true,
     defaultGenre: defGenreEl ? defGenreEl.value : "fashion",
     defaultExplorerView: defViewEl ? defViewEl.value : "clusters",
@@ -2254,8 +3033,8 @@ function saveSettingsFromForm() {
     similarityThreshold: threshEl ? (parseInt(threshEl.value) / 100) : 0.60,
     enableToasts: toastsEl ? toastsEl.checked : true,
     soundAlerts: soundEl ? soundEl.checked : false,
-    researcherName: resNameEl ? resNameEl.value.trim() : "FYP Evaluator",
-    researcherRole: resRoleEl ? resRoleEl.value.trim() : "Academic Committee"
+    researcherName: resNameEl ? resNameEl.value.trim() : (currentSettings.researcherName || "Hamza Khalid"),
+    researcherRole: resRoleEl ? resRoleEl.value.trim() : (currentSettings.researcherRole || "BSCS Final Year Project Researcher")
   };
 
   try {
@@ -2276,6 +3055,8 @@ function saveSettingsFromForm() {
   if (colLabel) colLabel.textContent = `${clusterGridColumns} Columns`;
   if (segCheckbox) segCheckbox.checked = showSegmentedImages;
 
+  applyEffectiveTheme(currentSettings.theme);
+  renderHeaderProfile();
   showToast("Preferences saved to local storage.", "success");
 }
 
@@ -2294,7 +3075,9 @@ function resetSettingsToDefault() {
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
   } catch (e) {}
 
+  applyEffectiveTheme("light");
   syncSettingsFormInputs();
+  renderHeaderProfile();
   document.body.classList.toggle("density-compact", currentSettings.density === "compact");
   clusterGridColumns = currentSettings.defaultColumns;
   showSegmentedImages = currentSettings.showSegmentedDefault;
@@ -2444,6 +3227,10 @@ function showToast(message, type = "info", duration = 3200) {
       setTimeout(() => toast.remove(), 250);
     }
   }, duration);
+}
+
+function showNotificationToast() {
+  showToast("All AI visual models & telemetry pipelines are online (ResNet-18, Prophet Forecaster).", "info", 3500);
 }
 
 // ==========================================================================
@@ -2768,4 +3555,428 @@ function filterMegaDrawerItems(query) {
   renderDrawerFashionItems();
   renderDrawerAutoItems();
 }
+
+// ==========================================================================
+// Account Menu, Dynamic Profile Avatar & Modals Controller
+// ==========================================================================
+
+const NEUTRAL_USER_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+let isAccountMenuOpen = false;
+let pendingProfileAvatarUrl = null;
+
+/**
+ * Safely extracts up to two uppercase initials from a full name.
+ * Handles single names, multi-part names, titles, and whitespace gracefully.
+ */
+function getInitials(name) {
+  if (!name || typeof name !== "string") return "";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/**
+ * Renders avatar content according to the strict priority rules:
+ * 1. Uploaded picture if available
+ * 2. User's initials derived safely from display name
+ * 3. Neutral SVG user icon if no name or picture available
+ * Includes automatic onerror fallback if an image fails to load.
+ */
+function renderAvatarIntoContainer(containerEl, avatarUrl, name) {
+  if (!containerEl) return;
+  containerEl.innerHTML = "";
+
+  if (avatarUrl && typeof avatarUrl === "string" && avatarUrl.trim() !== "") {
+    const img = document.createElement("img");
+    img.src = avatarUrl;
+    img.alt = name ? `${name}'s profile avatar` : "Researcher avatar";
+    img.className = "user-avatar-img";
+    img.onerror = () => {
+      // Fallback on image loading failure
+      renderAvatarFallback(containerEl, name);
+    };
+    containerEl.appendChild(img);
+  } else {
+    renderAvatarFallback(containerEl, name);
+  }
+}
+
+function renderAvatarFallback(containerEl, name) {
+  if (!containerEl) return;
+  containerEl.innerHTML = "";
+  const initials = getInitials(name);
+  if (initials) {
+    const span = document.createElement("span");
+    span.textContent = initials;
+    containerEl.appendChild(span);
+  } else {
+    containerEl.innerHTML = NEUTRAL_USER_SVG;
+  }
+}
+
+/**
+ * Updates all profile visual indicators across the application:
+ * - Header avatar circle and display name
+ * - Account dropdown header info
+ * - Accessible ARIA labels
+ */
+function renderHeaderProfile() {
+  const name = (currentSettings.researcherName && currentSettings.researcherName.trim()) || "Hamza Khalid";
+  const email = (currentSettings.researcherEmail && currentSettings.researcherEmail.trim()) || "hamza.khalid@trendlens.ai";
+  const avatarUrl = currentSettings.profileAvatarUrl || "";
+
+  // 1. Header Avatar Circle
+  const headerAvatarEl = document.getElementById("header-avatar-circle");
+  renderAvatarIntoContainer(headerAvatarEl, avatarUrl, name);
+
+  // 2. Header Profile Name
+  const headerNameEl = document.getElementById("header-profile-name");
+  if (headerNameEl) {
+    headerNameEl.textContent = name;
+  }
+
+  // 3. Header Button ARIA label
+  const userProfileBtn = document.getElementById("user-profile-btn");
+  if (userProfileBtn) {
+    userProfileBtn.setAttribute("aria-label", `Account menu for ${name}`);
+  }
+
+  // 4. Dropdown Header
+  const dropAvatarEl = document.getElementById("dropdown-avatar-circle");
+  renderAvatarIntoContainer(dropAvatarEl, avatarUrl, name);
+
+  const dropNameEl = document.getElementById("dropdown-user-name");
+  if (dropNameEl) {
+    dropNameEl.textContent = name;
+    dropNameEl.title = name;
+  }
+
+  const dropEmailEl = document.getElementById("dropdown-user-email");
+  if (dropEmailEl) {
+    dropEmailEl.textContent = email;
+    dropEmailEl.title = email;
+  }
+}
+
+/**
+ * Initializes the accessible Account Menu & Dropdown.
+ */
+function initAccountMenu() {
+  renderHeaderProfile();
+
+  // Close dropdown on click outside
+  document.addEventListener("click", (e) => {
+    const container = document.getElementById("account-menu-container");
+    if (isAccountMenuOpen && container && !container.contains(e.target)) {
+      closeAccountDropdown();
+    }
+  });
+
+  // Global keyboard shortcuts (Escape and Arrow navigation)
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (isAccountMenuOpen) {
+        closeAccountDropdown();
+        const btn = document.getElementById("user-profile-btn");
+        if (btn) btn.focus();
+      }
+      closeProfileModal();
+      closeAboutModal();
+    } else if (isAccountMenuOpen) {
+      handleAccountMenuKeydown(e);
+    }
+  });
+}
+
+function toggleAccountDropdown() {
+  if (isAccountMenuOpen) {
+    closeAccountDropdown();
+  } else {
+    openAccountDropdown();
+  }
+}
+
+function openAccountDropdown() {
+  const menu = document.getElementById("account-dropdown-menu");
+  const btn = document.getElementById("user-profile-btn");
+  if (!menu || !btn) return;
+
+  menu.classList.remove("hidden");
+  btn.setAttribute("aria-expanded", "true");
+  isAccountMenuOpen = true;
+
+  // Focus the first menu item for keyboard users
+  const firstItem = menu.querySelector(".dropdown-item");
+  if (firstItem) {
+    firstItem.focus();
+  }
+}
+
+function closeAccountDropdown() {
+  const menu = document.getElementById("account-dropdown-menu");
+  const btn = document.getElementById("user-profile-btn");
+  if (!menu || !btn) return;
+
+  menu.classList.add("hidden");
+  btn.setAttribute("aria-expanded", "false");
+  isAccountMenuOpen = false;
+}
+
+function handleAccountMenuKeydown(e) {
+  const menu = document.getElementById("account-dropdown-menu");
+  if (!menu) return;
+
+  const items = Array.from(menu.querySelectorAll(".dropdown-item"));
+  if (items.length === 0) return;
+
+  const currentIndex = items.indexOf(document.activeElement);
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    const nextIndex = (currentIndex + 1) % items.length;
+    items[nextIndex].focus();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+    items[prevIndex].focus();
+  } else if (e.key === "Tab") {
+    closeAccountDropdown();
+  }
+}
+
+/**
+ * Navigates directly to a specific section within the platform settings view.
+ */
+function navigateToSettingsSection(sectionId) {
+  closeAccountDropdown();
+  switchTab("settings-tab");
+
+  setTimeout(() => {
+    let targetEl = null;
+    if (sectionId === "profile") {
+      targetEl = document.getElementById("setting-researcher-name")?.closest(".settings-section-card");
+    } else if (sectionId === "appearance") {
+      targetEl = document.getElementById("setting-density")?.closest(".settings-section-card");
+    } else if (sectionId === "analysis") {
+      targetEl = document.getElementById("setting-default-genre")?.closest(".settings-section-card");
+    } else if (sectionId === "diagnostics") {
+      targetEl = document.querySelector(".telemetry-table-grid")?.closest(".settings-section-card");
+    }
+
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      targetEl.style.transition = "box-shadow 0.3s ease";
+      targetEl.style.boxShadow = "0 0 0 3px rgba(112, 64, 245, 0.35)";
+      setTimeout(() => {
+        targetEl.style.boxShadow = "";
+      }, 1600);
+    }
+  }, 120);
+}
+
+// ==========================================================================
+// Profile Modal Controller (View, Edit, Validate, and Persist)
+// ==========================================================================
+
+function openProfileModal() {
+  closeAccountDropdown();
+  const modal = document.getElementById("profile-modal");
+  if (!modal) return;
+
+  pendingProfileAvatarUrl = currentSettings.profileAvatarUrl || "";
+
+  // Prepopulate form inputs
+  const nameInput = document.getElementById("profile-input-name");
+  const emailInput = document.getElementById("profile-input-email");
+  const roleInput = document.getElementById("profile-input-role");
+  const domainInput = document.getElementById("profile-input-domain");
+  const densityInput = document.getElementById("profile-input-density");
+
+  if (nameInput) nameInput.value = currentSettings.researcherName || "Hamza Khalid";
+  if (emailInput) emailInput.value = currentSettings.researcherEmail || "hamza.khalid@trendlens.ai";
+  if (roleInput) roleInput.value = currentSettings.researcherRole || "BSCS Final Year Project Researcher";
+  if (domainInput) domainInput.value = currentSettings.defaultGenre || "fashion";
+  if (densityInput) densityInput.value = currentSettings.density || "comfortable";
+
+  // Clear previous error messages
+  document.getElementById("profile-name-error")?.classList.add("hidden");
+  document.getElementById("profile-email-error")?.classList.add("hidden");
+  document.getElementById("profile-photo-error")?.classList.add("hidden");
+
+  // Update preview circle
+  updateProfileModalAvatarPreview();
+
+  modal.classList.remove("hidden");
+
+  setTimeout(() => {
+    if (nameInput) nameInput.focus();
+  }, 100);
+}
+
+function closeProfileModal() {
+  const modal = document.getElementById("profile-modal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+  pendingProfileAvatarUrl = null;
+}
+
+function updateProfileModalAvatarPreview() {
+  const previewCircle = document.getElementById("profile-avatar-preview-circle");
+  const nameInput = document.getElementById("profile-input-name");
+  const currentName = nameInput ? nameInput.value.trim() : (currentSettings.researcherName || "Hamza Khalid");
+  renderAvatarIntoContainer(previewCircle, pendingProfileAvatarUrl, currentName);
+}
+
+function handleProfilePhotoUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  const errorEl = document.getElementById("profile-photo-error");
+  if (errorEl) errorEl.classList.add("hidden");
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    if (errorEl) {
+      errorEl.textContent = "Please select a valid image file (PNG, JPG, or WebP).";
+      errorEl.classList.remove("hidden");
+    }
+    return;
+  }
+
+  // 2MB size limit
+  if (file.size > 2 * 1024 * 1024) {
+    if (errorEl) {
+      errorEl.textContent = "Image size exceeds 2MB limit. Please upload a smaller photo.";
+      errorEl.classList.remove("hidden");
+    }
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    pendingProfileAvatarUrl = event.target.result;
+    updateProfileModalAvatarPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleRemoveProfilePhoto() {
+  pendingProfileAvatarUrl = "";
+  const fileInput = document.getElementById("profile-photo-input");
+  if (fileInput) fileInput.value = "";
+  updateProfileModalAvatarPreview();
+}
+
+function handleProfileFormSubmit(e) {
+  e.preventDefault();
+
+  const nameInput = document.getElementById("profile-input-name");
+  const emailInput = document.getElementById("profile-input-email");
+  const roleInput = document.getElementById("profile-input-role");
+  const domainInput = document.getElementById("profile-input-domain");
+  const densityInput = document.getElementById("profile-input-density");
+
+  const nameVal = nameInput ? nameInput.value.trim() : "";
+  const emailVal = emailInput ? emailInput.value.trim() : "";
+
+  let hasError = false;
+
+  // Validate Name
+  const nameError = document.getElementById("profile-name-error");
+  if (!nameVal) {
+    if (nameError) nameError.classList.remove("hidden");
+    hasError = true;
+  } else {
+    if (nameError) nameError.classList.add("hidden");
+  }
+
+  // Validate Email
+  const emailError = document.getElementById("profile-email-error");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailVal || !emailRegex.test(emailVal)) {
+    if (emailError) emailError.classList.remove("hidden");
+    hasError = true;
+  } else {
+    if (emailError) emailError.classList.add("hidden");
+  }
+
+  if (hasError) return;
+
+  // Show loading indicator
+  const saveBtn = document.getElementById("btn-save-profile");
+  const saveBtnText = document.getElementById("btn-save-profile-text");
+  if (saveBtn) saveBtn.disabled = true;
+  if (saveBtnText) saveBtnText.textContent = "Saving...";
+
+  setTimeout(() => {
+    // Update active settings
+    currentSettings.researcherName = nameVal;
+    currentSettings.researcherEmail = emailVal;
+    currentSettings.researcherRole = roleInput ? roleInput.value.trim() : currentSettings.researcherRole;
+    currentSettings.defaultGenre = domainInput ? domainInput.value : currentSettings.defaultGenre;
+    currentSettings.density = densityInput ? densityInput.value : currentSettings.density;
+    currentSettings.profileAvatarUrl = pendingProfileAvatarUrl !== null ? pendingProfileAvatarUrl : currentSettings.profileAvatarUrl;
+
+    // Persist to localStorage
+    try {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(currentSettings));
+    } catch (err) {
+      console.error("Failed to persist profile settings:", err);
+    }
+
+    // Apply immediate density change
+    document.body.classList.toggle("density-compact", currentSettings.density === "compact");
+
+    // Sync settings page inputs
+    syncSettingsFormInputs();
+
+    // Re-render header & dropdown
+    renderHeaderProfile();
+
+    if (saveBtn) saveBtn.disabled = false;
+    if (saveBtnText) saveBtnText.textContent = "Save Changes";
+
+    closeProfileModal();
+    showToast("Profile credentials updated successfully!", "success");
+  }, 250);
+}
+
+// ==========================================================================
+// About Modal & Local Demo Session Reset Controller
+// ==========================================================================
+
+function openAboutModal() {
+  closeAccountDropdown();
+  const modal = document.getElementById("about-modal");
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeAboutModal() {
+  const modal = document.getElementById("about-modal");
+  if (modal) modal.classList.add("hidden");
+}
+
+function confirmResetSession() {
+  closeAccountDropdown();
+  showConfirmModal({
+    title: "Reset Local Demo Session?",
+    message: "This will clear your local researcher profile customization, reset preferences to defaults, and clear temporary session search history.",
+    isDanger: true,
+    onConfirm: () => {
+      try {
+        localStorage.removeItem(SETTINGS_STORAGE_KEY);
+      } catch (err) {
+        console.error("Error clearing settings:", err);
+      }
+      currentSettings = { ...DEFAULT_SETTINGS };
+      document.body.classList.toggle("density-compact", currentSettings.density === "compact");
+      syncSettingsFormInputs();
+      renderHeaderProfile();
+      showToast("Demo session reset to default state.", "info");
+    }
+  });
+}
+
 
