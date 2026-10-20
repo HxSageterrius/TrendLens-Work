@@ -34,7 +34,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.clustering.cluster_engine import VisualClusterEngine
-from src.embeddings.extractor import FeatureExtractor, load_embeddings
+from src.embeddings.extractor import FeatureExtractor, load_embeddings, save_embeddings
 from src.forecasting.trend_forecaster import TrendForecaster
 from src.similarity.similarity_engine import SimilarityEngine
 
@@ -82,7 +82,41 @@ def load_app_resources():
             cluster_summary_cache = json.load(f)
 
     emb_file = embeddings_dir / "fashion_embeddings.npy"
-    if emb_file.is_file() and catalog_df is not None:
+    if catalog_df is not None and not emb_file.is_file():
+        # Fresh clone: fashion_embeddings.npy is generated output and is not
+        # committed, so build it on first startup from the catalog images
+        # instead of leaving fashion similarity unavailable (503).
+        # Set TRENDLENS_SKIP_EMBEDDING_BUILD=1 to opt out (e.g. in tests).
+        if os.environ.get("TRENDLENS_SKIP_EMBEDDING_BUILD") == "1":
+            print("[API] Fashion embeddings missing and auto-build disabled "
+                  "(TRENDLENS_SKIP_EMBEDDING_BUILD=1); fashion similarity unavailable.")
+        else:
+            try:
+                print("[API] Fashion embeddings not found — building them from "
+                      "the catalog on first startup (this downloads ResNet-18 "
+                      "weights and may take a minute)...")
+                extractor = FeatureExtractor(backbone_name="resnet18")
+                embeddings, valid_df = extractor.extract_from_catalog(
+                    catalog_df, project_root=PROJECT_ROOT)
+                save_embeddings(
+                    embeddings=embeddings,
+                    metadata_df=valid_df,
+                    output_dir=embeddings_dir,
+                    filename_prefix="fashion"
+                )
+                similarity_engine = SimilarityEngine(
+                    embeddings=embeddings,
+                    metadata_df=valid_df,
+                    feature_extractor=extractor
+                )
+                print(f"[API] Fashion embeddings built: {embeddings.shape} "
+                      f"for {len(valid_df)} catalog items.")
+            except Exception as e:
+                print(f"[API] Warning: could not build fashion embeddings on "
+                      f"startup: {e}. Fashion similarity will be unavailable; "
+                      f"run src/pipeline_runner.py to generate them manually.")
+
+    if emb_file.is_file() and catalog_df is not None and similarity_engine is None:
         try:
             embeddings, meta = load_embeddings(embeddings_dir, filename_prefix="fashion")
             extractor = FeatureExtractor(backbone_name="resnet18")
