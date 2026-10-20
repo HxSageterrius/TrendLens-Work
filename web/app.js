@@ -2432,102 +2432,105 @@ const TREND_REPORTS_DATABASE = {
     heroChip: "Fashion AI Briefing",
     kpis: {
       volume: "39 Garments",
-      volumeSub: "Curated Benchmark Assets",
-      clusters: "K=6 Families",
+      volumeSub: "Project-Assembled Catalog",
+      clusters: "K=8 Families",
       clustersSub: "ResNet-18 512D Vectors",
       trajectory: "Rising (+25.8%)",
-      trajectorySub: "Denim & Outwear Hot Index",
+      trajectorySub: "Denim — Fastest-Growing Style",
       engine: "Prophet AI",
-      engineSub: "90% Confidence Bounds"
+      engineSub: "Weekly Seasonality"
     },
-    executiveSummary: "Visual feature clustering and consumer engagement metrics highlight a definitive pivot toward structured, heavyweight outerwear and raw denim for Q4 2026. ResNet-18 visual representation learning partitions the catalog into 6 cohesive silhouette families, demonstrating high intra-cluster consistency between visual feature vectors and garment styles.",
+    executiveSummary: "In the forecaster's committed run over the project's simulated engagement series, Denim (+25.8% projected growth) and Minimalist (+17.8%) are the fastest-growing styles, while Y2K declines sharply (-57.3%). ResNet-18 embeddings partition the clustered items into 8 visual families, including dedicated sneakers and bags clusters alongside the garment categories.",
     takeaways: [
       {
         icon: "🧥",
-        title: "Outerwear Surge (+25.8%)",
-        desc: "Double-breasted trench coats and structured utility jackets have overtaken lightweight layers as the primary growth driver."
+        title: "Denim-Led Growth (+25.8%)",
+        desc: "Denim is the fastest-growing style in the forecaster output (current score 68.4, projected 86.0), ahead of Minimalist at +17.8%."
       },
       {
         icon: "🎯",
-        title: "Silhouette Cohesion (K=6)",
-        desc: "Silhouette validation confirms distinct clustering between long-sleeve tops, denim trousers, and winter outerwear."
+        title: "Silhouette Cohesion (K=8)",
+        desc: "K-Means over the ResNet-18 embeddings groups the items into 8 clusters, spanning garment categories plus sneakers and bags."
       },
       {
         icon: "📈",
-        title: "Consumer-to-Shop Alignment",
-        desc: "Consumer UGC uploads exhibit an 82% aesthetic alignment with commercial retail catalog silhouettes."
+        title: "Consumer-to-Shop Pairing",
+        desc: "Catalog items are stored as shop/user pairs in the DeepFashion2 annotation schema, so consumer photos and retail images of a garment can be matched with the similarity engine."
       }
     ],
     tableHeaders: ["Aesthetic Style", "Current Score", "Forecast Index", "Growth Rate", "Trajectory"],
     tableRows: [
-      { style: "Denim", current: 68.4, projected: 82.5, growth: "+25.8%", badge: "Rising (Hot Trend)", color: "emerald" },
-      { style: "Minimalist", current: 101.9, projected: 115.9, growth: "+17.8%", badge: "Rising (Hot Trend)", color: "emerald" },
-      { style: "Athleisure", current: 106.3, projected: 113.6, growth: "+10.8%", badge: "Peaking", color: "sky" },
-      { style: "Streetwear", current: 67.0, projected: 67.0, growth: "+0.0%", badge: "Stable / Classic", color: "violet" },
-      { style: "Cottagecore", current: 52.1, projected: 48.6, growth: "-6.7%", badge: "Peaking", color: "amber" },
-      { style: "Y2K", current: 84.5, projected: 36.1, growth: "-57.3%", badge: "Declining", color: "rose" }
+      { style: "Denim", current: 68.4, projected: 86.0, growth: "+25.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Minimalist", current: 101.9, projected: 120.1, growth: "+17.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Athleisure", current: 106.3, projected: 117.7, growth: "+10.8%", badge: "Peaking", color: "amber" },
+      { style: "Streetwear", current: 67.0, projected: 67.1, growth: "+0.0%", badge: "Stable / Classic", color: "violet" },
+      { style: "Cottagecore", current: 73.8, projected: 68.9, growth: "-6.7%", badge: "Peaking", color: "amber" },
+      { style: "Y2K", current: 71.4, projected: 30.5, growth: "-57.3%", badge: "Declining", color: "rose" }
     ],
     exemplars: [
-      { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Outwear • Wool • Commercial Shop", similarity: "Centroid Exemplar" },
-      { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Heavyweight • Streetwear", similarity: "94.2% Aesthetic Affinity" },
-      { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Minimalist • Fleece • Clean Line", similarity: "91.8% Aesthetic Affinity" },
-      { title: "Wide-Leg Classic Denim Trousers", category: "trousers", image: "/images/DF2_0024_trousers_shop.jpg", tags: "Denim • Wide-Leg • Everyday", similarity: "88.6% Aesthetic Affinity" }
+      { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Outwear • Wool • Commercial Shop", similarity: "Cluster #4 Member" },
+      { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Heavyweight • Streetwear", similarity: "Cluster #1 Member" },
+      { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Minimalist • Fleece • Clean Line", similarity: "Cluster #1 Member" },
+      { title: "Wide-Leg Classic Denim Trousers", category: "trousers", image: "/images/DF2_0024_trousers_shop.jpg", tags: "Denim • Wide-Leg • Everyday", similarity: "Cluster #4 Member" }
     ],
-    provenance: "Curated multimodal fashion trends repository with time-series engagement logs and high-resolution garment imagery. Deep visual representations extracted using PyTorch ResNet-18 (512-dimensional output vectors). Clustering executed via Scikit-Learn K-Means (K=6). Trajectory forecasting performed via Facebook/Meta Prophet with weekly seasonality and 90% uncertainty intervals."
+    provenance: "Fashion catalog assembled for this project in the DeepFashion2 annotation format (13 categories, shop/user pairs, bounding boxes) from Unsplash stock photography with hand-authored annotations — not the official DeepFashion2 dataset. The weekly trend series is simulated. Visual representations extracted using PyTorch ResNet-18 (512-dimensional vectors). Clustering executed via Scikit-Learn K-Means (K=8). Trajectory forecasting performed via Facebook/Meta Prophet with a statistical fallback; the table figures are the forecaster's committed output (data/forecasts/trend_forecasts.json)."
   },
 
   "ev_design": {
     id: "ev_design",
-    title: "Electric Vehicles & Aerodynamic Design Taxonomy Report",
-    subtitle: "Fastback rooflines, minimized front fascia aprons, and fine-grained visual vehicle categorization.",
+    title: "Automotive Visual Taxonomy & Body-Style Clustering Report",
+    subtitle: "Body-style groupings and visual cluster structure in the 45-image Stanford Cars subset.",
     genre: "automotive",
-    categoryBadge: "Aerodynamics & Design",
+    categoryBadge: "Visual Taxonomy",
     date: "October 10, 2026",
     readTime: "8 min read",
     coverImage: "/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg",
     heroChip: "Automotive Vision Lab",
     kpis: {
       volume: "45 Vehicles",
-      volumeSub: "Stanford Cars Benchmark",
-      clusters: "K=6 Body Classes",
-      clustersSub: "Coupe, Sedan, SUV, Truck",
-      trajectory: "Aero Focus",
-      trajectorySub: "Low Drag Coefficient",
+      volumeSub: "Stanford Cars Subset (Smoke Test)",
+      clusters: "K=3 Clusters",
+      clustersSub: "K-Means on ResNet-18 Vectors",
+      trajectory: "7 Body Types",
+      trajectorySub: "Incl. 2 Labelled 'Other'",
       engine: "ResNet-18",
       engineSub: "Cosine Visual Proximity"
     },
-    executiveSummary: "Computer vision clustering on the Stanford Cars benchmark reveals acute aerodynamic streamlining across modern electric and high-efficiency performance silhouettes. Low-slung hoods, aggressive front apron sculpting, and tapered greenhouse geometries cluster distinctly away from traditional three-box sedans, representing an industry-wide transition toward drag minimization.",
+    executiveSummary: "K-Means clustering (K=3) over ResNet-18 embeddings of the 45-image Stanford Cars subset groups the cars into three visual families: a sedan-led group (10 cars), a truck/wagon-led group (14), and a convertible/coupe-led group (21). The visual clusters cut across the seven labelled body types, which is expected at this subset size: visually similar silhouettes share embedding space regardless of their label. All vehicles in the subset are 1993–2012 models; no electric vehicles are present, and no temporal forecasting is performed on this genre.",
     takeaways: [
       {
-        icon: "⚡",
-        title: "Front Apron Convergence",
-        desc: "Modern aerodynamic sedans and coupes feature integrated front air curtains and reduced grille apertures to decrease frontal drag."
+        icon: "🧩",
+        title: "Three Visual Families (K=3)",
+        desc: "Cluster sizes are 10, 14 and 21 vehicles, led respectively by sedans, trucks/wagons, and convertibles/coupes (data/automotive/forecasts/automotive_clusters_summary.json)."
       },
       {
-        icon: "📐",
-        title: "Tapered C-Pillar Geometry",
-        desc: "Fastback rooflines slope smoothly toward the rear decklid, delaying aerodynamic boundary-layer separation."
+        icon: "🏷️",
+        title: "Labels vs. Clusters",
+        desc: "The labelled body types (sedan 8, coupe 8, convertible 8, truck 7, SUV 7, wagon 5, other 2) do not map one-to-one onto the visual clusters — the embedding groups by appearance, not by catalogue label."
       },
       {
         icon: "🔬",
-        title: "Fine-Grained Classification",
-        desc: "Deep ResNet-18 embeddings capture micro-contours, accurately separating performance coupes from executive luxury sedans."
+        title: "Two Unclassified Cars",
+        desc: "The Chevrolet TrailBlazer SS and Dodge Challenger SRT8 carry the placeholder label 'other' in the catalog — a known data-quality item in the subset."
       }
     ],
-    tableHeaders: ["Body Type Class", "Aspect Ratio (H/W)", "Aero Profile", "Benchmark Model", "Clustering Group"],
+    tableHeaders: ["Body Type (Label)", "Vehicles", "Share of Subset", "Example Model", "Notes"],
     tableRows: [
-      { style: "Performance Coupe", current: 0.72, projected: 0.69, growth: "High Downforce", badge: "Aero Optimized", color: "emerald" },
-      { style: "Executive Sedan", current: 0.78, projected: 0.75, growth: "Low Drag Fastback", badge: "Efficiency Focus", color: "sky" },
-      { style: "Compact Hatchback", current: 0.84, projected: 0.82, growth: "Urban Kammback", badge: "Commuter Profile", color: "violet" },
-      { style: "Crossover Utility", current: 0.92, projected: 0.89, growth: "Tapered Roofline", badge: "Hybrid Utility", color: "amber" }
+      { style: "Sedan", current: 8, projected: "17.8%", growth: "Audi S4 Sedan", badge: "Tied Largest", color: "sky" },
+      { style: "Coupe", current: 8, projected: "17.8%", growth: "BMW M3 Coupe", badge: "Tied Largest", color: "sky" },
+      { style: "Convertible", current: 8, projected: "17.8%", growth: "Ferrari California", badge: "Tied Largest", color: "sky" },
+      { style: "Truck", current: 7, projected: "15.6%", growth: "Ford F-150", badge: "Catalog Label", color: "violet" },
+      { style: "SUV", current: 7, projected: "15.6%", growth: "Land Rover Range Rover", badge: "Catalog Label", color: "violet" },
+      { style: "Wagon", current: 5, projected: "11.1%", growth: "BMW 3 Series Wagon", badge: "Catalog Label", color: "violet" },
+      { style: "Other", current: 2, projected: "4.4%", growth: "Dodge Challenger SRT8", badge: "Unclassified — Known Gap", color: "rose" }
     ],
     exemplars: [
-      { title: "BMW M3 Performance Coupe", category: "Coupe", image: "/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg", tags: "Aero Sculpt • Coupe • Aggressive Fascia", similarity: "Centroid Exemplar" },
-      { title: "Audi S4 Performance Sedan", category: "Sedan", image: "/automotive-images/AUTO_0001_audi_s4_sedan_2012.jpg", tags: "Sedan • Singleframe • Low Drag", similarity: "95.1% Aero Affinity" },
-      { title: "Bentley Continental GT Coupe", category: "Coupe", image: "/automotive-images/AUTO_0022_bentley_cont_gt_coupe_2012.jpg", tags: "Coupe • Gran Turismo • Sleek", similarity: "92.4% Aero Affinity" },
-      { title: "Lamborghini Aventador LP700", category: "Coupe", image: "/automotive-images/AUTO_0023_lamborghini_aventador_2012.jpg", tags: "Supercar • Wedge Aero • Low Profile", similarity: "90.8% Aero Affinity" }
+      { title: "BMW M3 Performance Coupe", category: "Coupe", image: "/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg", tags: "Coupe • Performance • 2012", similarity: "Cluster #3 Member" },
+      { title: "Audi S4 Performance Sedan", category: "Sedan", image: "/automotive-images/AUTO_0001_audi_s4_sedan_2012.jpg", tags: "Sedan • Performance • 2012", similarity: "Cluster #1 Member" },
+      { title: "Bentley Continental GT Coupe", category: "Coupe", image: "/automotive-images/AUTO_0022_bentley_cont_gt_coupe_2012.jpg", tags: "Coupe • Gran Turismo • 2012", similarity: "Cluster #3 Member" },
+      { title: "Lamborghini Aventador LP700", category: "Coupe", image: "/automotive-images/AUTO_0023_lamborghini_aventador_2012.jpg", tags: "Supercar • Wedge Profile • 2012", similarity: "Cluster #3 Member" }
     ],
-    provenance: "Stanford Cars research dataset (Krause et al., ICCV 2013). Evaluated exclusively for non-commercial academic research. Visual embeddings extracted using PyTorch ResNet-18 trained on ImageNet and normalized to unit sphere. Temporal forecasting explicitly disabled: model_year values denote manufacturing years rather than temporal consumer demand series."
+    provenance: "45-image smoke-test subset of the Stanford Cars research dataset (Krause et al., ICCV 2013); all models are from 1993–2012 and no electric vehicles are included. Evaluated exclusively for non-commercial academic research. Visual embeddings extracted using PyTorch ResNet-18 trained on ImageNet and normalized to unit sphere. Temporal forecasting explicitly disabled: model_year values denote manufacturing years rather than temporal consumer demand series."
   },
 
   "streetwear_y2k": {
@@ -2542,44 +2545,44 @@ const TREND_REPORTS_DATABASE = {
     heroChip: "Subculture AI",
     kpis: {
       volume: "39 Garments",
-      volumeSub: "Streetwear & Graphic Assets",
-      clusters: "K=4 Sub-styles",
-      clustersSub: "Boxy, Utility, Denim, Y2K",
-      trajectory: "Peak Trajectory",
-      trajectorySub: "Boxy Graphic Heavyweights",
+      volumeSub: "Project-Assembled Catalog",
+      clusters: "6 Trend Styles",
+      clustersSub: "Simulated Engagement Series",
+      trajectory: "Y2K -57.3%",
+      trajectorySub: "Steepest Decline in Forecast",
       engine: "Prophet AI",
       engineSub: "Seasonality & Cycles"
     },
-    executiveSummary: "Streetwear continues to display strong consumer preference for structured drop-shoulder boxy silhouettes and vintage graphic treatments. Conversely, traditional Y2K-era metallic ornamentation and hyper-synthetic cuts have exhibited a -57.3% downward trajectory, signaling a broader market maturation toward utilitarian minimalism and authentic heavyweight denim.",
+    executiveSummary: "In the forecaster's committed run over the simulated engagement series, Streetwear is essentially flat (67.0 → 67.1, +0.0%, classified Stable / Classic), while Y2K shows the steepest decline of any style (-57.3%, 71.4 → 30.5). The growth in the same run sits elsewhere: Denim (+25.8%) and Minimalist (+17.8%). Note that Y2K's forecast carries a high in-sample error (MAPE 37.1%), so its direction is clearer than its magnitude.",
     takeaways: [
       {
         icon: "👕",
-        title: "Heavyweight Boxy Tees",
-        desc: "Boxy tees with 240+ GSM cotton construction represent over 44% of total engagement in casual apparel."
+        title: "Streetwear Holds Steady",
+        desc: "Streetwear's forecast is flat (+0.0%), the most stable trajectory in the run, and its per-style forecast error is the lowest of the six styles (MAPE 6.8%)."
       },
       {
         icon: "📉",
         title: "Y2K Fatigue (-57.3%)",
-        desc: "Glossy synthetic fabrics and rhinestone graphics are seeing rapid deceleration in algorithmic engagement."
+        desc: "Y2K posts the steepest projected decline in the forecaster output (71.4 → 30.5); its high forecast error (MAPE 37.1%) means the magnitude should be read with caution."
       },
       {
         icon: "🔄",
-        title: "Workwear Convergence",
-        desc: "Carhartt-style utility jackets and relaxed denim trousers have consolidated as the standard streetwear bottom pairing."
+        title: "Growth Sits Elsewhere",
+        desc: "The same forecast run puts the strongest growth in Denim (+25.8%) and Minimalist (+17.8%), rather than in streetwear sub-styles."
       }
     ],
-    tableHeaders: ["Subculture Style", "Current Score", "Forecast Index", "Growth Rate", "Trend Classification"],
+    tableHeaders: ["Trend Style (Forecaster)", "Current Score", "Forecast Index", "Growth Rate", "Trend Classification"],
     tableRows: [
-      { style: "Boxy Graphic Tees", current: 88.2, projected: 98.4, growth: "+11.6%", badge: "High Velocity", color: "emerald" },
-      { style: "Relaxed Workwear Denim", current: 74.0, projected: 86.5, growth: "+16.9%", badge: "Rising Core", color: "emerald" },
-      { style: "Minimalist Streetwear", current: 67.0, projected: 67.0, growth: "+0.0%", badge: "Stable Classic", color: "violet" },
-      { style: "Y2K Cyber / Rave", current: 84.5, projected: 36.1, growth: "-57.3%", badge: "Declining", color: "rose" }
+      { style: "Streetwear", current: 67.0, projected: 67.1, growth: "+0.0%", badge: "Stable / Classic", color: "violet" },
+      { style: "Y2K", current: 71.4, projected: 30.5, growth: "-57.3%", badge: "Declining", color: "rose" },
+      { style: "Denim", current: 68.4, projected: 86.0, growth: "+25.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Minimalist", current: 101.9, projected: 120.1, growth: "+17.8%", badge: "Rising (Hot Trend)", color: "emerald" }
     ],
     exemplars: [
-      { title: "Lucky Cat Streetwear Graphic Boxy Tee", category: "short sleeve top", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Streetwear • Boxy Fit • Graphic Print", similarity: "Centroid Exemplar" },
-      { title: "California Graphic Long-Sleeve Pullover", category: "long sleeve top", image: "/images/DF2_0005_long_sleeve_top_user.jpg", tags: "Streetwear • Graphic • Consumer Fit", similarity: "96.4% Aesthetic Affinity" },
-      { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Workwear • Outerwear", similarity: "93.1% Aesthetic Affinity" },
-      { title: "Street Graphic Tee (Consumer Upload)", category: "short sleeve top", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "UGC • Consumer Shot • Graphic", similarity: "91.5% Aesthetic Affinity" }
+      { title: "Lucky Cat Streetwear Graphic Boxy Tee", category: "short sleeve top", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Streetwear • Boxy Fit • Graphic Print", similarity: "Cluster #1 Member" },
+      { title: "California Graphic Long-Sleeve Pullover", category: "long sleeve top", image: "/images/DF2_0005_long_sleeve_top_user.jpg", tags: "Streetwear • Graphic • Consumer Fit", similarity: "Cluster #3 Member" },
+      { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Workwear • Outerwear", similarity: "Cluster #1 Member" },
+      { title: "Street Graphic Tee (Consumer Upload)", category: "short sleeve top", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "UGC • Consumer Shot • Graphic", similarity: "Cluster #1 Member" }
     ],
     provenance: "Curated fashion catalog assembled in the DeepFashion2 annotation format from Unsplash photography (not the official DeepFashion2 dataset), with a simulated time-series engagement log. Visual embeddings extracted using PyTorch ResNet-18 (512-dimensional output vectors). Clustering executed via Scikit-Learn K-Means. Forecasting performed via Facebook Prophet."
   },
@@ -2593,28 +2596,28 @@ const TREND_REPORTS_DATABASE = {
     date: "October 5, 2026",
     readTime: "7 min read",
     coverImage: "/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg",
-    heroChip: "Fleet Telemetry",
+    heroChip: "Automotive Segment Analysis",
     kpis: {
       volume: "45 Vehicles",
-      volumeSub: "Stanford Cars Cross-Section",
-      clusters: "K=3 Sub-segments",
-      clustersSub: "Compact, Midsize, Rugged",
-      trajectory: "High Stance",
-      trajectorySub: "Command Driving Position",
+      volumeSub: "Stanford Cars Subset (Smoke Test)",
+      clusters: "K=3 Clusters",
+      clustersSub: "10 / 14 / 21 Vehicles per Cluster",
+      trajectory: "7 SUVs in Subset",
+      trajectorySub: "15.6% of the 45 Vehicles",
       engine: "ResNet-18",
       engineSub: "512D Normalized Space"
     },
-    executiveSummary: "The Sport Utility Vehicle segment represents the largest volume category in modern passenger transportation. Visual feature clustering identifies a bifurcated design strategy: luxury flagship SUVs maintain upright greenhouse glass and bold vertical grilles, whereas urban crossovers converge tightly toward elevated hatchback geometries.",
+    executiveSummary: "The subset contains 7 SUVs among its 45 vehicles. In the K=3 visual clustering they do not form a cluster of their own: three sit in the sedan-led cluster, three in the truck/wagon-led cluster, and one (the Hyundai Tucson) in the convertible/coupe-led cluster. In other words, the embedding groups each SUV with the silhouettes it most resembles, not with its body-type label — larger upright SUVs land near trucks, compact crossovers near passenger cars.",
     takeaways: [
       {
         icon: "🚙",
-        title: "Boxy Stance Resurgence",
-        desc: "Premium utility vehicles (Range Rover, Grand Cherokee) reinforce brand prestige through vertical greenhouse pillars and high hoodlines."
+        title: "Upright Flagship Silhouettes",
+        desc: "The subset's premium SUVs (Range Rover, Grand Cherokee) keep upright greenhouse pillars and high hoodlines, and both land in the truck/wagon-led visual cluster."
       },
       {
         icon: "🏙️",
         title: "Crossover Convergence",
-        desc: "Compact crossovers share over 74% visual embedding cosine similarity with 5-door passenger hatchbacks."
+        desc: "The Jeep Compass clusters with the sedan-led group rather than with the larger SUVs, and the Hyundai Tucson sits in the coupe/convertible-led cluster — compact crossovers group by silhouette, not by label."
       },
       {
         icon: "⚠️",
@@ -2622,20 +2625,19 @@ const TREND_REPORTS_DATABASE = {
         desc: "Historical Stanford Cars dataset timestamps represent manufacturing year metadata, ensuring academic integrity by disallowing speculative sales forecasting."
       }
     ],
-    tableHeaders: ["Vehicle Segment", "Ground Clearance", "Silhouette Type", "Key Benchmark", "Taxonomy Classification"],
+    tableHeaders: ["SUV Placement (Visual Cluster)", "SUVs", "Share of SUVs", "Example Model", "Cluster Character"],
     tableRows: [
-      { style: "Luxury Full-Size SUV", current: 8.7, projected: 9.1, growth: "Command Presence", badge: "Flagship Luxury", color: "emerald" },
-      { style: "Mid-Size Sport SUV", current: 8.0, projected: 8.2, growth: "Dynamic Stance", badge: "Performance Utility", color: "sky" },
-      { style: "Rugged Off-Road 4x4", current: 9.6, projected: 9.8, growth: "Approach Angle", badge: "Trail Rated", color: "amber" },
-      { style: "Compact Urban Crossover", current: 6.8, projected: 6.9, growth: "Hatchback-Adjacent", badge: "Commuter Crossover", color: "violet" }
+      { style: "Cluster #1", current: 3, projected: "42.9%", growth: "Jeep Compass", badge: "Sedan-Led Group", color: "sky" },
+      { style: "Cluster #2", current: 3, projected: "42.9%", growth: "Land Rover Range Rover", badge: "Truck/Wagon-Led Group", color: "amber" },
+      { style: "Cluster #3", current: 1, projected: "14.3%", growth: "Hyundai Tucson", badge: "Coupe-Led Group", color: "violet" }
     ],
     exemplars: [
-      { title: "Land Rover Range Rover Luxury SUV", category: "SUV", image: "/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg", tags: "SUV • Luxury • Vertical Glass", similarity: "Centroid Exemplar" },
-      { title: "Toyota 4Runner Off-Road SUV", category: "SUV", image: "/automotive-images/AUTO_0012_toyota_4runner_suv_2012.jpg", tags: "SUV • Rugged • High Clearance", similarity: "94.8% Visual Affinity" },
-      { title: "Jeep Compass Compact SUV", category: "SUV", image: "/automotive-images/AUTO_0010_jeep_compass_suv_2012.jpg", tags: "SUV • Compact • Urban Crossover", similarity: "92.1% Visual Affinity" },
-      { title: "BMW X3 Luxury Mid-Size SUV", category: "SUV", image: "/automotive-images/AUTO_0013_bmw_x3_suv_2012.jpg", tags: "SUV • Mid-Size • Dynamic", similarity: "91.3% Visual Affinity" }
+      { title: "Land Rover Range Rover Luxury SUV", category: "SUV", image: "/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg", tags: "SUV • Luxury • Vertical Glass", similarity: "Cluster #2 Member" },
+      { title: "Toyota 4Runner Off-Road SUV", category: "SUV", image: "/automotive-images/AUTO_0012_toyota_4runner_suv_2012.jpg", tags: "SUV • Rugged • High Clearance", similarity: "Cluster #1 Member" },
+      { title: "Jeep Compass Compact SUV", category: "SUV", image: "/automotive-images/AUTO_0010_jeep_compass_suv_2012.jpg", tags: "SUV • Compact • Urban Crossover", similarity: "Cluster #1 Member" },
+      { title: "BMW X3 Luxury Mid-Size SUV", category: "SUV", image: "/automotive-images/AUTO_0013_bmw_x3_suv_2012.jpg", tags: "SUV • Mid-Size • Dynamic", similarity: "Cluster #1 Member" }
     ],
-    provenance: "Stanford Cars research dataset (Krause et al., ICCV 2013). Feature embeddings generated with ResNet-18 normalized to L2 unit sphere. Clustering executed via VisualClusterEngine (K-Means). Explicit methodological notice: Temporal forecasting paused to prevent conflating manufacturing model years with economic adoption velocity."
+    provenance: "45-image smoke-test subset of the Stanford Cars research dataset (Krause et al., ICCV 2013). Feature embeddings generated with ResNet-18 normalized to L2 unit sphere. Clustering executed via VisualClusterEngine (K-Means, K=3); SUV placement counts are read from data/automotive/forecasts/automotive_clusters_summary.json. Explicit methodological notice: Temporal forecasting paused to prevent conflating manufacturing model years with economic adoption velocity."
   },
 
   "df2_benchmark": {
@@ -2663,12 +2665,12 @@ const TREND_REPORTS_DATABASE = {
       {
         icon: "🔬",
         title: "Consumer-to-Shop Robustness",
-        desc: "Invariance to folds, lighting variations, and cluttered backgrounds through deep convolutional activation layers."
+        desc: "The pairing setup is designed to test retrieval across folds, lighting variations, and cluttered backgrounds between consumer and shop photos of the same garment."
       },
       {
         icon: "⚡",
-        title: "Ultra-Fast Cosine Retrieval",
-        desc: "Average query execution requires only 1.4ms across catalog assets using optimized dot product similarity calculations."
+        title: "Cosine Retrieval",
+        desc: "Queries are ranked by dot product over L2-normalized vectors against the catalog embeddings. No latency benchmark is committed in this repository, so no query-time figure is reported."
       },
       {
         icon: "🎯",
