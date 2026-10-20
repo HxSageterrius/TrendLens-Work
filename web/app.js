@@ -949,26 +949,21 @@ function renderRecentScansList() {
   const container = document.getElementById("recent-scans-list");
   if (!container) return;
 
-  const scans = [
-    {
-      title: "Nike Air Force 1",
-      subtitle: "Similar items found • 89% match",
-      timeAgo: "2 mins ago",
-      image: "/web/assets/scan_sneaker.jpg"
-    },
-    {
-      title: "Denim Jacket",
-      subtitle: "Similar items found • 92% match",
-      timeAgo: "12 mins ago",
-      image: "/web/assets/scan_jacket.jpg"
-    },
-    {
-      title: "Toyota Corolla",
-      subtitle: "Similar items found • 87% match",
-      timeAgo: "28 mins ago",
-      image: "/web/assets/scan_car.jpg"
-    }
-  ];
+  // This project does not log user scans, so do not show fabricated
+  // "recent scans". Show the most recent catalog items reported by
+  // /api/dashboard/summary instead, labelled as what they are.
+  const recentItems = (cachedDashboardSummary && cachedDashboardSummary.recent_catalog_items) || [];
+  const scans = recentItems.map(item => ({
+    title: item.title,
+    subtitle: "Recent catalog item",
+    timeAgo: item.timestamp || "",
+    image: item.image_url
+  }));
+
+  if (!scans.length) {
+    container.innerHTML = `<div class="recent-scan-row"><div class="recent-scan-info"><div class="recent-scan-name">No recent catalog items available</div></div></div>`;
+    return;
+  }
 
   container.innerHTML = scans.map(s => `
     <div class="recent-scan-row" onclick="switchTab('scanner-tab')">
@@ -997,11 +992,11 @@ function renderDashboardActivityChart(activityData) {
   dashboardActivityChartInstance = new Chart(ctx, {
     type: "line",
     data: {
-      labels: activityData.months || ["May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+      labels: activityData.months || [],
       datasets: [
         {
           label: "Fashion Trend Momentum",
-          data: activityData.fashion || [24, 45, 52, 68, 62, 85],
+          data: activityData.fashion || [],
           borderColor: "#7040D8",
           backgroundColor: "rgba(112, 64, 216, 0.08)",
           borderWidth: 2.5,
@@ -1011,8 +1006,8 @@ function renderDashboardActivityChart(activityData) {
           pointHoverRadius: 6
         },
         {
-          label: "Automotive Engagement Index",
-          data: activityData.automotive || [60, 58, 65, 54, 70, 78],
+          label: "Automotive Engagement Index (no temporal data available)",
+          data: activityData.automotive || [],
           borderColor: "#2563EB",
           backgroundColor: "transparent",
           borderWidth: 2,
@@ -1734,7 +1729,7 @@ function populateFashionFilters() {
   const styleFilter = document.getElementById("catalog-style-filter");
   const heading = document.getElementById("catalog-gallery-heading");
 
-  if (heading) heading.textContent = "DeepFashion2 Catalog Benchmark Assets";
+  if (heading) heading.textContent = "Fashion Catalog Assets (DeepFashion2 Schema)";
 
   if (catFilter) {
     catFilter.innerHTML = `
@@ -2586,7 +2581,7 @@ const TREND_REPORTS_DATABASE = {
       { title: "Vintage Trucker Denim Jacket", category: "long sleeve outwear", image: "/images/DF2_0012_long_sleeve_outwear_shop.jpg", tags: "Denim • Workwear • Outerwear", similarity: "93.1% Aesthetic Affinity" },
       { title: "Street Graphic Tee (Consumer Upload)", category: "short sleeve top", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "UGC • Consumer Shot • Graphic", similarity: "91.5% Aesthetic Affinity" }
     ],
-    provenance: "Curated fashion dataset with DeepFashion2 real benchmark images and time-series engagement logs. Visual embeddings extracted using PyTorch ResNet-18 (512-dimensional output vectors). Clustering executed via Scikit-Learn K-Means. Forecasting performed via Facebook Prophet."
+    provenance: "Curated fashion catalog assembled in the DeepFashion2 annotation format from Unsplash photography (not the official DeepFashion2 dataset), with a simulated time-series engagement log. Visual embeddings extracted using PyTorch ResNet-18 (512-dimensional output vectors). Clustering executed via Scikit-Learn K-Means. Forecasting performed via Facebook Prophet."
   },
 
   "suv_trends": {
@@ -2645,8 +2640,8 @@ const TREND_REPORTS_DATABASE = {
 
   "df2_benchmark": {
     id: "df2_benchmark",
-    title: "DeepFashion2 ResNet-18 Cross-Domain Retrieval Benchmark",
-    subtitle: "Consumer-to-Shop pairing accuracy, Top-K precision, and deep feature space evaluation.",
+    title: "Fashion ResNet-18 Retrieval Benchmark (DeepFashion2 Schema)",
+    subtitle: "Consumer-to-Shop pairing setup and Top-K evaluation method. No measured Top-K results are committed in this repository yet.",
     genre: "fashion",
     categoryBadge: "Computer Vision Benchmark",
     date: "October 19, 2026",
@@ -2654,16 +2649,16 @@ const TREND_REPORTS_DATABASE = {
     coverImage: "/images/DF2_0004_long_sleeve_top_shop.jpg",
     heroChip: "Vision AI Research",
     kpis: {
-      volume: "39 Benchmark Assets",
-      volumeSub: "13 Standard DF2 Classes",
-      clusters: "Top-1: 82.5%",
-      clustersSub: "Consumer-to-Shop Precision",
-      trajectory: "Top-5: 94.8%",
-      trajectorySub: "Cross-Domain Recall",
+      volume: "39 Catalog Assets",
+      volumeSub: "13 DeepFashion2-Schema Classes",
+      clusters: "Top-1: Not evaluated",
+      clustersSub: "No committed benchmark results",
+      trajectory: "Top-5: Not evaluated",
+      trajectorySub: "Evaluator exists in code",
       engine: "PyTorch ResNet-18",
       engineSub: "512D Normalized Vectors"
     },
-    executiveSummary: "This technical benchmark validates the visual retrieval efficacy of the TrendLens feature extractor on the DeepFashion2 benchmark. Using unconstrained mobile consumer photos as queries, the system searches catalog assets via cosine similarity in normalized 512-dimensional embedding space, achieving 82.5% Top-1 accuracy and 94.8% Top-5 recall across all 13 official garment categories.",
+    executiveSummary: "This benchmark setup applies the TrendLens feature extractor to a project-assembled fashion catalog that follows the DeepFashion2 annotation schema (13 categories, shop/user pairs). The photographs are Unsplash stock images with hand-authored annotations — not the official DeepFashion2 dataset. A consumer-to-shop Top-K retrieval evaluator is implemented in src/preprocessing/deepfashion2_adapter.py, but no measured Top-K results are committed in this repository, so no accuracy figures are reported here.",
     takeaways: [
       {
         icon: "🔬",
@@ -2681,22 +2676,22 @@ const TREND_REPORTS_DATABASE = {
         desc: "Distinct vector cluster separation between short-sleeve vs long-sleeve tops, trousers vs shorts, and coats vs vests."
       }
     ],
-    tableHeaders: ["DeepFashion2 Category", "Pair ID", "Query Asset", "Gallery Target", "Top-1 Precision", "Retrieval Recall"],
+    tableHeaders: ["Category (DeepFashion2 schema)", "Pair ID", "Query Asset", "Gallery Target", "Top-1 Precision", "Retrieval Recall"],
     tableRows: [
-      { style: "short sleeve top", current: 101, projected: 100.0, growth: "Exact Match", badge: "100% Top-1", color: "emerald" },
-      { style: "long sleeve top", current: 103, projected: 100.0, growth: "Exact Match", badge: "100% Top-1", color: "emerald" },
-      { style: "long sleeve outwear", current: 107, projected: 100.0, growth: "Exact Match", badge: "100% Top-1", color: "emerald" },
-      { style: "vest", current: 110, projected: 95.0, growth: "High Precision", badge: "95% Top-1", color: "sky" },
-      { style: "trousers", current: 115, projected: 92.5, growth: "High Precision", badge: "92% Top-1", color: "sky" },
-      { style: "sling dress", current: 125, projected: 90.0, growth: "Structural Match", badge: "90% Top-1", color: "violet" }
+      { style: "short sleeve top", current: 101, projected: "—", growth: "Not evaluated", badge: "No results committed", color: "sky" },
+      { style: "long sleeve top", current: 103, projected: "—", growth: "Not evaluated", badge: "No results committed", color: "sky" },
+      { style: "long sleeve outwear", current: 107, projected: "—", growth: "Not evaluated", badge: "No results committed", color: "sky" },
+      { style: "vest", current: 110, projected: "—", growth: "Not evaluated", badge: "No results committed", color: "sky" },
+      { style: "trousers", current: 115, projected: "—", growth: "Not evaluated", badge: "No results committed", color: "sky" },
+      { style: "sling dress", current: 125, projected: "—", growth: "Not evaluated", badge: "No results committed", color: "sky" }
     ],
     exemplars: [
-      { title: "Graphic Oversized Boxy Tee", category: "short sleeve top (Cat 1)", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Query Pair #101 • Shop Catalog Target", similarity: "100% Match Precision" },
-      { title: "Street Graphic Tee (Consumer Fit)", category: "short sleeve top (Cat 1)", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "Query Pair #101 • Consumer UGC Photo", similarity: "Exact Ground Truth Pair" },
-      { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top (Cat 2)", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Query Pair #103 • Shop Catalog Target", similarity: "100% Match Precision" },
-      { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear (Cat 4)", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Query Pair #107 • Shop Catalog Target", similarity: "100% Match Precision" }
+      { title: "Graphic Oversized Boxy Tee", category: "short sleeve top (Cat 1)", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Query Pair #101 • Shop Catalog Target", similarity: "Catalog pair exemplar" },
+      { title: "Street Graphic Tee (Consumer Fit)", category: "short sleeve top (Cat 1)", image: "/images/DF2_0002_short_sleeve_top_user.jpg", tags: "Query Pair #101 • Consumer UGC Photo", similarity: "Catalog pair exemplar" },
+      { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top (Cat 2)", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Query Pair #103 • Shop Catalog Target", similarity: "Catalog pair exemplar" },
+      { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear (Cat 4)", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Query Pair #107 • Shop Catalog Target", similarity: "Catalog pair exemplar" }
     ],
-    provenance: "DeepFashion2 benchmark dataset (Ge et al., IEEE CVPR 2019). Evaluated across paired commercial and consumer instances. Embeddings extracted using PyTorch ResNet-18 (512 dimensions). Evaluated with standard Information Retrieval metrics (Top-1, Top-2, Top-5, Top-10 precision)."
+    provenance: "Catalog assembled for this project in the DeepFashion2 annotation format (schema: Ge et al., IEEE CVPR 2019): Unsplash stock photography with hand-authored annotations — not the official DeepFashion2 dataset. Embeddings extracted using PyTorch ResNet-18 (512 dimensions). A Top-K retrieval evaluator is implemented in code; no measured results are committed yet."
   }
 };
 
@@ -3163,7 +3158,7 @@ async function checkBackendHealthLive(notify = true) {
       const fashionCountEl = document.getElementById("diag-fashion-count");
       const autoCountEl = document.getElementById("diag-auto-count");
       if (fashionCountEl && data.catalog_size) {
-        fashionCountEl.textContent = `${data.catalog_size} Products (DeepFashion2)`;
+        fashionCountEl.textContent = `${data.catalog_size} Products (DeepFashion2 schema)`;
       }
       if (autoCountEl && data.automotive_catalog_size) {
         autoCountEl.textContent = `${data.automotive_catalog_size} Vehicles (Stanford Cars)`;

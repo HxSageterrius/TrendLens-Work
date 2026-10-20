@@ -1,8 +1,12 @@
 """
-TrendLens — DeepFashion2 Dataset Adapter & Benchmark Evaluator
+TrendLens — DeepFashion2-Schema Adapter & Benchmark Evaluator
 Implements parsing, schema normalization, and Consumer-to-Shop Clothes Retrieval evaluation
-based on the official DeepFashion2 benchmark (Yuying Ge et al., CVPR 2019).
-Repo: https://github.com/switchablenorms/DeepFashion2
+using the annotation format of the DeepFashion2 benchmark (Yuying Ge et al., CVPR 2019).
+Schema reference: https://github.com/switchablenorms/DeepFashion2
+
+Note: the catalog this adapter loads is assembled for this project from
+Unsplash photography with hand-authored annotations in DeepFashion2 format;
+it is not the official DeepFashion2 dataset.
 """
 
 import json

@@ -8,6 +8,8 @@
 
 **TrendLens** is an AI-powered visual trend analysis and forecasting platform. The platform analyzes product images across different domains (starting with **Fashion** and later demonstrating a proof-of-concept in **Automobiles**), extracts deep visual features, groups visually similar products into clusters, tracks how clusters evolve over time, forecasts trend trajectory, and allows users to match new images against active trends.
 
+> **Data provenance:** The fashion catalog is *not* the official DeepFashion2 dataset. It is a catalog assembled for this project in the DeepFashion2 annotation format (13 categories, shop/user pairs, bounding boxes), using Unsplash stock photography with hand-authored annotations (see `scripts/build_deepfashion2_dataset.py`). The weekly fashion trend series is simulated. The automobile side uses a 45-image subset of the real Stanford Cars dataset. Dashboard figures are computed from these catalogs and outputs at request time; no benchmark accuracy figures are reported, because no measured Top-K retrieval results are committed in this repository yet.
+
 ---
 
 ## 🚀 Core Pipeline
@@ -56,7 +58,7 @@ Product Images
 ```text
 trendlens/
 ├── data/                    # Datasets (git-ignored, strictly structured)
-│   ├── raw/                 # Original image downloads (DeepFashion2 / Stanford Cars)
+│   ├── raw/                 # Reserved for original dataset downloads (currently empty)
 │   ├── processed/           # Resized and cleaned images
 │   ├── embeddings/          # Extracted visual feature vectors (.npy / .parquet)
 │   ├── forecasts/           # Trend forecasting models & outputs
@@ -83,7 +85,7 @@ trendlens/
 | Module | Name | Focus / Deliverable | Status |
 | :---: | :--- | :--- | :---: |
 | **0** | **Environment & Foundation** | Git setup, virtual env, folder layout, dependency verification | 🟢 *Completed* |
-| **1** | **Dataset & Preprocessing** | DeepFashion2 & TrendVerse-aligned structured fashion ingestion & sample builder | 🟢 *Completed* |
+| **1** | **Dataset & Preprocessing** | DeepFashion2-schema fashion catalog (Unsplash photography, hand-authored annotations) & TrendVerse-aligned sample builder | 🟢 *Completed* |
 | **2** | **Visual Feature Extraction** | ResNet-18 / CNN feature extractor & L2-normalized 512-dim embedding export | 🟢 *Completed* |
 | **3** | **Visual Clustering** | K-Means & DBSCAN clustering, silhouette evaluation, centroid exemplars | 🟢 *Completed* |
 | **4** | **Trend Identification & Forecasting** | Time-series engagement trajectory, Prophet & seasonal statistical forecasting | 🟢 *Completed* |
