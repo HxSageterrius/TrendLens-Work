@@ -82,13 +82,27 @@ def load_app_resources():
             cluster_summary_cache = json.load(f)
 
     emb_file = embeddings_dir / "fashion_embeddings.npy"
-    if catalog_df is not None and not emb_file.is_file():
+    embeddings_stale = False
+    if emb_file.is_file() and catalog_df is not None:
+        # A stored matrix built from an older catalog (e.g. before items
+        # were added) no longer matches the catalog rows — rebuild it so
+        # similarity results stay aligned with the catalog.
+        try:
+            stored_rows = np.load(emb_file, mmap_mode="r").shape[0]
+            embeddings_stale = stored_rows != len(catalog_df)
+            if embeddings_stale:
+                print(f"[API] Stored fashion embeddings have {stored_rows} rows "
+                      f"but the catalog has {len(catalog_df)} items — rebuilding.")
+        except Exception:
+            embeddings_stale = False
+
+    if catalog_df is not None and (not emb_file.is_file() or embeddings_stale):
         # Fresh clone: fashion_embeddings.npy is generated output and is not
         # committed, so build it on first startup from the catalog images
         # instead of leaving fashion similarity unavailable (503).
         # Set TRENDLENS_SKIP_EMBEDDING_BUILD=1 to opt out (e.g. in tests).
         if os.environ.get("TRENDLENS_SKIP_EMBEDDING_BUILD") == "1":
-            print("[API] Fashion embeddings missing and auto-build disabled "
+            print("[API] Fashion embeddings missing/stale and auto-build disabled "
                   "(TRENDLENS_SKIP_EMBEDDING_BUILD=1); fashion similarity unavailable.")
         else:
             try:
@@ -116,7 +130,7 @@ def load_app_resources():
                       f"startup: {e}. Fashion similarity will be unavailable; "
                       f"run src/pipeline_runner.py to generate them manually.")
 
-    if emb_file.is_file() and catalog_df is not None and similarity_engine is None:
+    if emb_file.is_file() and not embeddings_stale and catalog_df is not None and similarity_engine is None:
         try:
             embeddings, meta = load_embeddings(embeddings_dir, filename_prefix="fashion")
             extractor = FeatureExtractor(backbone_name="resnet18")
@@ -692,7 +706,7 @@ def get_data_sources_metadata():
     return {
         "fashion": {
             "name": "TrendLens Fashion Catalog (DeepFashion2 schema)",
-            "description": "Project-assembled clothing catalog using the DeepFashion2 annotation format: 13 categories, commercial-consumer (shop/user) retrieval pairs and bounding boxes. The photographs are Unsplash stock images and the annotations were hand-authored for this project; this is not the official DeepFashion2 dataset.",
+            "description": "Project-assembled clothing catalog using the DeepFashion2 annotation format: the 13 schema categories plus two project-extension categories (sneakers, bags), commercial-consumer (shop/user) retrieval pairs and bounding boxes. The photographs are Unsplash stock images and the annotations were hand-authored for this project; this is not the official DeepFashion2 dataset.",
             "schema_reference_url": "https://github.com/switchablenorms/DeepFashion2",
             "total_assets": len(catalog_df) if catalog_df is not None else 0,
             "categories": fashion_categories,

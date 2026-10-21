@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 202,
+  "item1": {
+    "category_name": "sneakers",
+    "category_id": 14,
+    "style": 202,
+    "bounding_box": [
+      42,
+      45,
+      358,
+      455
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}

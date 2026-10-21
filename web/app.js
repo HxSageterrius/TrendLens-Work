@@ -2431,7 +2431,7 @@ const TREND_REPORTS_DATABASE = {
     coverImage: "/images/DF2_0010_long_sleeve_outwear_shop.jpg",
     heroChip: "Fashion AI Briefing",
     kpis: {
-      volume: "39 Garments",
+      volume: "43 Catalog Items",
       volumeSub: "Project-Assembled Catalog",
       clusters: "K=8 Families",
       clustersSub: "ResNet-18 512D Vectors",
@@ -2543,7 +2543,7 @@ const TREND_REPORTS_DATABASE = {
     coverImage: "/images/DF2_0001_short_sleeve_top_shop.jpg",
     heroChip: "Subculture AI",
     kpis: {
-      volume: "39 Garments",
+      volume: "43 Catalog Items",
       volumeSub: "Project-Assembled Catalog",
       clusters: "6 Trend Styles",
       clustersSub: "Simulated Engagement Series",
@@ -2650,8 +2650,8 @@ const TREND_REPORTS_DATABASE = {
     coverImage: "/images/DF2_0004_long_sleeve_top_shop.jpg",
     heroChip: "Vision AI Research",
     kpis: {
-      volume: "39 Catalog Assets",
-      volumeSub: "13 DeepFashion2-Schema Classes",
+      volume: "43 Catalog Assets",
+      volumeSub: "13 Schema Classes + Sneakers & Bags",
       clusters: "Top-1: Not evaluated",
       clustersSub: "No committed benchmark results",
       trajectory: "Top-5: Not evaluated",

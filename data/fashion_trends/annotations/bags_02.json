@@ -1,0 +1,19 @@
+{
+  "source": "shop",
+  "pair_id": 302,
+  "item1": {
+    "category_name": "bags",
+    "category_id": 15,
+    "style": 302,
+    "bounding_box": [
+      38,
+      42,
+      362,
+      458
+    ],
+    "scale": 2,
+    "occlusion": 1,
+    "zoom_in": 1,
+    "viewpoint": 2
+  }
+}
