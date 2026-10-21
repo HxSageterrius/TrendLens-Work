@@ -2491,12 +2491,12 @@ const TREND_REPORTS_DATABASE = {
       volumeSub: "Stanford Cars Subset (Smoke Test)",
       clusters: "K=3 Clusters",
       clustersSub: "K-Means on ResNet-18 Vectors",
-      trajectory: "7 Body Types",
-      trajectorySub: "Incl. 2 Labelled 'Other'",
+      trajectory: "6 Body Types",
+      trajectorySub: "All 45 Cars Labelled",
       engine: "ResNet-18",
       engineSub: "Cosine Visual Proximity"
     },
-    executiveSummary: "K-Means clustering (K=3) over ResNet-18 embeddings of the 45-image Stanford Cars subset groups the cars into three visual families: a sedan-led group (10 cars), a truck/wagon-led group (14), and a convertible/coupe-led group (21). The visual clusters cut across the seven labelled body types, which is expected at this subset size: visually similar silhouettes share embedding space regardless of their label. All vehicles in the subset are 1993–2012 models; no electric vehicles are present, and no temporal forecasting is performed on this genre.",
+    executiveSummary: "K-Means clustering (K=3) over ResNet-18 embeddings of the 45-image Stanford Cars subset groups the cars into three visual families: a sedan-led group (10 cars), a truck/wagon-led group (14), and a convertible/coupe-led group (21). The visual clusters cut across the six labelled body types, which is expected at this subset size: visually similar silhouettes share embedding space regardless of their label. All vehicles in the subset are 1993–2012 models; no electric vehicles are present, and no temporal forecasting is performed on this genre.",
     takeaways: [
       {
         icon: "🧩",
@@ -2506,23 +2506,22 @@ const TREND_REPORTS_DATABASE = {
       {
         icon: "🏷️",
         title: "Labels vs. Clusters",
-        desc: "The labelled body types (sedan 8, coupe 8, convertible 8, truck 7, SUV 7, wagon 5, other 2) do not map one-to-one onto the visual clusters — the embedding groups by appearance, not by catalogue label."
+        desc: "The labelled body types (coupe 9, sedan 8, convertible 8, SUV 8, truck 7, wagon 5) do not map one-to-one onto the visual clusters — the embedding groups by appearance, not by catalogue label."
       },
       {
         icon: "🔬",
-        title: "Two Unclassified Cars",
-        desc: "The Chevrolet TrailBlazer SS and Dodge Challenger SRT8 carry the placeholder label 'other' in the catalog — a known data-quality item in the subset."
+        title: "No Unclassified Cars",
+        desc: "Every car in the subset carries a body-type label. The adapter's model-name overrides classify the Chevrolet TrailBlazer SS as an SUV and the Dodge Challenger SRT8 as a coupe — the two models its keyword map previously missed and labelled 'other'."
       }
     ],
     tableHeaders: ["Body Type (Label)", "Vehicles", "Share of Subset", "Example Model", "Notes"],
     tableRows: [
-      { style: "Sedan", current: 8, projected: "17.8%", growth: "Audi S4 Sedan", badge: "Tied Largest", color: "sky" },
-      { style: "Coupe", current: 8, projected: "17.8%", growth: "BMW M3 Coupe", badge: "Tied Largest", color: "sky" },
-      { style: "Convertible", current: 8, projected: "17.8%", growth: "Ferrari California", badge: "Tied Largest", color: "sky" },
+      { style: "Coupe", current: 9, projected: "20.0%", growth: "BMW M3 Coupe", badge: "Largest Group", color: "emerald" },
+      { style: "Sedan", current: 8, projected: "17.8%", growth: "Audi S4 Sedan", badge: "Catalog Label", color: "sky" },
+      { style: "Convertible", current: 8, projected: "17.8%", growth: "Ferrari California", badge: "Catalog Label", color: "sky" },
+      { style: "SUV", current: 8, projected: "17.8%", growth: "Land Rover Range Rover", badge: "Catalog Label", color: "sky" },
       { style: "Truck", current: 7, projected: "15.6%", growth: "Ford F-150", badge: "Catalog Label", color: "violet" },
-      { style: "SUV", current: 7, projected: "15.6%", growth: "Land Rover Range Rover", badge: "Catalog Label", color: "violet" },
-      { style: "Wagon", current: 5, projected: "11.1%", growth: "BMW 3 Series Wagon", badge: "Catalog Label", color: "violet" },
-      { style: "Other", current: 2, projected: "4.4%", growth: "Dodge Challenger SRT8", badge: "Unclassified — Known Gap", color: "rose" }
+      { style: "Wagon", current: 5, projected: "11.1%", growth: "BMW 3 Series Wagon", badge: "Catalog Label", color: "violet" }
     ],
     exemplars: [
       { title: "BMW M3 Performance Coupe", category: "Coupe", image: "/automotive-images/AUTO_0018_bmw_m3_coupe_2012.jpg", tags: "Coupe • Performance • 2012", similarity: "Cluster #3 Member" },
@@ -2602,12 +2601,12 @@ const TREND_REPORTS_DATABASE = {
       volumeSub: "Stanford Cars Subset (Smoke Test)",
       clusters: "K=3 Clusters",
       clustersSub: "10 / 14 / 21 Vehicles per Cluster",
-      trajectory: "7 SUVs in Subset",
-      trajectorySub: "15.6% of the 45 Vehicles",
+      trajectory: "8 SUVs in Subset",
+      trajectorySub: "17.8% of the 45 Vehicles",
       engine: "ResNet-18",
       engineSub: "512D Normalized Space"
     },
-    executiveSummary: "The subset contains 7 SUVs among its 45 vehicles. In the K=3 visual clustering they do not form a cluster of their own: three sit in the sedan-led cluster, three in the truck/wagon-led cluster, and one (the Hyundai Tucson) in the convertible/coupe-led cluster. In other words, the embedding groups each SUV with the silhouettes it most resembles, not with its body-type label — larger upright SUVs land near trucks, compact crossovers near passenger cars.",
+    executiveSummary: "The subset contains 8 SUVs among its 45 vehicles. In the K=3 visual clustering they do not form a cluster of their own: three sit in the sedan-led cluster, four in the truck/wagon-led cluster, and one (the Hyundai Tucson) in the convertible/coupe-led cluster. In other words, the embedding groups each SUV with the silhouettes it most resembles, not with its body-type label — larger upright SUVs land near trucks, compact crossovers near passenger cars.",
     takeaways: [
       {
         icon: "🚙",
@@ -2627,9 +2626,9 @@ const TREND_REPORTS_DATABASE = {
     ],
     tableHeaders: ["SUV Placement (Visual Cluster)", "SUVs", "Share of SUVs", "Example Model", "Cluster Character"],
     tableRows: [
-      { style: "Cluster #1", current: 3, projected: "42.9%", growth: "Jeep Compass", badge: "Sedan-Led Group", color: "sky" },
-      { style: "Cluster #2", current: 3, projected: "42.9%", growth: "Land Rover Range Rover", badge: "Truck/Wagon-Led Group", color: "amber" },
-      { style: "Cluster #3", current: 1, projected: "14.3%", growth: "Hyundai Tucson", badge: "Coupe-Led Group", color: "violet" }
+      { style: "Cluster #1", current: 3, projected: "37.5%", growth: "Jeep Compass", badge: "Sedan-Led Group", color: "sky" },
+      { style: "Cluster #2", current: 4, projected: "50.0%", growth: "Land Rover Range Rover", badge: "Truck/Wagon-Led Group", color: "amber" },
+      { style: "Cluster #3", current: 1, projected: "12.5%", growth: "Hyundai Tucson", badge: "Coupe-Led Group", color: "violet" }
     ],
     exemplars: [
       { title: "Land Rover Range Rover Luxury SUV", category: "SUV", image: "/automotive-images/AUTO_0011_landrover_rangerover_suv_2012.jpg", tags: "SUV • Luxury • Vertical Glass", similarity: "Cluster #2 Member" },

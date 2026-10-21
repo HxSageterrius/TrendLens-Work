@@ -7,7 +7,7 @@ AUTO_0005,Mercedes-Benz C-Class Sedan 2012,sedan,sedan,Mercedes-Benz,C-Class Sed
 AUTO_0006,Hyundai Sonata Sedan 2012,sedan,sedan,Hyundai,Sonata Sedan,2012,data\automotive\smoke_test\images\AUTO_0006_hyundai_sonata_sedan_2012.jpg,#hyundai #sedan #cars #automotive #stanfordcars
 AUTO_0007,Toyota Corolla Sedan 2012,sedan,sedan,Toyota,Corolla Sedan,2012,data\automotive\smoke_test\images\AUTO_0007_toyota_corolla_sedan_2012.jpg,#toyota #sedan #cars #automotive #stanfordcars
 AUTO_0008,Rolls-Royce Phantom Sedan 2012,sedan,sedan,Rolls-Royce,Phantom Sedan,2012,data\automotive\smoke_test\images\AUTO_0008_rollsroyce_phantom_sedan_2012.jpg,#rolls-royce #sedan #cars #automotive #stanfordcars
-AUTO_0009,Chevrolet TrailBlazer SS 2009,other,other,Chevrolet,TrailBlazer SS,2009,data\automotive\smoke_test\images\AUTO_0009_chevy_trailblazer_ss_2009.jpg,#chevrolet #other #cars #automotive #stanfordcars
+AUTO_0009,Chevrolet TrailBlazer SS 2009,suv,suv,Chevrolet,TrailBlazer SS,2009,data\automotive\smoke_test\images\AUTO_0009_chevy_trailblazer_ss_2009.jpg,#chevrolet #suv #cars #automotive #stanfordcars
 AUTO_0010,Jeep Compass SUV 2012,suv,suv,Jeep,Compass SUV,2012,data\automotive\smoke_test\images\AUTO_0010_jeep_compass_suv_2012.jpg,#jeep #suv #cars #automotive #stanfordcars
 AUTO_0011,Land Rover Range Rover SUV 2012,suv,suv,Land,Rover Range Rover SUV,2012,data\automotive\smoke_test\images\AUTO_0011_landrover_rangerover_suv_2012.jpg,#land #suv #cars #automotive #stanfordcars
 AUTO_0012,Toyota 4Runner SUV 2012,suv,suv,Toyota,4Runner SUV,2012,data\automotive\smoke_test\images\AUTO_0012_toyota_4runner_suv_2012.jpg,#toyota #suv #cars #automotive #stanfordcars
@@ -19,7 +19,7 @@ AUTO_0017,Audi A5 Coupe 2012,coupe,coupe,Audi,A5 Coupe,2012,data\automotive\smok
 AUTO_0018,BMW M3 Coupe 2012,coupe,coupe,BMW,M3 Coupe,2012,data\automotive\smoke_test\images\AUTO_0018_bmw_m3_coupe_2012.jpg,#bmw #coupe #cars #automotive #stanfordcars
 AUTO_0019,Audi TT RS Coupe 2012,coupe,coupe,Audi,TT RS Coupe,2012,data\automotive\smoke_test\images\AUTO_0019_audi_ttrs_coupe_2012.jpg,#audi #coupe #cars #automotive #stanfordcars
 AUTO_0020,Honda Accord Coupe 2012,coupe,coupe,Honda,Accord Coupe,2012,data\automotive\smoke_test\images\AUTO_0020_honda_accord_coupe_2012.jpg,#honda #coupe #cars #automotive #stanfordcars
-AUTO_0021,Dodge Challenger SRT8 2011,other,other,Dodge,Challenger SRT8,2011,data\automotive\smoke_test\images\AUTO_0021_dodge_challenger_srt8_2011.jpg,#dodge #other #cars #automotive #stanfordcars
+AUTO_0021,Dodge Challenger SRT8 2011,coupe,coupe,Dodge,Challenger SRT8,2011,data\automotive\smoke_test\images\AUTO_0021_dodge_challenger_srt8_2011.jpg,#dodge #coupe #cars #automotive #stanfordcars
 AUTO_0022,Bentley Continental GT Coupe 2012,coupe,coupe,Bentley,Continental GT Coupe,2012,data\automotive\smoke_test\images\AUTO_0022_bentley_cont_gt_coupe_2012.jpg,#bentley #coupe #cars #automotive #stanfordcars
 AUTO_0023,Lamborghini Aventador Coupe 2012,coupe,coupe,Lamborghini,Aventador Coupe,2012,data\automotive\smoke_test\images\AUTO_0023_lamborghini_aventador_2012.jpg,#lamborghini #coupe #cars #automotive #stanfordcars
 AUTO_0024,Volkswagen Golf Hatchback 2012,coupe,coupe,Volkswagen,Golf Hatchback,2012,data\automotive\smoke_test\images\AUTO_0024_vw_golf_hatchback_2012.jpg,#volkswagen #coupe #cars #automotive #stanfordcars

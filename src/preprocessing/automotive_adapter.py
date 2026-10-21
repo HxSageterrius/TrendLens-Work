@@ -41,9 +41,21 @@ _BODY_TYPE_MAP: Dict[str, str] = {
 }
 
 
+# Model-name overrides for vehicles whose labels carry no body-type token.
+# Without these, both models fall through to "other" even though their body
+# types are unambiguous (verified against the Stanford Cars classes).
+_MODEL_BODY_OVERRIDES: Dict[str, str] = {
+    "trailblazer": "suv",   # Chevrolet TrailBlazer SS — mid-size SUV
+    "challenger": "coupe",  # Dodge Challenger SRT8 — two-door coupe
+}
+
+
 def infer_body_type(label: str) -> str:
     """Heuristically infer body-type from a Stanford Cars label string."""
     lower = label.lower()
+    for token, body_type in _MODEL_BODY_OVERRIDES.items():
+        if token in lower:
+            return body_type
     for token, body_type in _BODY_TYPE_MAP.items():
         if token in lower:
             return body_type

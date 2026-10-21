@@ -164,23 +164,23 @@
     },
     "dominant_styles": {
       "truck": 6,
-      "wagon": 4
+      "suv": 4
     },
     "dominant_categories": {
       "truck": 6,
-      "wagon": 4
+      "suv": 4
     },
     "items": [
       {
         "item_id": "AUTO_0009",
         "title": "Chevrolet TrailBlazer SS 2009",
-        "category": "other",
-        "style": "other",
+        "category": "suv",
+        "style": "suv",
         "make": "Chevrolet",
         "model": "TrailBlazer SS",
         "model_year": 2009,
         "file_path": "data\\automotive\\smoke_test\\images\\AUTO_0009_chevy_trailblazer_ss_2009.jpg",
-        "tags": "#chevrolet #other #cars #automotive #stanfordcars",
+        "tags": "#chevrolet #suv #cars #automotive #stanfordcars",
         "cluster_id": 1
       },
       {
@@ -358,12 +358,12 @@
       "cluster_id": 2
     },
     "dominant_styles": {
-      "convertible": 8,
-      "coupe": 7
+      "coupe": 8,
+      "convertible": 8
     },
     "dominant_categories": {
-      "convertible": 8,
-      "coupe": 7
+      "coupe": 8,
+      "convertible": 8
     },
     "items": [
       {
@@ -453,13 +453,13 @@
       {
         "item_id": "AUTO_0021",
         "title": "Dodge Challenger SRT8 2011",
-        "category": "other",
-        "style": "other",
+        "category": "coupe",
+        "style": "coupe",
         "make": "Dodge",
         "model": "Challenger SRT8",
         "model_year": 2011,
         "file_path": "data\\automotive\\smoke_test\\images\\AUTO_0021_dodge_challenger_srt8_2011.jpg",
-        "tags": "#dodge #other #cars #automotive #stanfordcars",
+        "tags": "#dodge #coupe #cars #automotive #stanfordcars",
         "cluster_id": 2
       },
       {
