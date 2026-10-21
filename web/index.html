@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js for time-series curves -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/web/style.css?v=3.7">
+  <script src="/web/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/web/style.css?v=3.8">
 </head>
 <body>
   <!-- App Container -->
@@ -319,7 +319,7 @@
           <div class="mega-drawer-footer">
             <div class="mega-footer-info">
               <span class="mega-dot"></span>
-              <span><strong>Live Data Pipelines:</strong> ResNet-18 (512D) Feature Extraction • K-Means Silhouette Evaluated • Prophet Forecaster</span>
+              <span><strong>Live Data Pipelines:</strong> ResNet-18 (512D) Feature Extraction • K-Means Silhouette Evaluated • Prophet/Fallback Forecaster</span>
             </div>
             <div class="mega-footer-shortcut">
               <span>Press <kbd>Esc</kbd> or click outside to dismiss</span>
@@ -852,18 +852,18 @@
               </div>
               <div class="metric-card">
                 <span class="metric-label">Fashion Catalog Assets</span>
-                <div class="metric-value">36 Ingested Garments</div>
+                <div class="metric-value" id="fashion-metric-garments">43 Ingested Garments</div>
                 <span class="metric-trend neutral">L2-Normalized 512D ResNet-18</span>
               </div>
               <div class="metric-card">
                 <span class="metric-label">Visual Clusters</span>
-                <div class="metric-value">K=5 Aesthetic Groups</div>
+                <div class="metric-value" id="fashion-metric-clusters">K=8 Aesthetic Groups</div>
                 <span class="metric-trend positive">Silhouette Evaluated</span>
               </div>
               <div class="metric-card">
                 <span class="metric-label">Time Series Horizon</span>
                 <div class="metric-value">52 Weeks Observed</div>
-                <span class="metric-trend positive">Prophet Seasonal Modeling</span>
+                <span class="metric-trend positive">Seasonal Trend Modeling</span>
               </div>
             </div>
 
@@ -944,7 +944,7 @@
             <div class="card-header">
               <div>
                 <h2>Time-Series Trajectory Forecaster</h2>
-                <p>Weekly engagement projections with Facebook Prophet and seasonal harmonics</p>
+                <p>Weekly engagement projections with seasonal trend modeling (Prophet with statistical fallback)</p>
               </div>
               <div class="explorer-filters">
                 <div class="control-group" id="style-select-group">
@@ -988,7 +988,7 @@
 
             <!-- Model Evaluation Performance Box (MAE, RMSE, MAPE) -->
             <div class="model-metrics-row mb-3" id="model-metrics-box">
-              <span class="control-label">Model Evaluation Metrics (Prophet In-Sample & Validation):</span>
+              <span class="control-label" id="forecast-metrics-label">Model Evaluation Metrics (In-Sample & Validation):</span>
               <div class="model-metrics-pills">
                 <span class="metric-pill"><strong>MAE:</strong> <span id="metric-mae">12.4</span></span>
                 <span class="metric-pill"><strong>RMSE:</strong> <span id="metric-rmse">18.7</span></span>
@@ -1573,7 +1573,7 @@
                   </div>
                   <div class="telemetry-item">
                     <span class="telemetry-label">Forecaster Engine</span>
-                    <strong class="telemetry-val">Meta Prophet (Additive / 90% Bounds)</strong>
+                    <strong class="telemetry-val">Trend Forecaster (Prophet + Statistical Fallback, 90% Bounds)</strong>
                   </div>
                   <div class="telemetry-item">
                     <span class="telemetry-label">Clustering Engine</span>
@@ -1585,7 +1585,7 @@
                   </div>
                   <div class="telemetry-item">
                     <span class="telemetry-label">Fashion Catalog</span>
-                    <strong class="telemetry-val" id="diag-fashion-count">36 Products (DeepFashion2)</strong>
+                    <strong class="telemetry-val" id="diag-fashion-count">43 Products (DeepFashion2 schema)</strong>
                   </div>
                   <div class="telemetry-item">
                     <span class="telemetry-label">Automotive Catalog</span>
@@ -1815,7 +1815,7 @@
             </div>
             <div class="about-spec-item">
               <span class="about-spec-k">Time-Series Forecaster:</span>
-              <span class="about-spec-v">Meta Prophet (Bayesian Changepoint Inference)</span>
+              <span class="about-spec-v">Prophet / Statistical Fallback Forecaster</span>
             </div>
             <div class="about-spec-item">
               <span class="about-spec-k">Backend Pipeline:</span>
@@ -1868,6 +1868,6 @@
        ==================================================================== -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="/web/app.js?v=3.7"></script>
+  <script src="/web/app.js?v=3.8"></script>
 </body>
 </html>

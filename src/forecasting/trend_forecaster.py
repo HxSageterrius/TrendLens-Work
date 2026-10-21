@@ -73,11 +73,13 @@ class TrendForecaster:
         values = style_df["trend_score"].values
 
         # Attempt Prophet if installed
+        engine = "prophet"
         try:
             from prophet import Prophet
             forecast_dict = self._forecast_with_prophet(style_df, horizon_weeks)
         except (ImportError, Exception):
             # Statistical Seasonal Regression Fallback
+            engine = "statistical"
             forecast_dict = self._forecast_with_statistical_engine(style_df, horizon_weeks)
 
         # Compute trajectory classification
@@ -100,6 +102,7 @@ class TrendForecaster:
 
         return {
             "style": style,
+            "engine": engine,
             "trajectory": classification,
             "badge_color": badge_color,
             "growth_rate_pct": round(growth_rate, 1),

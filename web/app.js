@@ -45,7 +45,7 @@ let currentUploadFile = null;
 let cameraMediaStream = null;
 
 // Reference Cluster Explorer State
-let currentRunId = "2026-06-23";
+let currentRunId = "fashion-benchmark";
 let availableRuns = [];
 let currentRunClusters = [];
 let selectedClusterIndex = 0;
@@ -279,7 +279,7 @@ function loadAllGenreData() {
   if (currentGenre === "fashion") {
     loadForecastData("Streetwear", 12);
     if (currentRunId === "automotive-benchmark") {
-      currentRunId = "2026-06-23";
+      currentRunId = "fashion-benchmark";
       loadRunClusters(currentRunId);
     }
   } else {
@@ -370,6 +370,10 @@ async function loadDashboardTelemetry() {
     if (res.ok) {
       const data = await res.json();
       cachedDashboardSummary = data;
+      const fgEl = document.getElementById("fashion-metric-garments");
+      if (fgEl && data.fashion_items) fgEl.textContent = `${data.fashion_items} Ingested Garments`;
+      const fcEl = document.getElementById("fashion-metric-clusters");
+      if (fcEl && data.fashion_clusters) fcEl.textContent = `K=${data.fashion_clusters} Aesthetic Groups`;
 
       // Legacy containers support if present
       const trendingContainer = document.getElementById("trending-now-container");
@@ -409,6 +413,146 @@ async function loadDashboardTelemetry() {
 // --------------------------------------------------------------------------
 // 1. Trending Insights (Chart + Direction List)
 // --------------------------------------------------------------------------
+let insightsCache = { fashion: null, automotive: null };
+
+function trajectoryBadge(trajectory) {
+  const t = (trajectory || "").toLowerCase();
+  if (t.includes("rising")) return { status: "Rising", badgeClass: "direction-rising", icon: "↗" };
+  if (t.includes("declining")) return { status: "Declining", badgeClass: "direction-declining", icon: "↘" };
+  if (t.includes("peaking")) return { status: "Peaking", badgeClass: "direction-peaking", icon: "↗" };
+  return { status: "Stable", badgeClass: "direction-stable", icon: "—" };
+}
+
+function openStyleForecast(style) {
+  switchTab("forecast-tab");
+  const sel = document.getElementById("style-select");
+  if (sel) sel.value = style;
+  const slider = document.getElementById("horizon-range");
+  const horizon = slider ? (parseInt(slider.value, 10) || 12) : 12;
+  if (typeof loadForecastData === "function") loadForecastData(style, horizon);
+}
+
+async function renderFashionInsights(directionList, canvas) {
+  try {
+    if (!insightsCache.fashion) {
+      const sumRes = await fetch("/api/trends/summary?genre=fashion");
+      const summary = await sumRes.json();
+      const forecasts = await Promise.all(summary.map(s =>
+        fetch(`/api/trends/forecast?genre=fashion&style=${encodeURIComponent(s.style)}&horizon=12`)
+          .then(r => r.json()).catch(() => null)
+      ));
+      insightsCache.fashion = { summary, forecasts };
+    }
+    const { summary, forecasts } = insightsCache.fashion;
+    if (directionList) {
+      directionList.innerHTML = summary.map(s => {
+        const b = trajectoryBadge(s.trajectory);
+        const growth = `${s.growth_rate_pct > 0 ? "+" : ""}${s.growth_rate_pct}%`;
+        return `
+        <div class="direction-row" style="cursor: pointer;" onclick="openStyleForecast('${escapeHtml(s.style)}')" title="Open ${escapeHtml(s.style)} forecast">
+          <span class="direction-name">${escapeHtml(s.style)}</span>
+          <span class="direction-status ${b.badgeClass}">
+            <span class="direction-icon">${b.icon}</span>
+            <span>${b.status} (${growth})</span>
+          </span>
+        </div>`;
+      }).join("");
+    }
+    if (!canvas || typeof Chart === "undefined") return;
+    if (trendingInsightsChartInstance) {
+      trendingInsightsChartInstance.destroy();
+      trendingInsightsChartInstance = null;
+    }
+    const palette = ["#7040F5", "#3B82F6", "#F59E0B", "#10B981", "#06B6D4", "#EC4899"];
+    const series = forecasts.filter(Boolean);
+    const labels = (series[0]?.historical_points || []).slice(-12).map(p => (p.date || "").slice(5));
+    const datasets = series.map((f, i) => ({
+      label: f.style,
+      data: (f.historical_points || []).slice(-12).map(p => p.value),
+      borderColor: palette[i % palette.length],
+      backgroundColor: "transparent",
+      borderWidth: 2.2,
+      tension: 0.42,
+      pointRadius: 0,
+      pointHoverRadius: 5
+    }));
+    trendingInsightsChartInstance = new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: true, position: "right", labels: { usePointStyle: true, boxWidth: 6, font: { size: 10 } } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 6 } },
+          y: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { font: { size: 9 } } }
+        }
+      }
+    });
+  } catch (err) {
+    console.warn("Fashion insights failed:", err);
+  }
+}
+
+async function renderAutomotiveInsights(directionList, canvas) {
+  try {
+    if (!insightsCache.automotive) {
+      const res = await fetch("/api/catalog?genre=automotive");
+      const data = await res.json();
+      insightsCache.automotive = Array.isArray(data) ? data : (data.items || []);
+    }
+    const items = insightsCache.automotive;
+    const counts = {};
+    items.forEach(it => {
+      const c = (it.category || "other").toLowerCase();
+      counts[c] = (counts[c] || 0) + 1;
+    });
+    const cats = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const labelFor = c => ({ sedan: "Sedans", suv: "SUVs", coupe: "Coupes", convertible: "Convertibles", truck: "Pickup Trucks", wagon: "Wagons" }[c] || (c.charAt(0).toUpperCase() + c.slice(1)));
+    if (directionList) {
+      directionList.innerHTML = cats.map(([c, n]) => `
+        <div class="direction-row" style="cursor: pointer;" onclick="navigateToCategoryCluster('${c}', 'automotive')" title="Explore ${labelFor(c)} cluster">
+          <span class="direction-name">${labelFor(c)}</span>
+          <span class="direction-status direction-stable">
+            <span>${n} vehicles</span>
+          </span>
+        </div>`).join("");
+    }
+    if (!canvas || typeof Chart === "undefined") return;
+    if (trendingInsightsChartInstance) {
+      trendingInsightsChartInstance.destroy();
+      trendingInsightsChartInstance = null;
+    }
+    trendingInsightsChartInstance = new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: cats.map(([c]) => labelFor(c)),
+        datasets: [{
+          label: "Vehicles",
+          data: cats.map(([, n]) => n),
+          backgroundColor: ["#7040F5", "#3B82F6", "#F59E0B", "#10B981", "#06B6D4", "#EC4899"],
+          borderRadius: 6,
+          maxBarThickness: 42
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: { beginAtZero: true, grid: { color: "rgba(0,0,0,0.05)" }, ticks: { stepSize: 5, font: { size: 9 } } }
+        }
+      }
+    });
+  } catch (err) {
+    console.warn("Automotive insights failed:", err);
+  }
+}
+
 function renderTrendingInsights(genre) {
   const isFashion = (genre || currentGenre) === "fashion";
   const heading = document.getElementById("insights-chart-heading");
@@ -417,314 +561,16 @@ function renderTrendingInsights(genre) {
 
   if (heading) {
     heading.innerHTML = isFashion
-      ? `Top Fashion Categories <span class="header-timeframe">(Last 30 Days)</span>`
-      : `Top Automotive Categories <span class="header-timeframe">(Last 30 Days)</span>`;
+      ? `Top Fashion Styles <span class="header-timeframe">(Trend Series)</span>`
+      : `Top Automotive Categories <span class="header-timeframe">(Catalog Composition)</span>`;
   }
 
-  // Populate Direction List
-  if (directionList) {
-    const directions = isFashion ? [
-      { name: "Streetwear", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "tops" },
-      { name: "Denim", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "jeans" },
-      { name: "Formal Wear", status: "Stable", badgeClass: "direction-stable", icon: "—", categoryKey: "jackets" },
-      { name: "Dresses", status: "Declining", badgeClass: "direction-declining", icon: "↘", categoryKey: "dresses" },
-      { name: "Sneakers", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "sneakers" }
-    ] : [
-      { name: "Sedans", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "sedan" },
-      { name: "SUVs", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "suv" },
-      { name: "Coupes", status: "Stable", badgeClass: "direction-stable", icon: "—", categoryKey: "coupe" },
-      { name: "Convertibles", status: "Declining", badgeClass: "direction-declining", icon: "↘", categoryKey: "convertible" },
-      { name: "Pickup Trucks", status: "Rising", badgeClass: "direction-rising", icon: "↗", categoryKey: "truck" }
-    ];
-
-    directionList.innerHTML = directions.map(d => `
-      <div class="direction-row" style="cursor: pointer;" onclick="navigateToCategoryCluster('${d.categoryKey}', '${isFashion ? 'fashion' : 'automotive'}')" title="Explore ${escapeHtml(d.name)} cluster">
-        <span class="direction-name">${escapeHtml(d.name)}</span>
-        <span class="direction-status ${d.badgeClass}">
-          <span class="direction-icon">${d.icon}</span>
-          <span>${d.status}</span>
-        </span>
-      </div>
-    `).join("");
+  if (isFashion) {
+    renderFashionInsights(directionList, canvas);
+  } else {
+    renderAutomotiveInsights(directionList, canvas);
   }
-
-  // Render Multi-Line Insights Chart
-  if (!canvas) return;
-  if (trendingInsightsChartInstance) {
-    trendingInsightsChartInstance.destroy();
-    trendingInsightsChartInstance = null;
-  }
-
-  const ctx = canvas.getContext("2d");
-  const labels = ["Apr 10", "Apr 17", "Apr 24", "May 1", "May 8"];
-
-  const datasets = isFashion ? [
-    {
-      label: "Tops",
-      data: [46, 55, 68, 62, 72],
-      borderColor: "#7040F5",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Denim",
-      data: [32, 38, 48, 46, 56],
-      borderColor: "#3B82F6",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Sneakers",
-      data: [22, 26, 38, 36, 42],
-      borderColor: "#F59E0B",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Dresses",
-      data: [14, 16, 25, 23, 28],
-      borderColor: "#10B981",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Jackets",
-      data: [8, 10, 18, 16, 22],
-      borderColor: "#06B6D4",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    }
-  ] : [
-    {
-      label: "Sedans",
-      data: [50, 56, 65, 62, 70],
-      borderColor: "#7040F5",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "SUVs",
-      data: [38, 45, 54, 58, 64],
-      borderColor: "#3B82F6",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Coupes",
-      data: [26, 30, 34, 33, 38],
-      borderColor: "#F59E0B",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Trucks",
-      data: [16, 18, 22, 24, 27],
-      borderColor: "#10B981",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    },
-    {
-      label: "Convertibles",
-      data: [10, 12, 14, 13, 17],
-      borderColor: "#06B6D4",
-      backgroundColor: "transparent",
-      borderWidth: 2.2,
-      tension: 0.42,
-      pointRadius: 0,
-      pointHoverRadius: 5
-    }
-  ];
-
-  trendingInsightsChartInstance = new Chart(ctx, {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        mode: "index",
-        intersect: false
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: "right",
-          labels: {
-            usePointStyle: true,
-            pointStyle: "circle",
-            boxWidth: 7,
-            boxHeight: 7,
-            padding: 12,
-            font: { size: 11, family: "'Plus Jakarta Sans', sans-serif", weight: "500" },
-            color: "#4A4E69"
-          }
-        },
-        tooltip: {
-          backgroundColor: "#FFFFFF",
-          titleColor: "#202447",
-          bodyColor: "#7A819A",
-          borderColor: "#E7E8F0",
-          borderWidth: 1,
-          padding: 9,
-          boxPadding: 4,
-          usePointStyle: true
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: "#7A819A", font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" } },
-          border: { display: false }
-        },
-        y: {
-          min: 0,
-          max: 100,
-          ticks: {
-            stepSize: 25,
-            color: "#7A819A",
-            font: { size: 10, family: "'Plus Jakarta Sans', sans-serif" }
-          },
-          grid: {
-            color: "#F1F1F6",
-            drawBorder: false
-          },
-          border: { display: false }
-        }
-      }
-    }
-  });
 }
-
-// --------------------------------------------------------------------------
-// Category-to-Cluster Taxonomy & Cross-Navigation Mappings
-// --------------------------------------------------------------------------
-const CATEGORY_CLUSTER_MAPPINGS = {
-  fashion: {
-    tops: {
-      name: "Tops & T-Shirts",
-      keywords: ["top", "shirt", "crewneck", "tee", "sweatshirt", "blouse", "cotton", "sleeveless"],
-      defaultIndex_2026_06_23: 2, // Cluster 3 (sporty graphic prints, short silhouettes)
-      defaultIndex_fashion_benchmark: 0, // Minimalist tops
-      catalogCategory: "short sleeve top",
-      catalogSearch: "top"
-    },
-    jackets: {
-      name: "Jackets & Coats",
-      keywords: ["jacket", "coat", "outwear", "outerwear", "trench", "utility", "hoodie", "bomber"],
-      defaultIndex_2026_06_23: 3, // Cluster 4 (athleisure, sporty jackets, shorts)
-      defaultIndex_fashion_benchmark: 1, // Long sleeve outwear & trench coats
-      catalogCategory: "long sleeve outwear",
-      catalogSearch: "outwear"
-    },
-    dresses: {
-      name: "Dresses & Skirts",
-      keywords: ["dress", "skirt", "floral", "maxi", "wrap dress", "cottagecore", "slit", "elegant"],
-      defaultIndex_2026_06_23: 4, // Cluster 5 (floral, pastel, maxi, slit, elegant)
-      defaultIndex_fashion_benchmark: 4, // Cottagecore dresses
-      catalogCategory: "short sleeve dress",
-      catalogSearch: "dress"
-    },
-    jeans: {
-      name: "Jeans & Trousers",
-      keywords: ["denim", "trousers", "jean", "pants", "shorts", "wide-leg", "indigo", "raw wash"],
-      defaultIndex_2026_06_23: 1, // Cluster 2 (denim, shorts, stripes, casual)
-      defaultIndex_fashion_benchmark: 3, // Denim trousers & pants
-      catalogCategory: "trousers",
-      catalogSearch: "denim"
-    },
-    sneakers: {
-      name: "Sneakers & Footwear",
-      keywords: ["sneaker", "shoes", "chunky", "athletic footwear", "streetwear kicks", "running", "kicks"],
-      defaultIndex_2026_06_23: 7, // Cluster 8 (Chunky Sneakers & Athletic Footwear)
-      defaultIndex_fashion_benchmark: 6, // Cluster 7 (Sneakers & Footwear)
-      catalogCategory: "",
-      catalogSearch: "sneaker"
-    },
-    bags: {
-      name: "Bags & Accessories",
-      keywords: ["bag", "handbag", "crossbody", "leather accessories", "tote", "luxury", "hardware"],
-      defaultIndex_2026_06_23: 8, // Cluster 9 (Luxury Handbags & Crossbody Bags)
-      defaultIndex_fashion_benchmark: 7, // Cluster 8 (Bags & Luxury Accessories)
-      catalogCategory: "",
-      catalogSearch: "bag"
-    }
-  },
-  automotive: {
-    sedan: {
-      name: "Sedans",
-      keywords: ["sedan", "four-door", "executive", "saloon", "audi s4", "bmw 3"],
-      defaultIndex: 0, // Cluster 1: Sedan
-      catalogCategory: "sedan",
-      catalogSearch: "sedan"
-    },
-    suv: {
-      name: "SUVs",
-      keywords: ["suv", "crossover", "high-clearance", "grand cherokee"],
-      defaultIndex: 2, // Cluster 3: SUV & Pickup
-      catalogCategory: "suv",
-      catalogSearch: "suv"
-    },
-    coupe: {
-      name: "Coupes",
-      keywords: ["coupe", "two-door", "fastback", "bentley gt", "bmw m3 coupe"],
-      defaultIndex: 1, // Cluster 2: Coupe
-      catalogCategory: "coupe",
-      catalogSearch: "coupe"
-    },
-    convertible: {
-      name: "Convertibles",
-      keywords: ["convertible", "cabriolet", "roadster", "open-top"],
-      defaultIndex: 1, // Coupe/Convertible
-      catalogCategory: "convertible",
-      catalogSearch: "convertible"
-    },
-    truck: {
-      name: "Pickup Trucks",
-      keywords: ["truck", "pickup", "payload", "hauling", "ram", "f-150"],
-      defaultIndex: 2, // Cluster 3: SUV & Pickup
-      catalogCategory: "truck",
-      catalogSearch: "truck"
-    },
-    supercar: {
-      name: "Supercars",
-      keywords: ["supercar", "exotic", "lamborghini", "aventador", "performance"],
-      defaultIndex: 1, // Cluster 2: Coupe & Supercar
-      catalogCategory: "coupe",
-      catalogSearch: "supercar"
-    }
-  }
-};
-
-// --------------------------------------------------------------------------
-// 2. Popular Categories (6 Image-First Cards with Dedicated Cluster Pathways)
-// --------------------------------------------------------------------------
 function renderPopularCategories(genre) {
   const container = document.getElementById("popular-categories-grid");
   if (!container) return;
@@ -787,7 +633,7 @@ async function navigateToCategoryCluster(categoryKey, genre = currentGenre) {
 
   // Ensure clusters are loaded for the current active run
   if (!currentRunClusters || currentRunClusters.length === 0) {
-    const runId = normGenre === "automotive" ? "automotive-benchmark" : "2026-06-23";
+    const runId = normGenre === "automotive" ? "automotive-benchmark" : "fashion-benchmark";
     await loadRunClusters(runId);
   }
 
@@ -900,37 +746,39 @@ function renderTrendingNowList(genre) {
   const isFashion = (genre || currentGenre) === "fashion";
   const normGenre = isFashion ? "fashion" : "automotive";
 
-  const items = isFashion ? [
-    { title: "Oversized Blazers", growth: "12%", direction: "Rising", image: "/web/assets/trend_blazer.jpg", categoryKey: "jackets" },
-    { title: "Graphic Tees", growth: "8%", direction: "Rising", image: "/web/assets/trend_tee.jpg", categoryKey: "tops" },
-    { title: "Wide Leg Jeans", growth: "6%", direction: "Rising", image: "/web/assets/trend_jeans.jpg", categoryKey: "jeans" },
-    { title: "Chunky Sneakers", growth: "5%", direction: "Rising", image: "/web/assets/trend_sneaker.jpg", categoryKey: "sneakers" },
-    { title: "Crossbody Bags", growth: "3%", direction: "Declining", image: "/web/assets/trend_bag.jpg", categoryKey: "bags" }
-  ] : [
-    { title: "BMW M3 Sedan", growth: "15%", direction: "Rising", image: "/web/assets/hero_car.jpg", categoryKey: "sedan" },
-    { title: "Audi R8 V10", growth: "11%", direction: "Rising", image: "/web/assets/scan_car.jpg", categoryKey: "coupe" },
-    { title: "Mercedes-AMG GT", growth: "9%", direction: "Rising", image: "/web/assets/hero_car.jpg", categoryKey: "supercar" },
-    { title: "Porsche 911 Turbo", growth: "7%", direction: "Rising", image: "/web/assets/scan_car.jpg", categoryKey: "coupe" },
-    { title: "Tesla Model S", growth: "4%", direction: "Declining", image: "/web/assets/hero_car.jpg", categoryKey: "sedan" }
-  ];
+  // Real data only: trending items come from /api/dashboard/summary
+  // (cachedDashboardSummary.trending_now), computed from the catalogs and
+  // forecasts. Automotive items carry growth "N/A" because the project has
+  // no temporal automotive data; they are labelled as such, never given an
+  // invented percentage.
+  const all = (cachedDashboardSummary && cachedDashboardSummary.trending_now) || [];
+  const items = all.filter(it => it.genre === normGenre);
+
+  if (!items.length) {
+    container.innerHTML = `<div class="trending-now-row"><div class="trending-now-info"><div class="trending-now-name">No trending items available</div></div></div>`;
+    return;
+  }
 
   container.innerHTML = items.map(item => {
-    const isRising = item.direction === "Rising";
-    const dirClass = isRising ? "trend-badge-rising" : "trend-badge-declining";
-    const dirIcon = isRising ? "↗" : "↘";
+    const hasGrowth = item.growth && item.growth !== "N/A";
+    const isRising = hasGrowth && !String(item.growth).startsWith("-");
+    const dirClass = !hasGrowth ? "trend-badge-stable" : (isRising ? "trend-badge-rising" : "trend-badge-declining");
+    const dirIcon = !hasGrowth ? "—" : (isRising ? "↗" : "↘");
+    const growthText = hasGrowth ? item.growth : "N/A";
+    const statusText = hasGrowth ? item.trend_direction : "No trend data";
     return `
-      <div class="trending-now-row" onclick="navigateToCategoryCluster('${item.categoryKey}', '${normGenre}')" title="Explore ${escapeHtml(item.title)} cluster">
-        <img class="trending-now-thumb" src="${item.image}" alt="${escapeHtml(item.title)}" onerror="this.src='/web/placeholder.png';">
+      <div class="trending-now-row" onclick="navigateToCategoryCluster('${escapeHtml(item.category || "")}', '${normGenre}')" title="Explore ${escapeHtml(item.title)} cluster">
+        <img class="trending-now-thumb" src="${item.image_url}" alt="${escapeHtml(item.title)}" onerror="this.src='/web/placeholder.png';">
         <div class="trending-now-info">
           <div class="trending-now-name">${escapeHtml(item.title)}</div>
           <div class="trending-now-metrics">
             <span class="trending-growth ${dirClass}">
               <span>${dirIcon}</span>
-              <span>${escapeHtml(item.growth)}</span>
+              <span>${escapeHtml(growthText)}</span>
             </span>
             <span class="trending-status-text ${dirClass}">
               <span>◆</span>
-              <span>${escapeHtml(item.direction)}</span>
+              <span>${escapeHtml(statusText)}</span>
             </span>
           </div>
         </div>
@@ -941,10 +789,6 @@ function renderTrendingNowList(genre) {
     `;
   }).join("");
 }
-
-// --------------------------------------------------------------------------
-// 4. Recent Scans (3 Items with Metadata & Match Counts)
-// --------------------------------------------------------------------------
 function renderRecentScansList() {
   const container = document.getElementById("recent-scans-list");
   if (!container) return;
@@ -1423,7 +1267,7 @@ async function executeScannerSearch() {
 
 async function initClusterExplorer() {
   await loadAvailableRuns();
-  const initialRun = currentGenre === "automotive" ? "automotive-benchmark" : "2026-06-23";
+  const initialRun = currentGenre === "automotive" ? "automotive-benchmark" : "fashion-benchmark";
   await loadRunClusters(initialRun);
 }
 
@@ -1463,7 +1307,7 @@ async function loadAvailableRuns() {
     if (currentGenre === "automotive") {
       runSelect.value = "automotive-benchmark";
     } else {
-      runSelect.value = runs[0]?.run_id || "2026-06-23";
+      runSelect.value = runs[0]?.run_id || "fashion-benchmark";
     }
     currentRunId = runSelect.value;
   } catch (err) {
@@ -1949,6 +1793,10 @@ async function loadForecastData(style, horizon) {
       if (rmseEl) rmseEl.textContent = data.metrics.rmse ?? "18.7";
       if (mapeEl) mapeEl.textContent = `${data.metrics.mape ?? "6.8"}%`;
     }
+      const metricsLabelEl = document.getElementById("forecast-metrics-label");
+      if (metricsLabelEl) metricsLabelEl.textContent = data.engine === "prophet"
+        ? "Model Evaluation Metrics (Prophet In-Sample & Validation):"
+        : "Model Evaluation Metrics (Statistical Engine \u2014 Prophet Fallback):";
 
     // Load full leaderboard
     const summaryRes = await fetch(`/api/trends/summary?genre=${currentGenre}`).then(r => r.json());
@@ -2047,7 +1895,7 @@ function renderForecastChart(data) {
           tension: 0.25
         },
         {
-          label: "Prophet AI Future Trajectory",
+          label: data.engine === "prophet" ? "Prophet AI Future Trajectory" : "Statistical Engine Future Trajectory",
           data: forecastValues,
           borderColor: "#7040D8",
           backgroundColor: "#7040D8",
@@ -3423,7 +3271,7 @@ async function loadMegaDrawerData() {
     // Update count meta
     const fCountEl = document.getElementById("drawer-fashion-count-meta");
     if (fCountEl && cachedMegaDrawerData.fashion.length > 0) {
-      fCountEl.textContent = `${cachedMegaDrawerData.fashion.length} Ingested Garments • 6 Macro Aesthetics • K=5 Silhouette Clusters`;
+      fCountEl.textContent = `${cachedMegaDrawerData.fashion.length} Ingested Garments • 6 Macro Aesthetics • K=8 Silhouette Clusters`;
     }
     const aCountEl = document.getElementById("drawer-auto-count-meta");
     if (aCountEl && cachedMegaDrawerData.automotive.length > 0) {

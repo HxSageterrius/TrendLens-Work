@@ -2833,6 +2833,7 @@ button, input, select, textarea {
 .direction-rising { color: var(--status-emerald) !important; }
 .direction-stable { color: var(--text-secondary) !important; }
 .direction-declining { color: var(--status-rose) !important; }
+.direction-peaking { color: #D97706 !important; }
 
 .pop-cat-card {
   background: var(--bg-surface);
@@ -2951,6 +2952,7 @@ button, input, select, textarea {
 
 .trend-badge-rising { color: var(--status-emerald) !important; }
 .trend-badge-declining { color: var(--status-rose) !important; }
+.trend-badge-stable { color: var(--text-secondary) !important; }
 
 .recent-scan-img {
   width: 38px;
