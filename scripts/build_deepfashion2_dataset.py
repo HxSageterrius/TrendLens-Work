@@ -171,7 +171,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 106,
         "style": "Denim",
         "pattern": "solid",
-        "src_image": "data/fashion_trends/images/FSH_0019_denim_jacket.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0009_short_sleeve_outwear_shop.jpg",
         "image_file": "DF2_0009_short_sleeve_outwear_shop.jpg",
         "bounding_box": [45, 50, 355, 450],
         "url": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=85&fit=crop"
@@ -215,7 +215,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 108,
         "style": "Denim",
         "pattern": "solid",
-        "src_image": "data/fashion_trends/images/FSH_0021_denim_jacket.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0012_long_sleeve_outwear_shop.jpg",
         "image_file": "DF2_0012_long_sleeve_outwear_shop.jpg",
         "bounding_box": [35, 35, 365, 465],
         "url": "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=400&q=85&fit=crop"
@@ -333,10 +333,10 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 113,
         "style": "Denim",
         "pattern": "solid",
-        "src_image": "data/fashion_trends/images/DF2_0019_shorts_shop.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0020_shorts_user.jpg",
         "image_file": "DF2_0020_shorts_user.jpg",
         "bounding_box": [45, 110, 355, 445],
-        "url": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=500&q=85&fit=crop"
+        "url": "https://images.unsplash.com/photo-1583176407414-cefc059dc06d?w=500&q=85&fit=crop"
     },
     {
         "item_id": "DF2_0021",
@@ -424,7 +424,7 @@ DEEPFASHION2_ITEMS = [
         "src_image": "data/fashion_trends/images/DF2_0026_skirt_user.jpg",
         "image_file": "DF2_0026_skirt_user.jpg",
         "bounding_box": [45, 90, 355, 445],
-        "url": "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=500&q=85&fit=crop"
+        "url": "https://images.unsplash.com/photo-1783113298798-ba2e5dde5296?w=500&q=85&fit=crop"
     },
     {
         "item_id": "DF2_0027",
@@ -435,7 +435,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 118,
         "style": "Cottagecore",
         "pattern": "floral",
-        "src_image": "data/fashion_trends/images/FSH_0028_cottagecore_skirt.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0027_skirt_shop.jpg",
         "image_file": "DF2_0027_skirt_shop.jpg",
         "bounding_box": [35, 70, 365, 460],
         "url": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=85&fit=crop"
@@ -509,7 +509,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 121,
         "style": "Cottagecore",
         "pattern": "floral",
-        "src_image": "data/fashion_trends/images/FSH_0030_cottagecore_dress.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0032_long_sleeve_dress_user.jpg",
         "image_file": "DF2_0032_long_sleeve_dress_user.jpg",
         "bounding_box": [35, 30, 365, 480],
         "url": "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&q=85&fit=crop"
@@ -526,7 +526,7 @@ DEEPFASHION2_ITEMS = [
         "src_image": "data/fashion_trends/images/DF2_0033_long_sleeve_dress_shop.jpg",
         "image_file": "DF2_0033_long_sleeve_dress_shop.jpg",
         "bounding_box": [30, 25, 370, 480],
-        "url": "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=500&q=85&fit=crop"
+        "url": "https://images.unsplash.com/photo-1687621029654-787c0d11aa0f?w=500&q=85&fit=crop"
     },
 
     # 12. Vest Dress (Category ID: 12)
@@ -567,7 +567,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 124,
         "style": "Athleisure",
         "pattern": "solid",
-        "src_image": "data/fashion_trends/images/FSH_0036_athleisure_dress.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0036_vest_dress_shop.jpg",
         "image_file": "DF2_0036_vest_dress_shop.jpg",
         "bounding_box": [35, 35, 365, 470],
         "url": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=400&q=85&fit=crop"
@@ -583,7 +583,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 125,
         "style": "Minimalist",
         "pattern": "solid",
-        "src_image": "data/fashion_trends/images/FSH_0016_minimalist_dress.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0037_sling_dress_shop.jpg",
         "image_file": "DF2_0037_sling_dress_shop.jpg",
         "bounding_box": [35, 30, 365, 480],
         "url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=85&fit=crop"
@@ -591,7 +591,7 @@ DEEPFASHION2_ITEMS = [
     {
         "item_id": "DF2_0038",
         "anno_id": "000038",
-        "title": "Emerald Satin Sling Maxi Dress",
+        "title": "Emerald Satin Sling Midi Dress",
         "category_id": 13,
         "source": "user",
         "pair_id": 125,
@@ -600,7 +600,7 @@ DEEPFASHION2_ITEMS = [
         "src_image": "data/fashion_trends/images/DF2_0038_sling_dress_user.jpg",
         "image_file": "DF2_0038_sling_dress_user.jpg",
         "bounding_box": [40, 40, 360, 475],
-        "url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&q=85&fit=crop"
+        "url": "https://images.unsplash.com/photo-1646160406526-ed037b48637f?w=500&q=85&fit=crop"
     },
     {
         "item_id": "DF2_0039",
@@ -611,7 +611,7 @@ DEEPFASHION2_ITEMS = [
         "pair_id": 126,
         "style": "Cottagecore",
         "pattern": "floral",
-        "src_image": "data/fashion_trends/images/FSH_0010_y2k_dress.jpg",
+        "src_image": "data/fashion_trends/images/DF2_0039_sling_dress_shop.jpg",
         "image_file": "DF2_0039_sling_dress_shop.jpg",
         "bounding_box": [35, 35, 365, 475],
         "url": "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&q=85&fit=crop"
