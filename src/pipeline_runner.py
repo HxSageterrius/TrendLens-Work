@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from src.embeddings.extractor import FeatureExtractor, save_embeddings
-from src.clustering.cluster_engine import VisualClusterEngine
+from src.clustering.cluster_engine import VisualClusterEngine, build_dbscan_summary
 from src.forecasting.trend_forecaster import TrendForecaster
 from src.similarity.similarity_engine import SimilarityEngine
 
@@ -85,6 +85,15 @@ def run_full_pipeline(project_root: Path) -> dict:
     with open(forecasts_dir / "clusters_summary.json", "w", encoding="utf-8") as f:
         json.dump(cluster_summary, f, indent=2)
 
+    # 3b. DBSCAN density / outlier analysis (alongside K-Means)
+    print("\n[Step 3b] Running DBSCAN density analysis...")
+    dbscan_summary = build_dbscan_summary(embeddings, valid_df)
+    with open(forecasts_dir / "dbscan_summary.json", "w", encoding="utf-8") as f:
+        json.dump(dbscan_summary, f, indent=2)
+    print(f"  DBSCAN: {dbscan_summary['n_clusters']} density cluster(s), "
+          f"{dbscan_summary['n_noise']} outlier item(s) "
+          f"(eps={dbscan_summary['eps']}, min_samples={dbscan_summary['min_samples']})")
+
     # 4. Trend Forecasting
     print("\n[Step 4] Running Time-Series Trend Forecaster...")
     forecaster = TrendForecaster(time_series_csv)
@@ -121,6 +130,8 @@ def run_full_pipeline(project_root: Path) -> dict:
         "embedding_dim": embeddings.shape[1],
         "optimal_k": cluster_engine.n_clusters,
         "silhouette_score": silhouette,
+        "dbscan_clusters": dbscan_summary["n_clusters"],
+        "dbscan_noise": dbscan_summary["n_noise"],
         "forecasted_styles": list(forecast_results.keys())
     }
 

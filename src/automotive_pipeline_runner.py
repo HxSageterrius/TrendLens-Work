@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 
 from src.embeddings.extractor import FeatureExtractor, save_embeddings
-from src.clustering.cluster_engine import VisualClusterEngine
+from src.clustering.cluster_engine import VisualClusterEngine, build_dbscan_summary
 from src.similarity.similarity_engine import SimilarityEngine
 from src.preprocessing.automotive_adapter import AutomotiveAdapter
 
@@ -107,6 +107,15 @@ def run_automotive_pipeline(project_root: Path) -> dict:
     with open(forecasts_dir / "automotive_clusters_summary.json", "w", encoding="utf-8") as f:
         json.dump(cluster_summary, f, indent=2)
     print(f"  Saved cluster summary -> {forecasts_dir / 'automotive_clusters_summary.json'}")
+
+    # 3b. DBSCAN density / outlier analysis (alongside K-Means)
+    print("\n[Step 3b] Running DBSCAN density analysis...")
+    dbscan_summary = build_dbscan_summary(embeddings, valid_df)
+    with open(forecasts_dir / "automotive_dbscan_summary.json", "w", encoding="utf-8") as f:
+        json.dump(dbscan_summary, f, indent=2)
+    print(f"  DBSCAN: {dbscan_summary['n_clusters']} density cluster(s), "
+          f"{dbscan_summary['n_noise']} outlier vehicle(s) "
+          f"(eps={dbscan_summary['eps']}, min_samples={dbscan_summary['min_samples']})")
 
     # 4. Forecasting placeholder
     print("\n[Step 4] Trend Forecasting: DISABLED (no temporal sales data)")

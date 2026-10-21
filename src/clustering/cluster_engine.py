@@ -171,3 +171,53 @@ class VisualClusterEngine:
     def load(cls, filepath: Path) -> "VisualClusterEngine":
         """Loads fitted cluster engine."""
         return joblib.load(filepath)
+
+
+def build_dbscan_summary(
+    embeddings: np.ndarray,
+    metadata_df: pd.DataFrame,
+    eps: float = 0.2,
+    min_samples: int = 5
+) -> Dict:
+    """
+    Runs DBSCAN density analysis alongside the K-Means clustering and
+    returns a JSON-serialisable summary (same per-cluster structure as
+    VisualClusterEngine.get_cluster_summary, plus run metadata).
+
+    DBSCAN is used as a density / outlier check on the embedding space,
+    not as a replacement for the K-Means taxonomy: on the current
+    catalogues it finds a single connected density mass, so its useful
+    output is the set of low-density outlier items (label -1).
+
+    eps=0.2 / min_samples=5 are calibrated for L2-normalised ResNet
+    embeddings, whose nearest-neighbour cosine distances on these
+    catalogues fall around 0.15-0.25; the fit_dbscan defaults
+    (eps=0.5, min_samples=2) chain every point into one cluster and
+    report no outliers at all.
+
+    A dedicated engine instance is used so the caller's fitted K-Means
+    labels are never overwritten.
+    """
+    engine = VisualClusterEngine()
+    labels, silhouette = engine.fit_dbscan(
+        embeddings, eps=eps, min_samples=min_samples)
+    clusters = engine.get_cluster_summary(embeddings, metadata_df)
+
+    n_noise = 0
+    n_clusters = 0
+    for c in clusters:
+        if c["cluster_id"] == -1:
+            n_noise = c["item_count"]
+        else:
+            n_clusters += 1
+
+    return {
+        "algorithm": "DBSCAN",
+        "metric": "cosine",
+        "eps": eps,
+        "min_samples": min_samples,
+        "silhouette": silhouette,
+        "n_clusters": n_clusters,
+        "n_noise": n_noise,
+        "clusters": clusters,
+    }

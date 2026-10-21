@@ -24,8 +24,7 @@ Product Images
 2. Visual Feature Extraction (ResNet embeddings)
       │
       ▼
-3. Visual Clustering (K-Means; DBSCAN is implemented in the cluster
-   engine but not yet wired into the pipeline)
+3. Visual Clustering (K-Means taxonomy + DBSCAN density/outlier analysis)
       │
       ▼
 4. Trend Identification & Temporal Aggregation
@@ -47,7 +46,7 @@ Product Images
 
 - **Languages:** Python (Core Engine & Backend), JavaScript (Web Presentation)
 - **Deep Learning / Vision:** PyTorch, torchvision (ResNet-18 / ResNet-50)
-- **Machine Learning & Analytics:** scikit-learn (K-Means, Cosine Similarity, silhouette evaluation; DBSCAN available in the cluster engine), Prophet (Time-series, with a statistical fallback)
+- **Machine Learning & Analytics:** scikit-learn (K-Means, Cosine Similarity, silhouette evaluation; DBSCAN density/outlier analysis, run alongside K-Means in both pipeline runners), Prophet (Time-series, with a statistical fallback)
 - **Backend API:** FastAPI, Uvicorn, Pydantic
 - **Data Storage:** CSV and JSON files, read with pandas (no database server is used)
 - **Web Dashboard:** HTML, CSS and JavaScript in `web/`, with Chart.js loaded from a CDN
@@ -75,7 +74,7 @@ trendlens/
 ├── src/
 │   ├── preprocessing/       # Module 1: Image loading, metadata parsing, dataset adapters
 │   ├── embeddings/          # Module 2: ResNet feature extraction
-│   ├── clustering/          # Module 3: K-Means clustering (DBSCAN method included)
+│   ├── clustering/          # Module 3: K-Means clustering + DBSCAN density analysis
 │   ├── forecasting/         # Module 4: Time-series trend forecasting (Prophet + fallback)
 │   ├── similarity/          # Module 5: Image search and cosine similarity matching
 │   ├── api/                 # Module 6: FastAPI endpoints and schemas
@@ -99,7 +98,7 @@ trendlens/
 | **0** | **Environment & Foundation** | Git setup, virtual env, folder layout, dependency verification | 🟢 *Completed* |
 | **1** | **Dataset & Preprocessing** | DeepFashion2-schema fashion catalog (Unsplash photography, hand-authored annotations) & TrendVerse-aligned sample builder | 🟢 *Completed* |
 | **2** | **Visual Feature Extraction** | ResNet-18 / CNN feature extractor & L2-normalized 512-dim embedding export | 🟢 *Completed* |
-| **3** | **Visual Clustering** | K-Means clustering, silhouette evaluation, centroid exemplars; DBSCAN implemented in the cluster engine but not yet integrated into the pipeline | 🟢 *Completed (K-Means)* |
+| **3** | **Visual Clustering** | K-Means clustering, silhouette evaluation, centroid exemplars; DBSCAN density/outlier analysis integrated into both pipeline runners (its output is a density check on the embeddings — on the current catalogues it finds a single density mass plus outlier items) | 🟢 *Completed (K-Means)* |
 | **4** | **Trend Identification & Forecasting** | Time-series engagement trajectory on the simulated fashion series, Prophet & seasonal statistical forecasting; forecasting is disabled for automobiles because production year is not a valid time axis | 🟢 *Completed* |
 | **5** | **Similarity Matching Engine** | Cosine similarity ranking, image-to-item & item-to-item visual recommendation | 🟢 *Completed* |
 | **6** | **FastAPI Backend & REST API** | REST API endpoints for trends, forecasts, clusters, and image upload search | 🟢 *Completed* |
