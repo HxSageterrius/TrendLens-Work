@@ -5,6 +5,13 @@ Generates:
 1. Time-series trend dataset for forecasting (weekly engagement / search volume over 2 years)
 2. Fashion post metadata (item_id, category, style, likes, tags, timestamps)
 3. High-quality fashion sample images for visual feature extraction and similarity search
+
+All randomness is seeded (RANDOM_SEED) so rebuilds are byte-deterministic.
+The committed CSVs were generated with the earlier unseeded version of this
+script; re-running the seeded builder produces a deterministic dataset that
+DIFFERS from the committed files. If the dataset is ever regenerated, re-run
+src/forecasting/trend_forecaster.py and refresh the editorial reports in
+web/app.js so forecasts and reports stay consistent with the new series.
 """
 
 import math
@@ -15,6 +22,11 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFilter
+
+
+# Fixed seed for both Python's `random` and NumPy so every rebuild of the
+# synthetic trend series and post metadata is reproducible.
+RANDOM_SEED = 42
 
 
 def create_fashion_image(
@@ -109,7 +121,15 @@ def create_fashion_image(
 def build_fashion_dataset(base_dir: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Builds the complete fashion catalog and time-series trends datasets.
+
+    Seeds Python's `random` and NumPy with RANDOM_SEED first, so repeated
+    runs produce identical outputs.
     """
+    # Seed all randomness: timestamps, likes, comments, trend noise,
+    # search_volume and social_engagement are then fully reproducible.
+    random.seed(RANDOM_SEED)
+    np.random.seed(RANDOM_SEED)
+
     trends_dir = base_dir / "data" / "fashion_trends"
     images_dir = trends_dir / "images"
     images_dir.mkdir(parents=True, exist_ok=True)
