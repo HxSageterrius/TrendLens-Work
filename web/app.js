@@ -3182,7 +3182,7 @@ function exportReportDataAsCSV() {
     }
 
     if (rep.exemplars && rep.exemplars.length > 0) {
-      csv += "Exemplar_Asset,Category,Tags,Affinity_Score\n";
+      csv += "Exemplar_Asset,Category,Tags,Similarity_Score\n";
       rep.exemplars.forEach(ex => {
         csv += `"${escapeCsv(ex.title)}","${escapeCsv(ex.category)}","${escapeCsv(ex.tags)}","${escapeCsv(ex.similarity)}"\n`;
       });
