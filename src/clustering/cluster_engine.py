@@ -189,11 +189,13 @@ def build_dbscan_summary(
     catalogues it finds a single connected density mass, so its useful
     output is the set of low-density outlier items (label -1).
 
-    eps=0.2 / min_samples=5 are calibrated for L2-normalised ResNet
-    embeddings, whose nearest-neighbour cosine distances on these
-    catalogues fall around 0.15-0.25; the fit_dbscan defaults
-    (eps=0.5, min_samples=2) chain every point into one cluster and
-    report no outliers at all.
+    eps is calibrated per catalogue from k-distance statistics of the
+    L2-normalised ResNet embeddings: the automotive default (0.2) fits
+    its dense space (median 5th-NN cosine distance ~0.14), while the
+    sparser fashion space (median 5th-NN distance ~0.32) needs eps=0.30
+    (passed explicitly by the fashion pipeline runner). The fit_dbscan
+    defaults (eps=0.5, min_samples=2) chain every point into one cluster
+    and report no outliers at all.
 
     A dedicated engine instance is used so the caller's fitted K-Means
     labels are never overwritten.

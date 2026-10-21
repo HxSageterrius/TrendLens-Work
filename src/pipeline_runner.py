@@ -87,7 +87,10 @@ def run_full_pipeline(project_root: Path) -> dict:
 
     # 3b. DBSCAN density / outlier analysis (alongside K-Means)
     print("\n[Step 3b] Running DBSCAN density analysis...")
-    dbscan_summary = build_dbscan_summary(embeddings, valid_df)
+    # Fashion embeddings are sparser than automotive ones (median 5th-NN
+    # cosine distance 0.32 vs 0.14), so eps is calibrated per catalogue:
+    # the shared default (0.2) finds no core points in the fashion space.
+    dbscan_summary = build_dbscan_summary(embeddings, valid_df, eps=0.30)
     with open(forecasts_dir / "dbscan_summary.json", "w", encoding="utf-8") as f:
         json.dump(dbscan_summary, f, indent=2)
     print(f"  DBSCAN: {dbscan_summary['n_clusters']} density cluster(s), "
