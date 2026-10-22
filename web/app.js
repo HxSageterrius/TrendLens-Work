@@ -2283,17 +2283,17 @@ const TREND_REPORTS_DATABASE = {
       volumeSub: "Project-Assembled Catalog",
       clusters: "K=8 Families",
       clustersSub: "ResNet-18 512D Vectors",
-      trajectory: "Rising (+25.8%)",
-      trajectorySub: "Denim — Fastest-Growing Style",
+      trajectory: "Rising (+23.4%)",
+      trajectorySub: "Streetwear — Fastest-Growing Style",
       engine: "Prophet AI",
-      engineSub: "Weekly Seasonality"
+      engineSub: "Yearly Seasonality"
     },
-    executiveSummary: "In the forecaster's committed run over the project's simulated engagement series, Denim (+25.8% projected growth) and Minimalist (+17.8%) are the fastest-growing styles, while Y2K declines sharply (-57.3%). ResNet-18 embeddings partition the clustered items into 8 visual families, including dedicated sneakers and bags clusters alongside the garment categories.",
+    executiveSummary: "In the forecaster's committed Prophet run over the project's simulated engagement series, Streetwear (+23.4% projected growth), Denim (+16.8%) and Minimalist (+16.3%) are the fastest-growing styles, while Y2K declines sharply (-93.8%) and Cottagecore also falls (-42.8%). ResNet-18 embeddings partition the clustered items into 8 visual families, including dedicated sneakers and bags clusters alongside the garment categories.",
     takeaways: [
       {
         icon: "🧥",
-        title: "Denim-Led Growth (+25.8%)",
-        desc: "Denim is the fastest-growing style in the forecaster output (current score 68.4, projected 86.0), ahead of Minimalist at +17.8%."
+        title: "Streetwear-Led Growth (+23.4%)",
+        desc: "Streetwear is the fastest-growing style in the forecaster output (current score 67.0, projected 82.7), ahead of Denim at +16.8% and Minimalist at +16.3%."
       },
       {
         icon: "🎯",
@@ -2308,12 +2308,12 @@ const TREND_REPORTS_DATABASE = {
     ],
     tableHeaders: ["Aesthetic Style", "Current Score", "Forecast Index", "Growth Rate", "Trajectory"],
     tableRows: [
-      { style: "Denim", current: 68.4, projected: 86.0, growth: "+25.8%", badge: "Rising (Hot Trend)", color: "emerald" },
-      { style: "Minimalist", current: 101.9, projected: 120.1, growth: "+17.8%", badge: "Rising (Hot Trend)", color: "emerald" },
-      { style: "Athleisure", current: 106.3, projected: 117.7, growth: "+10.8%", badge: "Peaking", color: "amber" },
-      { style: "Streetwear", current: 67.0, projected: 67.1, growth: "+0.0%", badge: "Stable / Classic", color: "violet" },
-      { style: "Cottagecore", current: 73.8, projected: 68.9, growth: "-6.7%", badge: "Peaking", color: "amber" },
-      { style: "Y2K", current: 71.4, projected: 30.5, growth: "-57.3%", badge: "Declining", color: "rose" }
+      { style: "Streetwear", current: 67.0, projected: 82.7, growth: "+23.4%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Denim", current: 68.4, projected: 79.8, growth: "+16.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Minimalist", current: 101.9, projected: 118.6, growth: "+16.3%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Athleisure", current: 106.3, projected: 112.8, growth: "+6.1%", badge: "Peaking", color: "amber" },
+      { style: "Cottagecore", current: 73.8, projected: 42.2, growth: "-42.8%", badge: "Declining", color: "rose" },
+      { style: "Y2K", current: 71.4, projected: 4.5, growth: "-93.8%", badge: "Declining", color: "rose" }
     ],
     exemplars: [
       { title: "Double-Breasted Wool Trench Coat", category: "long sleeve outwear", image: "/images/DF2_0010_long_sleeve_outwear_shop.jpg", tags: "Outwear • Wool • Commercial Shop", similarity: "Cluster #4 Member" },
@@ -2321,7 +2321,7 @@ const TREND_REPORTS_DATABASE = {
       { title: "Minimalist Crewneck Fleece Sweatshirt", category: "long sleeve top", image: "/images/DF2_0004_long_sleeve_top_shop.jpg", tags: "Minimalist • Fleece • Clean Line", similarity: "Cluster #1 Member" },
       { title: "Wide-Leg Classic Denim Trousers", category: "trousers", image: "/images/DF2_0024_trousers_shop.jpg", tags: "Denim • Wide-Leg • Everyday", similarity: "Cluster #4 Member" }
     ],
-    provenance: "Fashion catalog assembled for this project in the DeepFashion2 annotation format (13 categories, shop/user pairs, bounding boxes) from Unsplash stock photography with hand-authored annotations — not the official DeepFashion2 dataset. The weekly trend series is simulated. Visual representations extracted using PyTorch ResNet-18 (512-dimensional vectors). Clustering executed via Scikit-Learn K-Means (K=8). Trajectory forecasting performed via Facebook/Meta Prophet with a statistical fallback; the table figures are the forecaster's committed output (data/forecasts/trend_forecasts.json)."
+    provenance: "Fashion catalog assembled for this project in the DeepFashion2 annotation format (13 categories, shop/user pairs, bounding boxes) from Unsplash stock photography with hand-authored annotations — not the official DeepFashion2 dataset. The weekly trend series is simulated. Visual representations extracted using PyTorch ResNet-18 (512-dimensional vectors). Clustering executed via Scikit-Learn K-Means (K=8). Trajectory forecasting performed via Facebook/Meta Prophet (a statistical fallback engine runs when Prophet is unavailable); the table figures are the forecaster's committed Prophet output (data/forecasts/trend_forecasts.json)."
   },
 
   "ev_design": {
@@ -2395,35 +2395,35 @@ const TREND_REPORTS_DATABASE = {
       volumeSub: "Project-Assembled Catalog",
       clusters: "6 Trend Styles",
       clustersSub: "Simulated Engagement Series",
-      trajectory: "Y2K -57.3%",
+      trajectory: "Y2K -93.8%",
       trajectorySub: "Steepest Decline in Forecast",
       engine: "Prophet AI",
       engineSub: "Seasonality & Cycles"
     },
-    executiveSummary: "In the forecaster's committed run over the simulated engagement series, Streetwear is essentially flat (67.0 → 67.1, +0.0%, classified Stable / Classic), while Y2K shows the steepest decline of any style (-57.3%, 71.4 → 30.5). The growth in the same run sits elsewhere: Denim (+25.8%) and Minimalist (+17.8%). Note that Y2K's forecast carries a high in-sample error (MAPE 37.1%), so its direction is clearer than its magnitude.",
+    executiveSummary: "In the forecaster's committed Prophet run over the simulated engagement series, Streetwear is the fastest-growing style (67.0 → 82.7, +23.4%, classified Rising (Hot Trend)), while Y2K shows the steepest decline of any style (-93.8%, 71.4 → 4.5). Denim (+16.8%) and Minimalist (+16.3%) also rise. Note that Y2K's forecast carries the highest in-sample error of the six styles (MAPE 14.8%), so its direction is clearer than its magnitude.",
     takeaways: [
       {
         icon: "👕",
-        title: "Streetwear Holds Steady",
-        desc: "Streetwear's forecast is flat (+0.0%), the most stable trajectory in the run, and its per-style forecast error is the lowest of the six styles (MAPE 6.8%)."
+        title: "Streetwear Leads the Run",
+        desc: "Streetwear posts the strongest projected growth of any style (+23.4%, 67.0 → 82.7), and its per-style forecast error is the joint-lowest of the six styles (MAPE 2.6%)."
       },
       {
         icon: "📉",
-        title: "Y2K Fatigue (-57.3%)",
-        desc: "Y2K posts the steepest projected decline in the forecaster output (71.4 → 30.5); its high forecast error (MAPE 37.1%) means the magnitude should be read with caution."
+        title: "Y2K Fatigue (-93.8%)",
+        desc: "Y2K posts the steepest projected decline in the forecaster output (71.4 → 4.5); its forecast error is the highest of the six styles (MAPE 14.8%), so the magnitude should be read with caution."
       },
       {
         icon: "🔄",
-        title: "Growth Sits Elsewhere",
-        desc: "The same forecast run puts the strongest growth in Denim (+25.8%) and Minimalist (+17.8%), rather than in streetwear sub-styles."
+        title: "Denim & Minimalist Follow",
+        desc: "The same forecast run puts Denim (+16.8%) and Minimalist (+16.3%) directly behind Streetwear, while Cottagecore declines (-42.8%)."
       }
     ],
     tableHeaders: ["Trend Style (Forecaster)", "Current Score", "Forecast Index", "Growth Rate", "Trend Classification"],
     tableRows: [
-      { style: "Streetwear", current: 67.0, projected: 67.1, growth: "+0.0%", badge: "Stable / Classic", color: "violet" },
-      { style: "Y2K", current: 71.4, projected: 30.5, growth: "-57.3%", badge: "Declining", color: "rose" },
-      { style: "Denim", current: 68.4, projected: 86.0, growth: "+25.8%", badge: "Rising (Hot Trend)", color: "emerald" },
-      { style: "Minimalist", current: 101.9, projected: 120.1, growth: "+17.8%", badge: "Rising (Hot Trend)", color: "emerald" }
+      { style: "Streetwear", current: 67.0, projected: 82.7, growth: "+23.4%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Y2K", current: 71.4, projected: 4.5, growth: "-93.8%", badge: "Declining", color: "rose" },
+      { style: "Denim", current: 68.4, projected: 79.8, growth: "+16.8%", badge: "Rising (Hot Trend)", color: "emerald" },
+      { style: "Minimalist", current: 101.9, projected: 118.6, growth: "+16.3%", badge: "Rising (Hot Trend)", color: "emerald" }
     ],
     exemplars: [
       { title: "Lucky Cat Streetwear Graphic Boxy Tee", category: "short sleeve top", image: "/images/DF2_0001_short_sleeve_top_shop.jpg", tags: "Streetwear • Boxy Fit • Graphic Print", similarity: "Cluster #1 Member" },

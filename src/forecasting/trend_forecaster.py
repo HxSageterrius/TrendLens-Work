@@ -192,8 +192,12 @@ class TrendForecaster:
             "y": style_df["trend_score"]
         })
 
+        # Yearly seasonality needs at least one full yearly cycle of
+        # history to be identifiable; on shorter series Prophet itself
+        # warns it is under-identified and can extrapolate wildly.
+        span_days = (prophet_df["ds"].max() - prophet_df["ds"].min()).days
         m = Prophet(
-            yearly_seasonality=True,
+            yearly_seasonality=span_days >= 365,
             weekly_seasonality=False,
             daily_seasonality=False,
             interval_width=0.90
@@ -213,9 +217,11 @@ class TrendForecaster:
         forecast_points = [
             {
                 "date": pd.to_datetime(row["ds"]).strftime("%Y-%m-%d"),
-                "yhat": round(float(row["yhat"]), 2),
-                "yhat_lower": round(float(row["yhat_lower"]), 2),
-                "yhat_upper": round(float(row["yhat_upper"]), 2)
+                # Trend scores are non-negative by definition; clamp the
+                # forecast and its interval at zero.
+                "yhat": round(max(0.0, float(row["yhat"])), 2),
+                "yhat_lower": round(max(0.0, float(row["yhat_lower"])), 2),
+                "yhat_upper": round(max(0.0, float(row["yhat_upper"])), 2)
             }
             for _, row in forecast_rows.iterrows()
         ]
