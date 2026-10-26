@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initThemeEngine();
   initMobileNav();
   initSettingsAccordion();
+  initClickableCards();
   initGenreSwitcher();
   initNavigation();
   initGlobalSearch();
@@ -178,6 +179,19 @@ function initSettingsAccordion() {
   const collapseAll = document.getElementById("settings-collapse-all");
   if (expandAll) expandAll.addEventListener("click", () => setAll(false));
   if (collapseAll) collapseAll.addEventListener("click", () => setAll(true));
+}
+
+// Cards rendered as <div> for styling (hero + quick-access + drop prompt)
+// must still work from the keyboard: Enter/Space activates them.
+function initClickableCards() {
+  document.querySelectorAll(".quick-access-card, .hero-img-card, .lens-drop-prompt").forEach((el) => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
 }
 
 // ==========================================================================
@@ -395,6 +409,7 @@ function switchTab(tabId, updateHash = true) {
     const isTarget = btn.dataset.tab === tabId ||
       (btn.dataset.tab === "trends-tab" && (tabId === "fashion-tab" || tabId === "automotive-tab"));
     btn.classList.toggle("active", isTarget);
+    btn.setAttribute("aria-selected", String(isTarget));
   });
 
   // Update Tab Panes
@@ -438,26 +453,6 @@ async function loadDashboardTelemetry() {
       const fcEl = document.getElementById("fashion-metric-clusters");
       if (fcEl && data.fashion_clusters) fcEl.textContent = `K=${data.fashion_clusters} Aesthetic Groups`;
 
-      // Legacy containers support if present
-      const trendingContainer = document.getElementById("trending-now-container");
-      if (trendingContainer && data.trending_now) {
-        trendingContainer.innerHTML = data.trending_now.map(item => `
-          <div class="trending-card" onclick="openItemDetailModal('${escapeHtml(item.id)}', '${escapeHtml(item.genre)}')">
-            <div class="trending-img-box">
-              <img src="${resolveImagePath(item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
-              <span class="trending-growth-badge">${escapeHtml(item.growth)}</span>
-            </div>
-            <div class="trending-info">
-              <div class="trending-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
-              <div class="trending-sub">
-                <span>${escapeHtml(item.category)}</span>
-                <span class="badge ${item.genre === 'automotive' ? 'badge-sky' : 'badge-violet'}">${escapeHtml(item.genre)}</span>
-              </div>
-            </div>
-          </div>
-        `).join("");
-      }
-
       if (data.trend_activity) {
         renderDashboardActivityChart(data.trend_activity);
       }
@@ -477,6 +472,25 @@ async function loadDashboardTelemetry() {
 // 1. Trending Insights (Chart + Direction List)
 // --------------------------------------------------------------------------
 let insightsCache = { fashion: null, automotive: null };
+
+// Shared by the fashion + automotive insight renderers (previously copied
+// in both): chart palette, chart teardown, and direction-row markup.
+const CHART_PALETTE = ["#7040F5", "#3B82F6", "#F59E0B", "#10B981", "#06B6D4", "#EC4899"];
+
+function destroyInsightsChart() {
+  if (trendingInsightsChartInstance) {
+    trendingInsightsChartInstance.destroy();
+    trendingInsightsChartInstance = null;
+  }
+}
+
+function directionRow(name, statusHtml, onClick, title) {
+  return `
+        <div class="direction-row" style="cursor: pointer;" onclick="${onClick}" title="${title}">
+          <span class="direction-name">${name}</span>
+          ${statusHtml}
+        </div>`;
+}
 
 function trajectoryBadge(trajectory) {
   const t = (trajectory || "").toLowerCase();
@@ -511,22 +525,16 @@ async function renderFashionInsights(directionList, canvas) {
       directionList.innerHTML = summary.map(s => {
         const b = trajectoryBadge(s.trajectory);
         const growth = `${s.growth_rate_pct > 0 ? "+" : ""}${s.growth_rate_pct}%`;
-        return `
-        <div class="direction-row" style="cursor: pointer;" onclick="openStyleForecast('${escapeHtml(s.style)}')" title="Open ${escapeHtml(s.style)} forecast">
-          <span class="direction-name">${escapeHtml(s.style)}</span>
-          <span class="direction-status ${b.badgeClass}">
-            <span class="direction-icon">${b.icon}</span>
-            <span>${b.status} (${growth})</span>
-          </span>
-        </div>`;
+        return directionRow(
+          escapeHtml(s.style),
+          `<span class="direction-status ${b.badgeClass}"><span class="direction-icon">${b.icon}</span><span>${b.status} (${growth})</span></span>`,
+          `openStyleForecast('${escapeHtml(s.style)}')`,
+          `Open ${escapeHtml(s.style)} forecast`);
       }).join("");
     }
     if (!canvas || typeof Chart === "undefined") return;
-    if (trendingInsightsChartInstance) {
-      trendingInsightsChartInstance.destroy();
-      trendingInsightsChartInstance = null;
-    }
-    const palette = ["#7040F5", "#3B82F6", "#F59E0B", "#10B981", "#06B6D4", "#EC4899"];
+    destroyInsightsChart();
+    const palette = CHART_PALETTE;
     const series = forecasts.filter(Boolean);
     const labels = (series[0]?.historical_points || []).slice(-12).map(p => (p.date || "").slice(5));
     const datasets = series.map((f, i) => ({
@@ -576,19 +584,14 @@ async function renderAutomotiveInsights(directionList, canvas) {
     const cats = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     const labelFor = c => ({ sedan: "Sedans", suv: "SUVs", coupe: "Coupes", convertible: "Convertibles", truck: "Pickup Trucks", wagon: "Wagons" }[c] || (c.charAt(0).toUpperCase() + c.slice(1)));
     if (directionList) {
-      directionList.innerHTML = cats.map(([c, n]) => `
-        <div class="direction-row" style="cursor: pointer;" onclick="navigateToCategoryCluster('${c}', 'automotive')" title="Explore ${labelFor(c)} cluster">
-          <span class="direction-name">${labelFor(c)}</span>
-          <span class="direction-status direction-stable">
-            <span>${n} vehicles</span>
-          </span>
-        </div>`).join("");
+      directionList.innerHTML = cats.map(([c, n]) => directionRow(
+        labelFor(c),
+        `<span class="direction-status direction-stable"><span>${n} vehicles</span></span>`,
+        `navigateToCategoryCluster('${c}', 'automotive')`,
+        `Explore ${labelFor(c)} cluster`)).join("");
     }
     if (!canvas || typeof Chart === "undefined") return;
-    if (trendingInsightsChartInstance) {
-      trendingInsightsChartInstance.destroy();
-      trendingInsightsChartInstance = null;
-    }
+    destroyInsightsChart();
     trendingInsightsChartInstance = new Chart(canvas.getContext("2d"), {
       type: "bar",
       data: {
@@ -596,7 +599,7 @@ async function renderAutomotiveInsights(directionList, canvas) {
         datasets: [{
           label: "Vehicles",
           data: cats.map(([, n]) => n),
-          backgroundColor: ["#7040F5", "#3B82F6", "#F59E0B", "#10B981", "#06B6D4", "#EC4899"],
+          backgroundColor: CHART_PALETTE,
           borderRadius: 6,
           maxBarThickness: 42
         }]

@@ -6551,3 +6551,53 @@ body.density-compact .dashboard-hero-card {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================================================
+   UX FIX PACK 2 (2026-10-26): refined brief — touch targets, <=480px,
+   keyboard focus visibility
+   ========================================================================== */
+
+/* Keyboard focus ring for div-based cards (now role=button, tabindex=0). */
+.quick-access-card:focus-visible,
+.hero-img-card:focus-visible,
+.lens-drop-prompt:focus-visible {
+  outline: 2px solid var(--accent-violet);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  /* Touch targets: 44px minimum for the elements thumbs actually hit. */
+  .nav-btn {
+    padding: 12px;
+  }
+  .mobile-nav-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+  .header-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .domain-pill-btn {
+    padding: 9px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-header {
+    padding: 0 12px;
+  }
+  .content-body {
+    padding: 12px;
+  }
+  .home-hero-title {
+    font-size: 1.55rem;
+  }
+  .global-search-input {
+    font-size: 0.82rem;
+  }
+  .settings-toolbar-note {
+    flex-basis: 100%;
+  }
+}
