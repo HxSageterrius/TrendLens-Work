@@ -6452,3 +6452,102 @@ body.density-compact .dashboard-hero-card {
 }
 
 
+
+/* ==========================================================================
+   UX FIX PACK (2026-10-26): mobile drawer, collapsible Settings,
+   and missing small-screen breakpoints
+   ========================================================================== */
+
+/* --- Mobile sidebar backdrop --- */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 9, 20, 0.45);
+  z-index: 35;
+}
+.sidebar-backdrop.visible {
+  display: block;
+}
+
+/* --- Collapsible Settings sections --- */
+.settings-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.settings-toolbar-note {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-right: auto;
+}
+.settings-collapse-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.settings-collapse-btn:hover {
+  background: var(--bg-surface-muted);
+  color: var(--text-primary);
+}
+.settings-collapse-btn svg {
+  transition: transform 0.2s ease;
+}
+.settings-section-card.collapsed .settings-collapse-btn svg {
+  transform: rotate(-90deg);
+}
+.settings-section-card.collapsed .settings-form-body,
+.settings-section-card.collapsed .telemetry-table-grid {
+  display: none;
+}
+.settings-section-card.collapsed .settings-section-header {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* --- Small-screen gaps the earlier breakpoints missed --- */
+@media (max-width: 768px) {
+  .sidebar {
+    max-width: 85vw;
+  }
+  .sidebar.mobile-open {
+    z-index: 45;
+  }
+  /* settings-modern-grid uses auto-fit minmax(360px,1fr), which overflows
+     phones narrower than ~392px; force a single column here. */
+  .settings-modern-grid {
+    grid-template-columns: 1fr;
+  }
+  .settings-header-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .settings-action-buttons {
+    flex-wrap: wrap;
+  }
+  /* 2-column stat grids from the 1100px breakpoint are still too tight
+     on phones; stack them. */
+  .trajectory-banner,
+  .report-meta-grid {
+    grid-template-columns: 1fr;
+  }
+  .top-header {
+    gap: 8px;
+  }
+  .global-search-input {
+    font-size: 0.85rem;
+  }
+}

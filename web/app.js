@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadSettings();
   initThemeEngine();
   initMobileNav();
+  initSettingsAccordion();
   initGenreSwitcher();
   initNavigation();
   initGlobalSearch();
@@ -110,15 +111,73 @@ document.addEventListener("DOMContentLoaded", () => {
   loadMegaDrawerData();
 });
 
+function setMobileSidebarOpen(open) {
+  const sidebar = document.querySelector(".sidebar");
+  const backdrop = document.getElementById("sidebar-backdrop");
+  const toggleBtn = document.getElementById("mobile-nav-toggle");
+  if (!sidebar) return;
+  sidebar.classList.toggle("mobile-open", open);
+  if (backdrop) backdrop.classList.toggle("visible", open);
+  if (toggleBtn) toggleBtn.setAttribute("aria-expanded", String(open));
+}
+
 function initMobileNav() {
   const toggleBtn = document.getElementById("mobile-nav-toggle");
   const sidebar = document.querySelector(".sidebar");
+  const backdrop = document.getElementById("sidebar-backdrop");
   if (!toggleBtn || !sidebar) return;
 
+  // The stylesheet moves the sidebar off-canvas below 768px and brings it
+  // back with .mobile-open; toggling inline display alone never worked
+  // because the translateX(-100%) transform still applied.
   toggleBtn.addEventListener("click", () => {
-    const isHidden = sidebar.style.display === "none";
-    sidebar.style.display = isHidden ? "flex" : "none";
+    setMobileSidebarOpen(!sidebar.classList.contains("mobile-open"));
   });
+  if (backdrop) backdrop.addEventListener("click", () => setMobileSidebarOpen(false));
+  sidebar.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.addEventListener("click", () => setMobileSidebarOpen(false));
+  });
+}
+
+// Collapsible Settings sections: the page has 7 config cards and showing
+// all of them expanded at once is overwhelming. Each card header gets a
+// toggle button; only the first card starts open. All controls keep their
+// ids, so save/load logic is untouched.
+function initSettingsAccordion() {
+  const cards = document.querySelectorAll(".settings-section-card");
+  if (!cards.length) return;
+  cards.forEach((card, idx) => {
+    const header = card.querySelector(".settings-section-header");
+    if (!header || header.querySelector(".settings-collapse-btn")) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "settings-collapse-btn";
+    btn.setAttribute("aria-label", "Toggle section");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>';
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const collapsed = card.classList.toggle("collapsed");
+      btn.setAttribute("aria-expanded", String(!collapsed));
+    });
+    header.appendChild(btn);
+    if (idx > 0) {
+      card.classList.add("collapsed");
+      btn.setAttribute("aria-expanded", "false");
+    } else {
+      btn.setAttribute("aria-expanded", "true");
+    }
+  });
+  const setAll = (collapse) => {
+    document.querySelectorAll(".settings-section-card").forEach((card) => {
+      card.classList.toggle("collapsed", collapse);
+      const btn = card.querySelector(".settings-collapse-btn");
+      if (btn) btn.setAttribute("aria-expanded", String(!collapse));
+    });
+  };
+  const expandAll = document.getElementById("settings-expand-all");
+  const collapseAll = document.getElementById("settings-collapse-all");
+  if (expandAll) expandAll.addEventListener("click", () => setAll(false));
+  if (collapseAll) collapseAll.addEventListener("click", () => setAll(true));
 }
 
 // ==========================================================================
@@ -326,6 +385,10 @@ function switchTab(tabId, updateHash = true) {
   }
 
   currentTab = tabId;
+
+  // Close the mobile sidebar drawer after navigation (desktop unaffected:
+  // .mobile-open only moves the sidebar inside the <=768px media query).
+  setMobileSidebarOpen(false);
 
   // Update Nav Buttons (supports unified trends button)
   document.querySelectorAll(".nav-btn").forEach(btn => {

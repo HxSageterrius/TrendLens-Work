@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js for time-series curves -->
   <script src="/web/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/web/style.css?v=4.0">
+  <link rel="stylesheet" href="/web/style.css?v=4.1">
 </head>
 <body>
   <!-- App Container -->
@@ -116,6 +116,9 @@
         </svg>
       </div>
     </aside>
+
+    <!-- Mobile sidebar backdrop (tap to close the drawer) -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
     <!-- Main Workspace Area -->
     <main class="main-content">
@@ -504,10 +507,6 @@
                       <span>Trending Now</span>
                     </h3>
                     <p class="side-card-subtitle">Live trends across categories</p>
-                  </div>
-                  <div class="side-domain-tabs">
-                    <button class="side-tab-btn active" id="trending-tab-fashion" onclick="setDashboardDomain('fashion')">Fashion</button>
-                    <button class="side-tab-btn" id="trending-tab-auto" onclick="setDashboardDomain('automotive')">Automobiles</button>
                   </div>
                 </div>
 
@@ -1287,6 +1286,13 @@
               </div>
             </div>
 
+            <!-- Collapse helpers: sections start collapsed except the first -->
+            <div class="settings-toolbar" role="group" aria-label="Settings sections">
+              <span class="settings-toolbar-note">7 sections — only the first is open by default.</span>
+              <button type="button" class="btn-secondary btn-sm" id="settings-expand-all">Expand all</button>
+              <button type="button" class="btn-secondary btn-sm" id="settings-collapse-all">Collapse all</button>
+            </div>
+
             <!-- 7 Config Sections Grid -->
             <div class="settings-modern-grid">
 
@@ -1868,6 +1874,6 @@
        ==================================================================== -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="/web/app.js?v=4.0"></script>
+  <script src="/web/app.js?v=4.1"></script>
 </body>
 </html>
