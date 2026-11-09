@@ -98,6 +98,10 @@ class FeatureExtractor:
         """
         Extracts embeddings for an entire catalog DataFrame.
 
+        Images are processed in true batches (previously the batch_size
+        argument was accepted but every image still went through the model
+        one at a time).
+
         Args:
             metadata_df: DataFrame containing 'file_path' column.
             project_root: Root directory to resolve relative file_paths.
@@ -106,11 +110,27 @@ class FeatureExtractor:
         Returns:
             (embeddings_matrix, valid_metadata_df)
         """
-        embeddings_list: List[np.ndarray] = []
-        valid_indices: List[int] = []
-
         if project_root is None:
             project_root = Path.cwd()
+
+        embeddings_list: List[np.ndarray] = []
+        valid_indices: List[int] = []
+        batch_tensors: List[torch.Tensor] = []
+        batch_indices: List[int] = []
+
+        def _flush() -> None:
+            if not batch_tensors:
+                return
+            stacked = torch.stack(batch_tensors).to(self.device)
+            features = self.model(stacked).cpu().numpy()
+            for emb in features:
+                norm = np.linalg.norm(emb)
+                if norm > 0:
+                    emb = emb / norm
+                embeddings_list.append(emb)
+            valid_indices.extend(batch_indices)
+            batch_tensors.clear()
+            batch_indices.clear()
 
         for idx, row in metadata_df.iterrows():
             rel_path = row["file_path"]
@@ -120,11 +140,17 @@ class FeatureExtractor:
                 continue
 
             try:
-                emb = self.extract_from_image(full_path)
-                embeddings_list.append(emb)
-                valid_indices.append(idx)
-            except Exception as e:
+                pil_img = load_and_validate_image(full_path)
+                if pil_img is None:
+                    continue
+                batch_tensors.append(self.transform(pil_img))
+                batch_indices.append(idx)
+                if len(batch_tensors) >= max(1, batch_size):
+                    _flush()
+            except Exception:
                 continue
+
+        _flush()
 
         if not embeddings_list:
             raise RuntimeError("No valid images could be processed for embeddings.")

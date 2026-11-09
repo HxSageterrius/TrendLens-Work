@@ -16,6 +16,7 @@ Genre switching:
 import io
 import json
 import os
+import threading
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional
@@ -57,10 +58,16 @@ auto_similarity_engine: Optional[SimilarityEngine] = None
 auto_cluster_summary_cache: Optional[List[Dict]] = None
 auto_catalog_df: Optional[pd.DataFrame] = None
 
+# Guard against concurrent first-request loading (FastAPI serves sync
+# endpoints from a threadpool, so the lazy loader can run on many threads).
+_resources_lock = threading.Lock()
+_resources_loaded = False
+
 
 def load_app_resources():
     global extractor, forecaster, similarity_engine, cluster_summary_cache, catalog_df
     global auto_extractor, auto_similarity_engine, auto_cluster_summary_cache, auto_catalog_df
+    global _resources_loaded
 
     # ------------------------------------------------------------------
     # Fashion (primary pipeline)
@@ -175,10 +182,21 @@ def load_app_resources():
         except Exception as e:
             print(f"[API] Warning during automotive similarity engine init: {e}")
 
+    _resources_loaded = True
+
 
 def ensure_resources_loaded():
-    if forecaster is None or catalog_df is None or auto_similarity_engine is None:
+    # Load once per process. Previously this re-invoked the whole loader on
+    # every request whenever the automotive artifacts were absent (their
+    # globals stay None), re-reading every CSV/JSON each time.
+    global _resources_loaded
+    if _resources_loaded:
+        return
+    with _resources_lock:
+        if _resources_loaded:
+            return
         load_app_resources()
+        _resources_loaded = True
 
 
 def _resolve_genre_resources(genre: str):
@@ -206,11 +224,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for local web development
+# Enable CORS for local web development.
+# The dashboard is served from this origin, so it needs no CORS; these
+# entries exist for external dev tooling. Credentials are not used anywhere,
+# and the wildcard-origin + credentials combination is invalid per the CORS
+# spec, so both are avoided here.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -362,6 +389,44 @@ def get_clusters(
     )
 
 
+# Maximum accepted upload size for /api/similarity/match (10 MB).
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+
+
+def _benchmark_run_titles() -> Dict[str, str]:
+    """
+    Builds the two benchmark run titles from the committed cluster artifacts
+    so the advertised item counts and K values always match what is actually
+    on disk (they were previously hardcoded and drifted from the pipelines).
+    """
+    titles = {
+        "fashion-benchmark": "Fashion ResNet-18 Benchmark — DeepFashion2-schema catalog",
+        "automotive-benchmark": "Stanford Cars CVPR Benchmark",
+    }
+
+    fashion_path = PROJECT_ROOT / "data" / "forecasts" / "clusters_summary.json"
+    if fashion_path.is_file():
+        try:
+            with open(fashion_path, "r", encoding="utf-8") as f:
+                clusters = json.load(f)
+            n_items = sum(int(c.get("item_count", len(c.get("items", [])))) for c in clusters)
+            titles["fashion-benchmark"] += f" ({n_items} clustered assets, K={len(clusters)})"
+        except Exception:
+            pass
+
+    auto_path = PROJECT_ROOT / "data" / "automotive" / "forecasts" / "automotive_clusters_summary.json"
+    if auto_path.is_file():
+        try:
+            with open(auto_path, "r", encoding="utf-8") as f:
+                clusters = json.load(f)
+            n_items = sum(int(c.get("item_count", len(c.get("items", [])))) for c in clusters)
+            titles["automotive-benchmark"] += f" ({n_items} Vehicles, K={len(clusters)})"
+        except Exception:
+            pass
+
+    return titles
+
+
 @app.get("/api/runs")
 def get_available_runs():
     """Returns all available ML pipeline & scraped cluster runs."""
@@ -375,14 +440,15 @@ def get_available_runs():
                     "title": f"Run {d.name} (Scraped & YOLO+SAM Segmented)",
                     "type": "scraped_lineage"
                 })
+    titles = _benchmark_run_titles()
     runs.append({
         "run_id": "fashion-benchmark",
-        "title": "Fashion ResNet-18 Benchmark — DeepFashion2-schema catalog (43 clustered assets, K=8)",
+        "title": titles["fashion-benchmark"],
         "type": "benchmark"
     })
     runs.append({
         "run_id": "automotive-benchmark",
-        "title": "Stanford Cars CVPR Benchmark (45 Vehicles, K=3)",
+        "title": titles["automotive-benchmark"],
         "type": "benchmark"
     })
     return runs
@@ -1046,10 +1112,23 @@ async def match_image_similarity(
 
     if file is not None:
         try:
+            # Reject oversized uploads before buffering them into memory.
+            if file.size is not None and file.size > MAX_UPLOAD_BYTES:
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"Image too large ({file.size} bytes). Maximum is {MAX_UPLOAD_BYTES // (1024 * 1024)} MB."
+                )
             contents = await file.read()
+            if len(contents) > MAX_UPLOAD_BYTES:
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"Image too large. Maximum is {MAX_UPLOAD_BYTES // (1024 * 1024)} MB."
+                )
             pil_img = Image.open(io.BytesIO(contents)).convert("RGB")
             filename = file.filename
             matches = active_sim_engine.find_similar_by_image(pil_img, top_k=top_k)
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Invalid image file: {str(e)}")
 

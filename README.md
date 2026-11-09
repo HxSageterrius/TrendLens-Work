@@ -83,7 +83,8 @@ trendlens/
 ├── web/                     # Module 7: Web dashboard (index.html, app.js, style.css, assets/)
 ├── scripts/                 # Dataset builder / download scripts (see Data provenance)
 ├── tests/                   # Automated unit & integration tests per module
-├── health_check.py          # Repository / data diagnostic script
+├── docs/                    # Architecture, data provenance & API reference
+├── health_check.py          # Repository / data diagnostic script (exit code 1 on failure)
 ├── .gitignore               # Ignore rules for large data and generated embeddings
 ├── requirements.txt         # Project dependencies
 └── README.md                # Project documentation
@@ -131,3 +132,13 @@ trendlens/
 ```
 
 Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser to access the live dashboard!
+
+---
+
+## 📚 Further Documentation
+
+| Document | Contents |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | Pipeline diagram, module map, data flow, key design decisions |
+| [`docs/data-provenance.md`](docs/data-provenance.md) | What is real vs simulated, and what the project explicitly does *not* claim |
+| [`docs/api-reference.md`](docs/api-reference.md) | Every endpoint, error semantics, static mounts, scale notes |

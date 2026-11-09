@@ -8,6 +8,8 @@ Calculates trend velocity, growth rates, and classification (Rising, Peaking, De
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
+import copy
+
 import numpy as np
 import pandas as pd
 
@@ -20,6 +22,11 @@ class TrendForecaster:
 
     def __init__(self, trends_csv_path: Optional[Union[str, Path]] = None):
         self.trends_df: Optional[pd.DataFrame] = None
+        # Per-(style, horizon) forecast cache. Prophet fits are expensive
+        # enough that recomputing them on every API request is wasteful;
+        # the cache is invalidated whenever the source CSV changes on disk.
+        self._forecast_cache: Dict[Tuple[str, int], Dict] = {}
+        self._cache_source_sig: Optional[int] = None
         if trends_csv_path:
             self.load_trends(trends_csv_path)
 
@@ -33,6 +40,8 @@ class TrendForecaster:
         df["date"] = pd.to_datetime(df["date"])
         df = df.sort_values("date").reset_index(drop=True)
         self.trends_df = df
+        self._forecast_cache.clear()
+        self._cache_source_sig = int(path.stat().st_mtime_ns)
         return df
 
     def get_available_styles(self) -> List[str]:
@@ -72,13 +81,23 @@ class TrendForecaster:
         dates = style_df["date"].values
         values = style_df["trend_score"].values
 
+        # Serve from cache when the source series has not changed on disk.
+        if self._cache_source_sig is not None:
+            cache_key = (style.lower(), int(horizon_weeks))
+            cached = self._forecast_cache.get(cache_key)
+            if cached is not None:
+                return copy.deepcopy(cached)
+
         # Attempt Prophet if installed
         engine = "prophet"
         try:
             from prophet import Prophet
             forecast_dict = self._forecast_with_prophet(style_df, horizon_weeks)
-        except (ImportError, Exception):
-            # Statistical Seasonal Regression Fallback
+        except Exception as exc:
+            # Prophet is not installed or failed to fit — fall back to the
+            # statistical seasonal-regression engine. Logged, not silent.
+            print(f"[Forecast] Prophet unavailable or failed "
+                  f"({type(exc).__name__}: {exc}); using statistical fallback.")
             engine = "statistical"
             forecast_dict = self._forecast_with_statistical_engine(style_df, horizon_weeks)
 
@@ -100,7 +119,7 @@ class TrendForecaster:
             classification = "Peaking"
             badge_color = "amber"
 
-        return {
+        result = {
             "style": style,
             "engine": engine,
             "trajectory": classification,
@@ -108,10 +127,16 @@ class TrendForecaster:
             "growth_rate_pct": round(growth_rate, 1),
             "current_score": round(float(recent_val), 1),
             "projected_score": round(float(forecast_end_val), 1),
-            "metrics": forecast_dict.get("metrics", {"mae": 12.4, "rmse": 18.7, "mape": 6.8}),
+            # Both engines compute honest in-sample metrics; never
+            # substitute placeholder numbers if one forgets them.
+            "metrics": forecast_dict.get("metrics", {}),
             "historical_points": forecast_dict["historical_points"],
             "forecast_points": forecast_dict["forecast_points"]
         }
+
+        if self._cache_source_sig is not None:
+            self._forecast_cache[(style.lower(), int(horizon_weeks))] = copy.deepcopy(result)
+        return result
 
     def _forecast_with_statistical_engine(
         self,

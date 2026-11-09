@@ -13,6 +13,10 @@ Steps:
 NOTE: Trend forecasting is INTENTIONALLY DISABLED.
   model_year labels encode production year, not sales/popularity.
   The API returns a static placeholder instead of a forecast chart.
+
+The reusable ML steps live in src/pipeline_common.py so this runner and the
+fashion runner share one implementation of embedding extraction, K-Means
++ DBSCAN clustering, and similarity smoke testing.
 """
 
 import json
@@ -26,13 +30,15 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-import numpy as np
-import pandas as pd
-
-from src.embeddings.extractor import FeatureExtractor, save_embeddings
-from src.clustering.cluster_engine import VisualClusterEngine, build_dbscan_summary
-from src.similarity.similarity_engine import SimilarityEngine
+from src.embeddings.extractor import FeatureExtractor
 from src.preprocessing.automotive_adapter import AutomotiveAdapter
+from src.pipeline_common import (
+    cluster_and_save,
+    ensure_output_dirs,
+    extract_and_save_embeddings,
+    require_minimum_items,
+    smoke_test_similarity,
+)
 
 
 def run_automotive_pipeline(project_root: Path) -> dict:
@@ -45,9 +51,7 @@ def run_automotive_pipeline(project_root: Path) -> dict:
     models_dir = project_root / "models"
     forecasts_dir = project_root / "data" / "automotive" / "forecasts"
 
-    embeddings_dir.mkdir(parents=True, exist_ok=True)
-    models_dir.mkdir(parents=True, exist_ok=True)
-    forecasts_dir.mkdir(parents=True, exist_ok=True)
+    ensure_output_dirs(embeddings_dir, models_dir, forecasts_dir)
 
     # 1. Load automotive catalog
     print("\n[Step 1] Loading automotive catalog (AutomotiveAdapter)...")
@@ -58,64 +62,37 @@ def run_automotive_pipeline(project_root: Path) -> dict:
     dist = adapter.get_body_type_distribution(catalog_df)
     print(f"  Body-type distribution: {dist}")
 
-    if len(catalog_df) < 4:
-        raise RuntimeError(
-            f"Only {len(catalog_df)} images found. Need >= 4 for clustering.\n"
-            "Populate data/automotive/smoke_test/images/ with Stanford Cars images."
-        )
+    require_minimum_items(
+        catalog_df,
+        minimum=4,
+        subject="images",
+        extra="\nPopulate data/automotive/smoke_test/images/ with Stanford Cars images.",
+    )
 
     # 2. Extract visual embeddings
     print(f"\n[Step 2] Extracting visual embeddings for {len(catalog_df)} vehicles...")
     extractor = FeatureExtractor(backbone_name="resnet18")
-    embeddings, valid_df = extractor.extract_from_catalog(
-        catalog_df, project_root=project_root
+    embeddings, valid_df, _ = extract_and_save_embeddings(
+        extractor, catalog_df, project_root, embeddings_dir, "automotive"
     )
-    print(f"  Embedding matrix: {embeddings.shape} (L2-normalized ResNet-18)")
 
-    emb_file, meta_file = save_embeddings(
-        embeddings=embeddings,
-        metadata_df=valid_df,
-        output_dir=embeddings_dir,
-        filename_prefix="automotive"
-    )
-    print(f"  Saved embeddings -> {emb_file}")
-
-    # 3. Visual clustering
+    # 3. Visual clustering (K-Means + DBSCAN alongside). K search only
+    #    makes sense with a handful of samples; below 8 the fixed lower
+    #    bound is used.
     n_samples = len(embeddings)
     max_k = min(6, n_samples - 1)
     min_k = min(3, max_k)
-    print(f"\n[Step 3] Running K-Means clustering (k_range={min_k}-{max_k})...")
-    cluster_engine = VisualClusterEngine(n_clusters=min_k)
-    labels, silhouette = cluster_engine.fit_kmeans(
-        embeddings, find_optimal_k=(n_samples >= 8), k_range=(min_k, max_k)
+    cluster_engine, silhouette, dbscan_summary = cluster_and_save(
+        embeddings=embeddings,
+        valid_df=valid_df,
+        models_dir=models_dir,
+        model_filename="automotive_cluster_model.joblib",
+        summary_out_path=forecasts_dir / "automotive_clusters_summary.json",
+        k_range=(min_k, max_k),
+        dbscan_eps=0.2,
+        find_optimal_k=(n_samples >= 8),
+        item_noun="vehicles",
     )
-    print(
-        f"  Optimal K={cluster_engine.n_clusters}, "
-        f"Silhouette={silhouette:.4f}"
-    )
-
-    cluster_summary = cluster_engine.get_cluster_summary(embeddings, valid_df)
-    for c in cluster_summary:
-        body_types = list(c["dominant_styles"].keys())
-        print(
-            f"  * {c['cluster_name']}: {c['item_count']} vehicles | "
-            f"Body types: {body_types}"
-        )
-
-    cluster_engine.save(models_dir / "automotive_cluster_model.joblib")
-
-    with open(forecasts_dir / "automotive_clusters_summary.json", "w", encoding="utf-8") as f:
-        json.dump(cluster_summary, f, indent=2)
-    print(f"  Saved cluster summary -> {forecasts_dir / 'automotive_clusters_summary.json'}")
-
-    # 3b. DBSCAN density / outlier analysis (alongside K-Means)
-    print("\n[Step 3b] Running DBSCAN density analysis...")
-    dbscan_summary = build_dbscan_summary(embeddings, valid_df)
-    with open(forecasts_dir / "automotive_dbscan_summary.json", "w", encoding="utf-8") as f:
-        json.dump(dbscan_summary, f, indent=2)
-    print(f"  DBSCAN: {dbscan_summary['n_clusters']} density cluster(s), "
-          f"{dbscan_summary['n_noise']} outlier vehicle(s) "
-          f"(eps={dbscan_summary['eps']}, min_samples={dbscan_summary['min_samples']})")
 
     # 4. Forecasting placeholder
     print("\n[Step 4] Trend Forecasting: DISABLED (no temporal sales data)")
@@ -137,18 +114,7 @@ def run_automotive_pipeline(project_root: Path) -> dict:
         json.dump(forecasting_status, f, indent=2)
 
     # 5. Validate similarity engine
-    print("\n[Step 5] Validating Similarity Engine...")
-    similarity_engine = SimilarityEngine(
-        embeddings=embeddings,
-        metadata_df=valid_df,
-        feature_extractor=extractor
-    )
-
-    test_item = valid_df.iloc[0]
-    sim_matches = similarity_engine.find_similar_by_item_id(test_item["item_id"], top_k=3)
-    print(f"  Top-3 matches for '{test_item['title']}' ({test_item['item_id']}):")
-    for m in sim_matches:
-        print(f"    -> #{m['rank']} {m['title']} ({m['category']}) - {m['match_percentage']}% match")
+    smoke_test_similarity(embeddings, valid_df, extractor, item_noun="vehicles")
 
     print("\n" + "=" * 60)
     print("[SUCCESS] Automotive POC Pipeline Completed!")

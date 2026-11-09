@@ -6,6 +6,10 @@ Executes the full end-to-end ML pipeline:
 3. Fits visual clusters (K-Means) and computes silhouette evaluation
 4. Generates time-series trend projections (Prophet / Statistical engine)
 5. Validates similarity matching engine
+
+The reusable ML steps live in src/pipeline_common.py so this runner and the
+automotive runner share one implementation of embedding extraction, K-Means
++ DBSCAN clustering, and similarity smoke testing.
 """
 
 import json
@@ -21,13 +25,16 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-import numpy as np
 import pandas as pd
 
-from src.embeddings.extractor import FeatureExtractor, save_embeddings
-from src.clustering.cluster_engine import VisualClusterEngine, build_dbscan_summary
+from src.embeddings.extractor import FeatureExtractor
 from src.forecasting.trend_forecaster import TrendForecaster
-from src.similarity.similarity_engine import SimilarityEngine
+from src.pipeline_common import (
+    cluster_and_save,
+    ensure_output_dirs,
+    extract_and_save_embeddings,
+    smoke_test_similarity,
+)
 
 
 def run_full_pipeline(project_root: Path) -> dict:
@@ -43,9 +50,7 @@ def run_full_pipeline(project_root: Path) -> dict:
     models_dir = project_root / "models"
     forecasts_dir = project_root / "data" / "forecasts"
 
-    embeddings_dir.mkdir(parents=True, exist_ok=True)
-    models_dir.mkdir(parents=True, exist_ok=True)
-    forecasts_dir.mkdir(parents=True, exist_ok=True)
+    ensure_output_dirs(embeddings_dir, models_dir, forecasts_dir)
 
     # 1. Load Catalog Metadata
     print("\n[Step 1] Loading fashion catalog metadata...")
@@ -57,45 +62,24 @@ def run_full_pipeline(project_root: Path) -> dict:
     # 2. Extract Deep Visual Embeddings
     print("\n[Step 2] Extracting visual embeddings (ResNet)...")
     extractor = FeatureExtractor(backbone_name="resnet18")
-    embeddings, valid_df = extractor.extract_from_catalog(catalog_df, project_root=project_root)
-    print(f"Extracted feature matrix shape: {embeddings.shape} (L2-normalized)")
-
-    # Save embeddings
-    emb_file, meta_file = save_embeddings(
-        embeddings=embeddings,
-        metadata_df=valid_df,
-        output_dir=embeddings_dir,
-        filename_prefix="fashion"
+    embeddings, valid_df, _ = extract_and_save_embeddings(
+        extractor, catalog_df, project_root, embeddings_dir, "fashion"
     )
-    print(f"Saved embeddings to: {emb_file}")
 
-    # 3. Visual Clustering
-    print("\n[Step 3] Running Visual Clustering (K-Means)...")
-    cluster_engine = VisualClusterEngine(n_clusters=5)
-    labels, silhouette = cluster_engine.fit_kmeans(embeddings, find_optimal_k=True, k_range=(3, 6))
-    print(f"Optimal clusters: K={cluster_engine.n_clusters}, Silhouette Score: {silhouette:.4f}")
-
-    cluster_summary = cluster_engine.get_cluster_summary(embeddings, valid_df)
-    for c in cluster_summary:
-        print(f"  • {c['cluster_name']}: {c['item_count']} items | Top styles: {list(c['dominant_styles'].keys())}")
-
-    cluster_engine.save(models_dir / "cluster_model.joblib")
-
-    # Save cluster summary JSON for fast API serving
-    with open(forecasts_dir / "clusters_summary.json", "w", encoding="utf-8") as f:
-        json.dump(cluster_summary, f, indent=2)
-
-    # 3b. DBSCAN density / outlier analysis (alongside K-Means)
-    print("\n[Step 3b] Running DBSCAN density analysis...")
-    # Fashion embeddings are sparser than automotive ones (median 5th-NN
-    # cosine distance 0.32 vs 0.14), so eps is calibrated per catalogue:
-    # the shared default (0.2) finds no core points in the fashion space.
-    dbscan_summary = build_dbscan_summary(embeddings, valid_df, eps=0.30)
-    with open(forecasts_dir / "dbscan_summary.json", "w", encoding="utf-8") as f:
-        json.dump(dbscan_summary, f, indent=2)
-    print(f"  DBSCAN: {dbscan_summary['n_clusters']} density cluster(s), "
-          f"{dbscan_summary['n_noise']} outlier item(s) "
-          f"(eps={dbscan_summary['eps']}, min_samples={dbscan_summary['min_samples']})")
+    # 3. Visual Clustering (K-Means with silhouette-selected K, plus a
+    #    DBSCAN density check alongside). Fashion embeddings are sparser
+    #    than automotive ones (median 5th-NN cosine distance 0.32 vs 0.14),
+    #    so eps is calibrated per catalogue: the shared default (0.2) finds
+    #    no core points in the fashion space.
+    cluster_engine, silhouette, dbscan_summary = cluster_and_save(
+        embeddings=embeddings,
+        valid_df=valid_df,
+        models_dir=models_dir,
+        model_filename="cluster_model.joblib",
+        summary_out_path=forecasts_dir / "clusters_summary.json",
+        k_range=(3, 6),
+        dbscan_eps=0.30,
+    )
 
     # 4. Trend Forecasting
     print("\n[Step 4] Running Time-Series Trend Forecaster...")
@@ -110,19 +94,7 @@ def run_full_pipeline(project_root: Path) -> dict:
         json.dump(forecast_results, f, indent=2)
 
     # 5. Validate Similarity Engine
-    print("\n[Step 5] Validating Similarity Matching Engine...")
-    similarity_engine = SimilarityEngine(
-        embeddings=embeddings,
-        metadata_df=valid_df,
-        feature_extractor=extractor
-    )
-
-    test_item_id = valid_df.iloc[0]["item_id"]
-    test_title = valid_df.iloc[0]["title"]
-    sim_matches = similarity_engine.find_similar_by_item_id(test_item_id, top_k=3)
-    print(f"Top 3 visual matches for '{test_title}' ({test_item_id}):")
-    for m in sim_matches:
-        print(f"  -> #{m['rank']} {m['title']} ({m['style']} {m['category']}) - Match: {m['match_percentage']}%")
+    smoke_test_similarity(embeddings, valid_df, extractor)
 
     print("\n" + "=" * 60)
     print("[SUCCESS] Full Pipeline Completed Successfully!")

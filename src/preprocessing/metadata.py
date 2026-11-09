@@ -13,21 +13,24 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Standard DeepFashion2 category definitions (13 primary classes)
+# Standard DeepFashion2 category definitions (13 primary classes).
+# This is the canonical mapping for the project — the label spelling matches
+# the committed catalog CSVs and annotation JSONs. deepfashion2_adapter.py
+# imports it from here; do not redefine divergent copies elsewhere.
 DEEPFASHION2_CATEGORIES: Dict[int, str] = {
-    1: "short_sleeved_shirt",
-    2: "long_sleeved_shirt",
-    3: "short_sleeved_outwear",
-    4: "long_sleeved_outwear",
+    1: "short sleeve top",
+    2: "long sleeve top",
+    3: "short sleeve outwear",
+    4: "long sleeve outwear",
     5: "vest",
     6: "sling",
     7: "shorts",
     8: "trousers",
     9: "skirt",
-    10: "short_sleeved_dress",
-    11: "long_sleeved_dress",
-    12: "vest_dress",
-    13: "sling_dress"
+    10: "short sleeve dress",
+    11: "long sleeve dress",
+    12: "vest dress",
+    13: "sling dress"
 }
 
 

@@ -16,22 +16,10 @@ import numpy as np
 import pandas as pd
 
 
-# 13 Official DeepFashion2 Category Classes
-DEEPFASHION2_CATEGORIES: Dict[int, str] = {
-    1: "short sleeve top",
-    2: "long sleeve top",
-    3: "short sleeve outwear",
-    4: "long sleeve outwear",
-    5: "vest",
-    6: "sling",
-    7: "shorts",
-    8: "trousers",
-    9: "skirt",
-    10: "short sleeve dress",
-    11: "long sleeve dress",
-    12: "vest dress",
-    13: "sling dress"
-}
+# 13 Official DeepFashion2 Category Classes — imported from metadata.py,
+# the single canonical definition (previously a divergent snake_case copy
+# lived there and here; this module's spelling matches the committed data).
+from src.preprocessing.metadata import DEEPFASHION2_CATEGORIES
 
 CATEGORY_TO_ID: Dict[str, int] = {v: k for k, v in DEEPFASHION2_CATEGORIES.items()}
 

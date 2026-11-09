@@ -153,3 +153,7 @@ elif errors:
 else:
     print(f"  No errors. {len(warnings)} WARNING(S):")
     for w in warnings: print(f"    * {w}")
+
+# Exit non-zero when errors were found so CI and shell scripts can detect
+# a failing state (previously the script always exited 0).
+sys.exit(1 if errors else 0)

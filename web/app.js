@@ -38,7 +38,7 @@ let currentSettings = { ...DEFAULT_SETTINGS };
 let currentGenre = "fashion";
 let currentTab = "overview-tab";
 let trendChartInstance = null;
-let dashboardActivityChartInstance = null;
+
 let trendingInsightsChartInstance = null;
 let currentSelectedSampleId = null;
 let currentUploadFile = null;
@@ -109,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial load
   loadAllGenreData();
   loadDashboardTelemetry();
-  loadMegaDrawerData();
 });
 
 function setMobileSidebarOpen(open) {
@@ -211,8 +210,6 @@ function initGlobalSearch() {
     if (e.key === "Escape") {
       searchInput.blur();
       closeItemDetailModal();
-      closeCameraModal();
-      closeMegaDrawer();
     }
   });
 
@@ -457,9 +454,6 @@ async function loadDashboardTelemetry() {
       const fcEl = document.getElementById("fashion-metric-clusters");
       if (fcEl && data.fashion_clusters) fcEl.textContent = `K=${data.fashion_clusters} Aesthetic Groups`;
 
-      if (data.trend_activity) {
-        renderDashboardActivityChart(data.trend_activity);
-      }
     }
   } catch (err) {
     console.warn("Dashboard summary API fetch notice:", err);
@@ -683,6 +677,92 @@ function renderPopularCategories(genre) {
 }
 
 /**
+ * Maps popular-category / trending keys to the cluster each one should open in
+ * the Trend Explorer. Keywords are matched against cluster names, summaries and
+ * the keyword lists returned by /api/runs/{run_id}/clusters; the defaultIndex
+ * values are the fallback cluster positions per run (verified against the
+ * committed clusters_summary.json artifacts).
+ */
+const CATEGORY_CLUSTER_MAPPINGS = {
+  fashion: {
+    tops: {
+      keywords: ["streetwear", "oversized", "hoodies", "top"],
+      catalogSearch: "top",
+      defaultIndex: 0,
+      defaultIndex_fashion_benchmark: 0,
+      defaultIndex_2026_06_23: 0
+    },
+    jackets: {
+      keywords: ["denim", "jackets", "outerwear", "indigo"],
+      catalogSearch: "jacket",
+      defaultIndex: 0,
+      defaultIndex_fashion_benchmark: 0,
+      defaultIndex_2026_06_23: 0
+    },
+    dresses: {
+      keywords: ["cottagecore", "floral", "dress", "y2k"],
+      catalogSearch: "dress",
+      defaultIndex: 4,
+      defaultIndex_fashion_benchmark: 4,
+      defaultIndex_2026_06_23: 0
+    },
+    jeans: {
+      keywords: ["denim", "jeans", "raw wash", "trousers"],
+      catalogSearch: "jeans",
+      defaultIndex: 0,
+      defaultIndex_fashion_benchmark: 0,
+      defaultIndex_2026_06_23: 0
+    },
+    sneakers: {
+      keywords: ["sneakers", "footwear", "chunky soles"],
+      catalogSearch: "sneaker",
+      defaultIndex: 6,
+      defaultIndex_fashion_benchmark: 6,
+      defaultIndex_2026_06_23: 0
+    },
+    bags: {
+      keywords: ["bags", "accessories", "leather", "crossbody"],
+      catalogSearch: "bag",
+      defaultIndex: 7,
+      defaultIndex_fashion_benchmark: 7,
+      defaultIndex_2026_06_23: 0
+    }
+  },
+  automotive: {
+    sedan: {
+      keywords: ["sedan", "aerodynamic", "executive"],
+      catalogSearch: "sedan",
+      defaultIndex: 0
+    },
+    suv: {
+      keywords: ["suv", "rugged", "crossover"],
+      catalogSearch: "suv",
+      defaultIndex: 1
+    },
+    coupe: {
+      keywords: ["coupe", "sport", "two-door"],
+      catalogSearch: "coupe",
+      defaultIndex: 2
+    },
+    convertible: {
+      keywords: ["convertible", "open-top", "roadster"],
+      catalogSearch: "convertible",
+      defaultIndex: 2
+    },
+    truck: {
+      keywords: ["truck", "pickup", "utility"],
+      catalogSearch: "truck",
+      defaultIndex: 1
+    },
+    supercar: {
+      keywords: ["sport", "performance", "sleek"],
+      catalogSearch: "sport",
+      defaultIndex: 2
+    }
+  }
+};
+
+/**
  * Navigates directly from any Category / Trend button to its related Cluster in Trend Explorer.
  */
 async function navigateToCategoryCluster(categoryKey, genre = currentGenre) {
@@ -894,72 +974,6 @@ function renderRecentScansList() {
   `).join("");
 }
 
-function renderDashboardActivityChart(activityData) {
-  const canvas = document.getElementById("dashboardActivityChart");
-  if (!canvas) return;
-
-  if (dashboardActivityChartInstance) {
-    dashboardActivityChartInstance.destroy();
-  }
-
-  const ctx = canvas.getContext("2d");
-  dashboardActivityChartInstance = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: activityData.months || [],
-      datasets: [
-        {
-          label: "Fashion Trend Momentum",
-          data: activityData.fashion || [],
-          borderColor: "#7040D8",
-          backgroundColor: "rgba(112, 64, 216, 0.08)",
-          borderWidth: 2.5,
-          tension: 0.35,
-          fill: true,
-          pointRadius: 3,
-          pointHoverRadius: 6
-        },
-        {
-          label: "Automotive Engagement Index (no temporal data available)",
-          data: activityData.automotive || [],
-          borderColor: "#2563EB",
-          backgroundColor: "transparent",
-          borderWidth: 2,
-          tension: 0.35,
-          borderDash: [4, 4],
-          pointRadius: 3,
-          pointHoverRadius: 6
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: "#FFFFFF",
-          titleColor: "#24232B",
-          bodyColor: "#777580",
-          borderColor: "#DAD6DF",
-          borderWidth: 1,
-          padding: 8
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: "#E6E3E9" },
-          ticks: { color: "#777580", font: { size: 10 } }
-        },
-        y: {
-          grid: { color: "#E6E3E9" },
-          ticks: { color: "#777580", font: { size: 10 } }
-        }
-      }
-    }
-  });
-}
-
 // ==========================================================================
 // Google Lens-Style Visual Scanner & Camera Capture
 // ==========================================================================
@@ -1126,57 +1140,6 @@ function renderLensFocalPins(attributes) {
 function clearLensFocalPins() {
   const pinsLayer = document.getElementById("lens-focal-pins-layer");
   if (pinsLayer) pinsLayer.innerHTML = "";
-}
-
-async function openCameraModal() {
-  const modal = document.getElementById("camera-modal");
-  const video = document.getElementById("camera-stream-video");
-  if (!modal || !video) return;
-
-  modal.classList.remove("hidden");
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
-    });
-    cameraMediaStream = stream;
-    video.srcObject = stream;
-  } catch (err) {
-    alert("Camera Access Notice: Camera permission was denied or device has no camera. Please upload an image instead.");
-    closeCameraModal();
-  }
-}
-
-function closeCameraModal() {
-  const modal = document.getElementById("camera-modal");
-  const video = document.getElementById("camera-stream-video");
-  if (modal) modal.classList.add("hidden");
-
-  if (cameraMediaStream) {
-    cameraMediaStream.getTracks().forEach(t => t.stop());
-    cameraMediaStream = null;
-  }
-  if (video) video.srcObject = null;
-}
-
-function captureCameraPhoto() {
-  const video = document.getElementById("camera-stream-video");
-  const canvas = document.getElementById("camera-capture-canvas");
-  if (!video || !canvas) return;
-
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  canvas.toBlob((blob) => {
-    if (blob) {
-      const file = new File([blob], "camera_capture.jpg", { type: "image/jpeg" });
-      handleScannerImageUpload(file);
-      closeCameraModal();
-      executeScannerSearch();
-    }
-  }, "image/jpeg", 0.9);
 }
 
 function handleScannerImageUpload(file) {
@@ -2113,7 +2076,7 @@ function updateTopKSetting(val) {
   currentSettings.similarityTopK = parseInt(val, 10);
   const settingSelect = document.getElementById("setting-similarity-topk");
   if (settingSelect) settingSelect.value = val;
-  saveSettings();
+  saveSettingsSilently();
   if (currentUploadFile || currentSelectedSampleId) {
     executeScannerSearch();
   }
@@ -2816,11 +2779,6 @@ function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed.researcherName === "FYP Evaluator / Committee" || !parsed.researcherName) {
-        parsed.researcherName = "Hamza Khalid";
-        parsed.researcherRole = "BSCS Final Year Project Researcher";
-        parsed.researcherEmail = "hamza.khalid@trendlens.ai";
-      }
       currentSettings = { ...DEFAULT_SETTINGS, ...parsed };
     }
   } catch (e) {
@@ -2833,13 +2791,13 @@ function loadSettings() {
   // Apply cluster settings
   if (currentSettings.defaultColumns) {
     clusterGridColumns = parseInt(currentSettings.defaultColumns) || 4;
-    const colSlider = document.getElementById("explorer-cols-slider");
-    const colLabel = document.getElementById("explorer-cols-label");
+    const colSlider = document.getElementById("cols-slider");
+    const colLabel = document.getElementById("cols-val");
     if (colSlider) colSlider.value = clusterGridColumns;
-    if (colLabel) colLabel.textContent = `${clusterGridColumns} Columns`;
+    if (colLabel) colLabel.textContent = `${clusterGridColumns}`;
   }
   showSegmentedImages = currentSettings.showSegmentedDefault !== false;
-  const segCheckbox = document.getElementById("explorer-show-segmented");
+  const segCheckbox = document.getElementById("show-segmented-toggle");
   if (segCheckbox) segCheckbox.checked = showSegmentedImages;
 
   // Sync form inputs
@@ -2981,9 +2939,9 @@ function saveSettingsFromForm() {
   clusterGridColumns = currentSettings.defaultColumns;
   showSegmentedImages = currentSettings.showSegmentedDefault;
 
-  const colSlider = document.getElementById("explorer-cols-slider");
-  const colLabel = document.getElementById("explorer-cols-label");
-  const segCheckbox = document.getElementById("explorer-show-segmented");
+  const colSlider = document.getElementById("cols-slider");
+  const colLabel = document.getElementById("cols-val");
+  const segCheckbox = document.getElementById("show-segmented-toggle");
   if (colSlider) colSlider.value = clusterGridColumns;
   if (colLabel) colLabel.textContent = `${clusterGridColumns} Columns`;
   if (segCheckbox) segCheckbox.checked = showSegmentedImages;
@@ -3015,9 +2973,9 @@ function resetSettingsToDefault() {
   clusterGridColumns = currentSettings.defaultColumns;
   showSegmentedImages = currentSettings.showSegmentedDefault;
 
-  const colSlider = document.getElementById("explorer-cols-slider");
-  const colLabel = document.getElementById("explorer-cols-label");
-  const segCheckbox = document.getElementById("explorer-show-segmented");
+  const colSlider = document.getElementById("cols-slider");
+  const colLabel = document.getElementById("cols-val");
+  const segCheckbox = document.getElementById("show-segmented-toggle");
   if (colSlider) colSlider.value = clusterGridColumns;
   if (colLabel) colLabel.textContent = `${clusterGridColumns} Columns`;
   if (segCheckbox) segCheckbox.checked = showSegmentedImages;
@@ -3296,198 +3254,6 @@ function exportReportDataAsCSV() {
 // ==========================================================================
 // Slide-Down Top Drawer (Dedicated Fashion & Automotive Visual Collections)
 // ==========================================================================
-
-let cachedMegaDrawerData = { fashion: [], automotive: [] };
-let activeDrawerFashionStyle = "all";
-let activeDrawerAutoCategory = "all";
-let drawerSearchFilterQuery = "";
-
-function toggleMegaDrawer() {
-  const drawer = document.getElementById("mega-top-drawer");
-  if (!drawer) return;
-  if (drawer.classList.contains("open")) {
-    closeMegaDrawer();
-  } else {
-    openMegaDrawer();
-  }
-}
-
-function openMegaDrawer() {
-  const drawer = document.getElementById("mega-top-drawer");
-  const backdrop = document.getElementById("mega-drawer-backdrop");
-  const triggerBtn = document.getElementById("mega-drawer-trigger-btn");
-  if (!drawer) return;
-
-  drawer.classList.add("open");
-  drawer.setAttribute("aria-hidden", "false");
-  if (backdrop) backdrop.classList.add("open");
-  if (triggerBtn) {
-    triggerBtn.classList.add("active");
-    triggerBtn.setAttribute("aria-expanded", "true");
-  }
-
-  // Populate items if empty
-  if (!cachedMegaDrawerData.fashion.length || !cachedMegaDrawerData.automotive.length) {
-    loadMegaDrawerData();
-  }
-}
-
-function closeMegaDrawer() {
-  const drawer = document.getElementById("mega-top-drawer");
-  const backdrop = document.getElementById("mega-drawer-backdrop");
-  const triggerBtn = document.getElementById("mega-drawer-trigger-btn");
-  if (!drawer) return;
-
-  drawer.classList.remove("open");
-  drawer.setAttribute("aria-hidden", "true");
-  if (backdrop) backdrop.classList.remove("open");
-  if (triggerBtn) {
-    triggerBtn.classList.remove("active");
-    triggerBtn.setAttribute("aria-expanded", "false");
-  }
-}
-
-async function loadMegaDrawerData() {
-  try {
-    const [fashionRes, autoRes] = await Promise.all([
-      fetch("/api/items?genre=fashion").then(r => r.json()).catch(() => []),
-      fetch("/api/items?genre=automotive").then(r => r.json()).catch(() => [])
-    ]);
-
-    cachedMegaDrawerData.fashion = (Array.isArray(fashionRes) ? fashionRes : []).map(item => ({ ...item, genre: "fashion" }));
-    cachedMegaDrawerData.automotive = (Array.isArray(autoRes) ? autoRes : []).map(item => ({ ...item, genre: "automotive" }));
-
-    // Update count meta
-    const fCountEl = document.getElementById("drawer-fashion-count-meta");
-    if (fCountEl && cachedMegaDrawerData.fashion.length > 0) {
-      fCountEl.textContent = `${cachedMegaDrawerData.fashion.length} Ingested Garments • 6 Macro Aesthetics • K=8 Silhouette Clusters`;
-    }
-    const aCountEl = document.getElementById("drawer-auto-count-meta");
-    if (aCountEl && cachedMegaDrawerData.automotive.length > 0) {
-      aCountEl.textContent = `${cachedMegaDrawerData.automotive.length} Verified Models • 11 Makes • K=3 Structural Clusters`;
-    }
-
-    renderDrawerFashionItems();
-    renderDrawerAutoItems();
-  } catch (err) {
-    console.warn("Failed to load mega drawer data:", err);
-  }
-}
-
-function renderDrawerFashionItems() {
-  const container = document.getElementById("drawer-fashion-items-track");
-  if (!container) return;
-
-  let items = cachedMegaDrawerData.fashion;
-
-  // Filter by style
-  if (activeDrawerFashionStyle !== "all") {
-    items = items.filter(it => (it.style || "").toLowerCase() === activeDrawerFashionStyle.toLowerCase());
-  }
-
-  // Filter by search query
-  if (drawerSearchFilterQuery) {
-    const q = drawerSearchFilterQuery.toLowerCase();
-    items = items.filter(it => 
-      (it.title || "").toLowerCase().includes(q) ||
-      (it.style || "").toLowerCase().includes(q) ||
-      (it.category || "").toLowerCase().includes(q)
-    );
-  }
-
-  if (items.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.8rem;">No fashion items match the filter.</div>`;
-    return;
-  }
-
-  container.innerHTML = items.map(item => {
-    const itemId = item.item_id || item.id;
-    return `
-      <div class="mega-item-card" onclick="openItemDetailModal('${escapeHtml(itemId)}', 'fashion'); closeMegaDrawer();" title="${escapeHtml(item.title)}">
-        <div class="mega-item-thumb-wrapper">
-          <img class="mega-item-thumb" src="${resolveImagePath(item.file_path || item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
-          <span class="mega-item-pill">${escapeHtml(item.style || item.category || 'Fashion')}</span>
-        </div>
-        <div class="mega-item-info">
-          <div class="mega-item-name">${escapeHtml(item.title || itemId)}</div>
-          <div class="mega-item-sub">
-            <span>${escapeHtml(item.category || '')}</span>
-            <span style="font-weight: 600; color: var(--accent-violet);">DF2</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function renderDrawerAutoItems() {
-  const container = document.getElementById("drawer-auto-items-track");
-  if (!container) return;
-
-  let items = cachedMegaDrawerData.automotive;
-
-  // Filter by category
-  if (activeDrawerAutoCategory !== "all") {
-    items = items.filter(it => (it.category || it.style || "").toLowerCase().includes(activeDrawerAutoCategory.toLowerCase()));
-  }
-
-  // Filter by search query
-  if (drawerSearchFilterQuery) {
-    const q = drawerSearchFilterQuery.toLowerCase();
-    items = items.filter(it => 
-      (it.title || "").toLowerCase().includes(q) ||
-      (it.make || "").toLowerCase().includes(q) ||
-      (it.model || "").toLowerCase().includes(q) ||
-      (it.category || "").toLowerCase().includes(q)
-    );
-  }
-
-  if (items.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.8rem;">No vehicle models match the filter.</div>`;
-    return;
-  }
-
-  container.innerHTML = items.map(item => {
-    const itemId = item.item_id || item.id;
-    return `
-      <div class="mega-item-card" onclick="openItemDetailModal('${escapeHtml(itemId)}', 'automotive'); closeMegaDrawer();" title="${escapeHtml(item.title)}">
-        <div class="mega-item-thumb-wrapper">
-          <img class="mega-item-thumb" src="${resolveImagePath(item.file_path || item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/web/placeholder.png';">
-          <span class="mega-item-pill">${escapeHtml(String(item.model_year || item.category || 'Auto'))}</span>
-        </div>
-        <div class="mega-item-info">
-          <div class="mega-item-name">${escapeHtml(item.title || itemId)}</div>
-          <div class="mega-item-sub">
-            <span>${escapeHtml(item.make || item.category || '')}</span>
-            <span style="font-weight: 600; color: var(--status-sky);">CVPR</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function filterDrawerFashionStyle(style, btn) {
-  activeDrawerFashionStyle = style;
-  const chips = document.querySelectorAll("#drawer-fashion-chips .mega-chip");
-  chips.forEach(c => c.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-  renderDrawerFashionItems();
-}
-
-function filterDrawerAutoCategory(cat, btn) {
-  activeDrawerAutoCategory = cat;
-  const chips = document.querySelectorAll("#drawer-auto-chips .mega-chip");
-  chips.forEach(c => c.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-  renderDrawerAutoItems();
-}
-
-function filterMegaDrawerItems(query) {
-  drawerSearchFilterQuery = (query || "").trim();
-  renderDrawerFashionItems();
-  renderDrawerAutoItems();
-}
 
 // ==========================================================================
 // Account Menu, Dynamic Profile Avatar & Modals Controller
