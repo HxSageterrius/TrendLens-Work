@@ -64,7 +64,7 @@ const TAB_HASH_MAP = {
   "home": "overview-tab",
   "explorer": "explorer-tab",
   "lens-scan": "scanner-tab",
-  "similar": "similarity-tab",
+  "similar": "scanner-tab",
   "trends": "trends-tab",
   "fashion": "fashion-tab",
   "automotive": "automotive-tab",
@@ -77,7 +77,7 @@ const TAB_ID_TO_HASH = {
   "overview-tab": "home",
   "explorer-tab": "explorer",
   "scanner-tab": "lens-scan",
-  "similarity-tab": "similar",
+  "similarity-tab": "lens-scan",
   "fashion-tab": "trends",
   "automotive-tab": "trends",
   "forecast-tab": "forecasting",
@@ -396,6 +396,10 @@ function switchTab(tabId, updateHash = true) {
   // If generic trends-tab is requested, route dynamically based on active domain
   if (tabId === "trends-tab") {
     tabId = currentGenre === "automotive" ? "automotive-tab" : "fashion-tab";
+  }
+  // Route similarity-tab to unified Visual Lens & Similarity tab
+  if (tabId === "similarity-tab") {
+    tabId = "scanner-tab";
   }
 
   currentTab = tabId;
@@ -961,61 +965,57 @@ function renderDashboardActivityChart(activityData) {
 // ==========================================================================
 
 function initScannerControls() {
-  const uploadZone = document.getElementById("upload-zone");
   const fileInput = document.getElementById("image-file-input");
-  const clearBtn = document.getElementById("btn-clear-upload");
+  const uploadPrompt = document.getElementById("upload-prompt");
+  const uploadViewport = document.getElementById("lens-upload-viewport");
+  const viewfinderWidget = document.getElementById("lens-viewfinder-widget");
   const runBtn = document.getElementById("btn-run-match");
-  const openCameraBtn = document.getElementById("btn-open-camera");
-  const closeCameraBtn = document.getElementById("btn-close-camera");
-  const cancelCameraBtn = document.getElementById("btn-cancel-camera");
-  const snapPhotoBtn = document.getElementById("btn-snap-photo");
 
-  if (uploadZone && fileInput) {
-    uploadZone.addEventListener("click", (e) => {
-      if (e.target.id === "btn-clear-upload") return;
-      fileInput.click();
-    });
-
-    uploadZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      uploadZone.classList.add("dragover");
-    });
-
-    uploadZone.addEventListener("dragleave", () => {
-      uploadZone.classList.remove("dragover");
-    });
-
-    uploadZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      uploadZone.classList.remove("dragover");
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        handleScannerImageUpload(e.dataTransfer.files[0]);
-      }
-    });
-
+  // 1. File Input Change Listener (Triggers when user selects a photo)
+  if (fileInput) {
     fileInput.addEventListener("change", () => {
       if (fileInput.files && fileInput.files[0]) {
-        handleScannerImageUpload(fileInput.files[0]);
+        handleScannerImageUpload(fileInput.files[0], true);
       }
     });
   }
 
-  if (clearBtn) {
-    clearBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      clearSimilaritySelection();
+  // 2. Click & Keyboard activation on drop prompt
+  if (uploadPrompt && fileInput) {
+    uploadPrompt.addEventListener("click", () => {
+      fileInput.click();
+    });
+    uploadPrompt.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fileInput.click();
+      }
     });
   }
 
+  // 3. Drag and drop onto viewfinder & dropzone
+  const dropTargets = [uploadPrompt, uploadViewport, viewfinderWidget].filter(Boolean);
+  dropTargets.forEach(el => {
+    el.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      el.classList.add("dragover");
+    });
+    el.addEventListener("dragleave", () => {
+      el.classList.remove("dragover");
+    });
+    el.addEventListener("drop", (e) => {
+      e.preventDefault();
+      el.classList.remove("dragover");
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleScannerImageUpload(e.dataTransfer.files[0], true);
+      }
+    });
+  });
+
+  // 4. Scan trigger button
   if (runBtn) {
     runBtn.addEventListener("click", executeScannerSearch);
   }
-
-  // Camera integration
-  if (openCameraBtn) openCameraBtn.addEventListener("click", openCameraModal);
-  if (closeCameraBtn) closeCameraBtn.addEventListener("click", closeCameraModal);
-  if (cancelCameraBtn) cancelCameraBtn.addEventListener("click", closeCameraModal);
-  if (snapPhotoBtn) snapPhotoBtn.addEventListener("click", captureCameraPhoto);
 }
 
 // ==========================================================================
@@ -1246,6 +1246,13 @@ async function executeScannerSearch() {
 
     const data = await res.json();
     const matches = data.matches || [];
+    currentSimilarityMatches = matches;
+    currentSimilarityQuery = currentUploadFile ? currentUploadFile.name : (currentSelectedSampleId || "Interactive Scan");
+
+    const exportBtn = document.getElementById("btn-export-sim-report");
+    const printBtn = document.getElementById("btn-print-sim-report");
+    if (exportBtn) exportBtn.style.display = matches.length > 0 ? "inline-flex" : "none";
+    if (printBtn) printBtn.style.display = matches.length > 0 ? "inline-flex" : "none";
 
     // Render interactive focal pins on target
     if (data.predicted_attributes) {
@@ -2084,59 +2091,68 @@ async function renderFashionTrendsPage() {
 }
 
 // ==========================================================================
-// Similar Products Page (Independent Similarity Matcher)
+// Visual Lens & Similarity Matcher Controls & Reporting
 // ==========================================================================
 
+let currentSimilarityMatches = [];
+let currentSimilarityQuery = null;
+
 function initSimilarityUploader() {
-  const uploadZone = document.getElementById("sim-upload-zone");
-  const fileInput = document.getElementById("sim-image-file-input");
-  const clearBtn = document.getElementById("btn-sim-clear-upload");
-  const runBtn = document.getElementById("btn-sim-run-match");
   const topkSlider = document.getElementById("similarity-topk");
   const topkVal = document.getElementById("topk-val");
 
-  if (topkSlider && topkVal) {
-    topkSlider.addEventListener("input", () => {
-      topkVal.textContent = topkSlider.value;
-    });
+  if (topkSlider) {
+    topkSlider.value = currentSettings.similarityTopK || 6;
+    if (topkVal) topkVal.textContent = topkSlider.value;
   }
+}
 
-  if (uploadZone && fileInput) {
-    uploadZone.addEventListener("click", (e) => {
-      if (e.target.id === "btn-sim-clear-upload") return;
-      fileInput.click();
-    });
-
-    fileInput.addEventListener("change", () => {
-      if (fileInput.files && fileInput.files[0]) {
-        currentUploadFile = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.getElementById("sim-preview-img");
-          const cont = document.getElementById("sim-preview-container");
-          const promptEl = document.getElementById("sim-upload-prompt");
-          if (img) img.src = e.target.result;
-          if (cont) cont.classList.remove("hidden");
-          if (promptEl) promptEl.classList.add("hidden");
-          if (runBtn) runBtn.disabled = false;
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-      }
-    });
+function updateTopKSetting(val) {
+  const topkVal = document.getElementById("topk-val");
+  if (topkVal) topkVal.textContent = val;
+  currentSettings.similarityTopK = parseInt(val, 10);
+  const settingSelect = document.getElementById("setting-similarity-topk");
+  if (settingSelect) settingSelect.value = val;
+  saveSettings();
+  if (currentUploadFile || currentSelectedSampleId) {
+    executeScannerSearch();
   }
+}
 
-  if (clearBtn) {
-    clearBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      clearSimilaritySelection();
-    });
+function exportSimilarityReportCSV() {
+  if (!currentSimilarityMatches || currentSimilarityMatches.length === 0) {
+    showToast("No active similarity matches to export.", "warning");
+    return;
   }
+  const headers = ["Rank", "Item_ID", "Title", "Category", "Style_or_Model", "Similarity_Score", "Confidence_Percentage"];
+  const rows = currentSimilarityMatches.map((m, idx) => {
+    const score = Number(m.similarity_score || 0).toFixed(4);
+    const scorePct = (Number(m.similarity_score || 0) * 100).toFixed(1) + "%";
+    const subLabel = currentGenre === "automotive" ? `${m.make || ''} ${m.model || ''} (${m.model_year || ''})`.trim() : (m.style || '');
+    return [
+      idx + 1,
+      `"${(m.item_id || '').replace(/"/g, '""')}"`,
+      `"${(m.title || '').replace(/"/g, '""')}"`,
+      `"${(m.category || '').replace(/"/g, '""')}"`,
+      `"${subLabel.replace(/"/g, '""')}"`,
+      score,
+      scorePct
+    ].join(",");
+  });
 
-  if (runBtn) {
-    runBtn.addEventListener("click", () => {
-      executeScannerSearch();
-    });
-  }
+  const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `similarity_report_${currentGenre}_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast("Similarity Report CSV downloaded successfully.", "success");
+}
+
+function printSimilarityReport() {
+  window.print();
 }
 
 // ==========================================================================
@@ -2221,6 +2237,13 @@ function selectSampleQuery(itemId, autoScan = false) {
 function clearSimilaritySelection() {
   currentUploadFile = null;
   currentSelectedSampleId = null;
+  currentSimilarityMatches = [];
+  currentSimilarityQuery = null;
+
+  const exportBtn = document.getElementById("btn-export-sim-report");
+  const printBtn = document.getElementById("btn-print-sim-report");
+  if (exportBtn) exportBtn.style.display = "none";
+  if (printBtn) printBtn.style.display = "none";
 
   const fileInput = document.getElementById("image-file-input");
   if (fileInput) fileInput.value = "";

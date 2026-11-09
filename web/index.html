@@ -52,7 +52,7 @@
 
         <button class="nav-btn" data-tab="scanner-tab" data-hash="lens-scan" id="nav-scanner" aria-selected="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
-          <span>Lens Scan</span>
+          <span>Lens &amp; Similarity</span>
         </button>
 
         <div class="nav-section-title">TREND INTELLIGENCE</div>
@@ -72,11 +72,6 @@
         </button>
 
         <div class="nav-section-title">ANALYSIS &amp; CONFIG</div>
-        <button class="nav-btn" data-tab="similarity-tab" data-hash="similar" id="nav-similarity" aria-selected="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
-          <span>Similar Products</span>
-        </button>
-
         <button class="nav-btn" data-tab="reports-tab" data-hash="reports" id="nav-reports" aria-selected="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <span>Reports</span>
@@ -378,17 +373,17 @@
 
               <!-- 2. QUICK ACCESS FEATURES (5 COMPACT CARDS) -->
               <div class="quick-access-grid">
-                <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('scanner-tab')" title="Google Lens-Style Scanner">
+                <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('scanner-tab')" title="Visual Lens &amp; Similarity Matcher">
                   <div class="quick-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
                   </div>
                   <div class="quick-card-text">
-                    <h4>Lens Scan</h4>
-                    <p>Upload or capture an image</p>
+                    <h4>Lens &amp; Similarity</h4>
+                    <p>Scan, match &amp; find similar</p>
                   </div>
                 </div>
 
-                <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('explorer-tab')" title="Cluster & Style Explorer">
+                <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('explorer-tab')" title="Cluster &amp; Style Explorer">
                   <div class="quick-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                   </div>
@@ -408,16 +403,6 @@
                   </div>
                 </div>
 
-                <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('similarity-tab')" title="Visual Similarity Matching">
-                  <div class="quick-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
-                  </div>
-                  <div class="quick-card-text">
-                    <h4>Similar Products</h4>
-                    <p>Find visually similar items</p>
-                  </div>
-                </div>
-
                 <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('reports-tab')" title="Executive Trend Intelligence Briefings">
                   <div class="quick-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -425,6 +410,16 @@
                   <div class="quick-card-text">
                     <h4>Reports</h4>
                     <p>View &amp; export reports</p>
+                  </div>
+                </div>
+
+                <div class="quick-access-card" role="button" tabindex="0" onclick="switchTab('settings-tab')" title="Platform Configuration &amp; Settings">
+                  <div class="quick-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  </div>
+                  <div class="quick-card-text">
+                    <h4>Settings</h4>
+                    <p>Platform &amp; ML controls</p>
                   </div>
                 </div>
               </div>
@@ -550,22 +545,29 @@
               <div>
                 <div class="lens-header-badge">
                   <span class="lens-sparkle-icon">✨</span>
-                  <span>AI Visual Intelligence</span>
+                  <span>AI Visual Intelligence &amp; Similarity Report</span>
                 </div>
-                <h2>Google Lens Interactive Scanner</h2>
-                <p>Scan real-world apparel or automobiles to extract 512D deep feature vectors and retrieve closest aesthetic catalog matches.</p>
+                <h2>Visual Lens &amp; Similarity Matcher</h2>
+                <p>Scan real-world apparel or automobiles, upload imagery, or select catalog samples to extract 512D deep feature vectors and generate instant similarity reports with closest aesthetic matches.</p>
               </div>
 
-              <!-- Top Controls: Mode Switcher -->
-              <div class="lens-mode-pills" role="tablist" aria-label="Lens Input Mode">
-                <button type="button" class="lens-mode-btn active" id="lens-mode-upload" onclick="switchLensMode('upload')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  <span>Upload Image</span>
-                </button>
-                <button type="button" class="lens-mode-btn" id="lens-mode-camera" onclick="switchLensMode('camera')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  <span>Live Camera</span>
-                </button>
+              <!-- Top Controls: Mode Switcher & Top-K Depth Slider -->
+              <div class="scanner-header-controls">
+                <div class="scanner-topk-control">
+                  <label for="similarity-topk" class="control-label">Top-K Depth: <strong id="topk-val">6</strong></label>
+                  <input type="range" id="similarity-topk" min="3" max="12" step="1" value="6" class="styled-slider" oninput="updateTopKSetting(this.value)">
+                </div>
+
+                <div class="lens-mode-pills" role="tablist" aria-label="Lens Input Mode">
+                  <button type="button" class="lens-mode-btn active" id="lens-mode-upload" onclick="switchLensMode('upload')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Upload Image</span>
+                  </button>
+                  <button type="button" class="lens-mode-btn" id="lens-mode-camera" onclick="switchLensMode('camera')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    <span>Live Camera</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -641,7 +643,7 @@
                 <!-- Primary Scan Trigger Button -->
                 <button class="btn-primary w-full mt-3 lens-scan-action-btn" id="btn-run-match" disabled onclick="executeScannerSearch()">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-                  <span id="btn-run-match-label">Scan Target &amp; Match Similar</span>
+                  <span id="btn-run-match-label">Scan &amp; Generate Similarity Report</span>
                 </button>
 
                 <!-- Quick Visual Sample Reel (Horizontal Interactive Cards!) -->
@@ -658,12 +660,22 @@
 
               <!-- Right: Results & Extraction Panel -->
               <div class="results-panel">
-                <div class="card-header mb-2">
+                <div class="card-header mb-2 scanner-results-header">
                   <div>
-                    <h3 id="similarity-results-heading">Visual Analysis &amp; Catalog Matches</h3>
+                    <h3 id="similarity-results-heading">Visual Analysis &amp; Similarity Report</h3>
                     <p class="section-subtext" id="similarity-results-subheading">Aesthetic similarity retrieval via 512D deep embedding dot-product.</p>
                   </div>
-                  <span class="badge badge-muted" id="match-status-label">Awaiting search query...</span>
+                  <div class="scanner-results-actions">
+                    <span class="badge badge-muted" id="match-status-label">Awaiting search query...</span>
+                    <button type="button" class="btn-secondary btn-sm" id="btn-export-sim-report" onclick="exportSimilarityReportCSV()" title="Export similarity report as CSV" style="display: none;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      <span>Export Report</span>
+                    </button>
+                    <button type="button" class="btn-secondary btn-sm" id="btn-print-sim-report" onclick="printSimilarityReport()" title="Print similarity report" style="display: none;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      <span>Print</span>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Visual Attributes Extraction Box (Shown after scan) -->
@@ -1042,73 +1054,7 @@
         </section>
 
         <!-- ==================================================================
-             PAGE 7: SIMILAR PRODUCTS (AI VISUAL SIMILARITY)
-             ================================================================== -->
-        <section id="similarity-tab" class="tab-pane" role="tabpanel">
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <h2>AI Visual Similarity & Cosine Matcher</h2>
-                <p id="similarity-subtitle">Upload an item image or select a sample query to calculate deep cosine similarity rankings</p>
-              </div>
-              <div class="control-group" style="min-width: 130px;">
-                <label for="similarity-topk" class="control-label">Top-K Matches: <span id="topk-val">6</span></label>
-                <input type="range" id="similarity-topk" min="3" max="12" step="1" value="6" class="styled-slider">
-              </div>
-            </div>
-
-            <div class="similarity-layout">
-              <!-- Left: Query Panel -->
-              <div class="query-panel">
-                <div class="upload-zone" id="sim-upload-zone">
-                  <input type="file" id="sim-image-file-input" accept="image/*" hidden>
-                  <div class="upload-content" id="sim-upload-prompt">
-                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    <p><strong>Click to upload</strong> or drag & drop</p>
-                    <span>PNG, JPG, WEBP (Deep Vision ResNet-18)</span>
-                  </div>
-                  <div class="preview-container hidden" id="sim-preview-container">
-                    <img id="sim-preview-img" src="" alt="Query Preview">
-                    <button type="button" class="btn-secondary btn-sm" id="btn-sim-clear-upload">Remove Image</button>
-                  </div>
-                </div>
-
-                <div class="quick-samples">
-                  <label class="control-label mb-2" style="display:block;">Or select sample from catalog:</label>
-                  <div class="sample-pills" id="sim-sample-pills">
-                    <!-- Populated dynamically -->
-                  </div>
-                </div>
-
-                <button class="btn-primary w-full mt-2" id="btn-sim-run-match" disabled>
-                  <span id="btn-sim-run-match-label">Find Similar Garments</span>
-                </button>
-              </div>
-
-              <!-- Right: Results Panel -->
-              <div class="results-panel">
-                <div class="card-header mb-3">
-                  <h3 id="sim-similarity-results-heading">Top Visual Matches</h3>
-                  <span class="badge badge-muted" id="sim-match-status-label">Awaiting search query...</span>
-                </div>
-
-                <div class="matches-grid" id="sim-matches-grid">
-                  <div class="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
-                    <p>Upload an image or pick a test sample above to calculate 512-dimensional cosine similarity matches.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ==================================================================
-             PAGE 8: TREND REPORTS (Matching Mockup Image 1 Screen 6)
+             PAGE 7: TREND REPORTS (Matching Mockup Image 1 Screen 6)
              ================================================================== -->
         <section id="reports-tab" class="tab-pane" role="tabpanel">
           <div class="reports-container">

@@ -5717,6 +5717,53 @@ body.density-compact .dashboard-hero-card {
   border-color: rgba(139, 92, 246, 0.3);
 }
 
+.scanner-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.scanner-topk-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.scanner-topk-control input[type="range"] {
+  width: 90px;
+  cursor: pointer;
+  accent-color: var(--accent-violet);
+}
+
+.scanner-topk-control strong {
+  color: var(--text-primary);
+  min-width: 16px;
+  display: inline-block;
+  text-align: center;
+}
+
+.scanner-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.scanner-results-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .lens-mode-pills {
   display: inline-flex;
   align-items: center;
